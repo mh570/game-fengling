@@ -1,0 +1,20 @@
+{
+    "name": "Fengling.Editor",
+    "rootNamespace": "Fengling.EditorTools",
+    "references": [
+        "Fengling.Water",
+        "Fengling.Water.Abstractions",
+        "Fengling.Player"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
