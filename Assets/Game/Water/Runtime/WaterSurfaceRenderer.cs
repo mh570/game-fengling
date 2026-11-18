@@ -46,6 +46,12 @@ namespace Fengling.Water
         [Range(0f, 1f)] public float waveIrregularity = 0.35f;
         [Range(0f, 3f)] public float sunIntensity = 2f;
 
+        [Header("风格：0 = 写实，1 = 风格化（奶蓝奶白）")]
+        [Range(0f, 1f)] public float stylized = 1f;
+        public Color stylizedShallow = new Color(0.72f, 0.90f, 0.92f);
+        public Color stylizedDeep = new Color(0.10f, 0.38f, 0.52f);
+        [Range(0f, 1f)] public float stylizedOpacity = 0.65f;
+
         [Header("开关（阶段 7 品质档会用）")]
         public bool useFoam = true;
         public bool useReflectionCube = true;
@@ -152,8 +158,8 @@ namespace Fengling.Water
             if (normalMap1 != null) _material.SetTexture("_NormalMap1", normalMap1);
             if (normalMap2 != null) _material.SetTexture("_NormalMap2", normalMap2);
 
-            _material.SetColor("_ShallowColor", shallowColor);
-            _material.SetColor("_DeepColor", deepColor);
+            _material.SetColor("_ShallowColor", Color.Lerp(shallowColor, stylizedShallow, stylized));
+            _material.SetColor("_DeepColor", Color.Lerp(deepColor, stylizedDeep, stylized));
             _material.SetFloat("_AbsorptionDistance", absorptionDistance);
             _material.SetFloat("_Roughness", roughness);
             _material.SetFloat("_F0", f0);
@@ -164,6 +170,8 @@ namespace Fengling.Water
             _material.SetFloat("_FoamWarp", foamWarp);
             _material.SetFloat("_FoamDistance", foamDistance);
             _material.SetFloat("_FoamStrength", foamStrength);
+            _material.SetFloat("_Stylized", stylized);
+            _material.SetFloat("_OpacityScale", stylizedOpacity);
             _material.SetFloat("_UseFoam", useFoam ? 1f : 0f);
             _material.SetFloat("_UseReflectionCube", useReflectionCube ? 1f : 0f);
             _material.SetFloat("_WaterLevel", s.baseLevel);

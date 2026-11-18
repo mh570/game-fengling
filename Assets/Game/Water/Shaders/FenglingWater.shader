@@ -63,6 +63,8 @@ Shader "Fengling/Water Surface"
         [ToggleUI] _UseReflectionCube ("Use Reflection Cube", Float) = 1
         [ToggleUI] _UseFoam ("Use Foam", Float) = 1
         _CameraUnderwater ("Camera Underwater", Float) = 0
+        _Stylized ("Stylized (0=realistic 1=stylized)", Range(0,1)) = 0
+        _OpacityScale ("Stylized Opacity Scale", Range(0,1)) = 0.65
     }
 
     SubShader
@@ -135,6 +137,8 @@ Shader "Fengling/Water Surface"
             float _UseReflectionCube;
             float _UseFoam;
             float _CameraUnderwater;
+            float _Stylized;
+            float _OpacityScale;
 
             struct appdata
             {
@@ -263,8 +267,17 @@ Shader "Fengling/Water Surface"
 
                 // ---- 深度（决定颜色和透明度）
                 float depth = TerrainDepth(i.worldPos);
+
+                // 写实：Beer-Lambert 连续吸收
                 float transmittance = exp(-depth / max(0.01, _AbsorptionDistance));
-                float3 waterColor = lerp(_DeepColor.rgb, _ShallowColor.rgb, transmittance);
+                float3 realColor = lerp(_DeepColor.rgb, _ShallowColor.rgb, transmittance);
+
+                // 风格化：4 档色阶（t3ssel8r 的思路，牺牲连续渐变换可读性）
+                float depthT = saturate(depth / max(0.01, _FadeDistance));
+                float bands = floor(depthT * 4.0) / 4.0;
+                float3 stylColor = lerp(_ShallowColor.rgb, _DeepColor.rgb, bands);
+
+                float3 waterColor = lerp(realColor, stylColor, _Stylized);
 
                 // ---- 菲涅尔 + 环境反射
                 float NoV = saturate(dot(N, V));
@@ -289,7 +302,7 @@ Shader "Fengling/Water Surface"
                 float D = DistributionGGX(NoH, a);
                 float3 F = FresnelSchlick(VoH, float3(_F0, _F0, _F0));
                 float spec = D * F.x * NoL / max(4.0 * NoV * NoL, 1e-4);
-                color += _SunColor.rgb * spec * _SunIntensity;
+                color += _SunColor.rgb * spec * _SunIntensity * (1.0 - _Stylized);
 
                 // ---- 岸边泡沫：深度差 + 噪声扭曲坐标（让边缘碎掉）
                 float2 warp = float2(
@@ -307,16 +320,25 @@ Shader "Fengling/Water Surface"
                 foamNoise = saturate((foamNoise - 0.35) * 2.2);
 
                 float crest = saturate((i.worldPos.y - _WaterLevel) / 1.2);
-                float foam = (depthMask * (0.35 + 0.65 * foamNoise) + coreLine * 0.55 + crest * 0.15 * foamNoise)
-                             * _FoamStrength * _UseFoam;
+                float realFoam = (depthMask * (0.35 + 0.65 * foamNoise) + coreLine * 0.55 + crest * 0.15 * foamNoise);
+
+                // 风格化：硬阈值切出点状虚线（参考图的岸线就是这种点线）
+                float dotNoise = valueNoise(i.worldPos.xz * 6.0 + _WaterTime * 0.08);
+                float dotMask = step(0.52, dotNoise);
+                float stylFoam = coreLine * dotMask * 1.4 + depthMask * dotMask * 0.5;
+
+                float foam = lerp(realFoam, stylFoam, _Stylized) * _FoamStrength * _UseFoam;
 
                 color = lerp(color, _FoamColor.rgb, saturate(foam));
 
                 // ---- 透明度：浅处几乎全透（看得见沙底），深处不透明
                 float alpha = saturate(depth / max(0.01, _FadeDistance));
-                alpha = max(alpha, saturate(foam));        // 泡沫不透明
-                alpha = max(alpha, fresnel * 0.9);         // 掠射角反光不透明
-                alpha = saturate(alpha + 0.06);            // 保底一点存在感
+                alpha = max(alpha, saturate(foam));
+                alpha = max(alpha, fresnel * 0.9);
+                alpha = saturate(alpha + 0.06);
+
+                // 风格化：整体压低不透明度，让水下地形和鱼透出来
+                alpha = lerp(alpha, saturate(depth / max(0.01, _FadeDistance)) * _OpacityScale, _Stylized);
 
                 // ---- 水下整体偏青
                 color = lerp(color, color * float3(0.35, 0.70, 0.90), _CameraUnderwater * 0.5);

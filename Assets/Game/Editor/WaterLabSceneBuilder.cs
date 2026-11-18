@@ -69,20 +69,7 @@ namespace Fengling.EditorTools
             surfaceRenderer.normalMap1 = GetOrCreateNormalMap(NormalMap1Path, 1337, 5);
             surfaceRenderer.normalMap2 = GetOrCreateNormalMap(NormalMap2Path, 4242, 9);
 
-            // 6. 玩家：站在水线上，相机贴水面看向海 —— 对标参考图构图
-            var player = new GameObject("Player");
-            player.transform.position = new Vector3(-6f, 2f, terrain.shoreZ + 28f);
-            player.transform.rotation = Quaternion.Euler(0f, 32f, 0f);
-
-            var cc = player.AddComponent<CharacterController>();
-            cc.height = 1.8f;
-            cc.radius = 0.35f;
-            cc.center = new Vector3(0f, 0.9f, 0f);
-
-            player.AddComponent<Player.PlayerMotor>();
-            player.AddComponent<Player.PlayerBuoyancy>();
-
-            // 7. 相机挂到玩家头上
+            // 6. 相机：正交俯视（地图视角，没有角色）
             var cam = Camera.main;
             if (cam == null)
             {
@@ -90,15 +77,14 @@ namespace Fengling.EditorTools
                 camGo.tag = "MainCamera";
                 cam = camGo.AddComponent<Camera>();
             }
-            // 第三人称俯视：相机不再挂在玩家头上，而是独立物体跟随
             cam.transform.SetParent(null, false);
-            var tpc = cam.gameObject.GetComponent<Player.ThirdPersonCamera>();
-            if (tpc == null) tpc = cam.gameObject.AddComponent<Player.ThirdPersonCamera>();
-            tpc.target = player.transform;
-            tpc.offset = new Vector3(0f, 3.6f, -12f);    // 后上方，低俯角，画面里同时有水和天
-            tpc.followYaw = false;                       // 固定方位，等距视角
-            cam.transform.position = player.transform.position + tpc.offset;
-            cam.transform.LookAt(player.transform.position + Vector3.up * tpc.lookAtHeight);
+            var topDown = cam.gameObject.GetComponent<Player.TopDownCamera>();
+            if (topDown == null) topDown = cam.gameObject.AddComponent<Player.TopDownCamera>();
+            topDown.pitch = 58f;
+            topDown.yaw = 0f;
+            topDown.orthoSize = 75f;
+            topDown.focus = new Vector3(0f, 0f, terrain.shoreZ + 20f);
+            topDown.clampFocus = false;
 
             // 8. 保存
             Directory.CreateDirectory("Assets/Scenes");
