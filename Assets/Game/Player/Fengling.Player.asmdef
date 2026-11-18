@@ -1,0 +1,16 @@
+{
+    "name": "Fengling.Player",
+    "rootNamespace": "Fengling.Player",
+    "references": [
+        "Fengling.Water.Abstractions"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
