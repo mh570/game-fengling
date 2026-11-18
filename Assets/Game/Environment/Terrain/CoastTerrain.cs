@@ -147,5 +147,62 @@ namespace Fengling.Environment
             Gizmos.DrawLine(new Vector3(transform.position.x - halfX, 0f, shoreZ),
                             new Vector3(transform.position.x + halfX, 0f, shoreZ));
         }
+
+        /// <summary>
+        /// 把高度函数烘焙成一张纹理，供水面 shader 采样。
+        ///
+        /// 为什么要这么做：水面需要知道"这个像素下面是多深"，
+        /// 常规做法是读深度缓冲（_CameraDepthTexture），但那是 HDRP 内部格式，
+        /// 自包含 shader 里访问容易踩坑。
+        /// 改成烘焙地形高度图后，shader 只要采样一张普通 2D 纹理，
+        /// 完全不依赖渲染管线的深度，跨管线也可用。
+        ///
+        /// 纹理编码：R 通道 = 归一化高度，0 = 最低点，1 = 最高点。
+        /// </summary>
+        /// <param name="res">纹理分辨率，256 对本场景（200m）约 0.8m/像素，足够泡沫用</param>
+        public Texture2D BuildHeightMap(int res = 256)
+        {
+            res = Mathf.Clamp(res, 16, 1024);
+
+            // 高度范围：陆地最高 + 噪声余量，到深海最低 - 噪声余量
+            float minH = -seaDepth - noiseAmplitude;
+            float maxH = landHeight + noiseAmplitude;
+            float range = Mathf.Max(0.001f, maxH - minH);
+
+            var tex = new Texture2D(res, res, TextureFormat.RFloat, false, true)
+            {
+                name = "CoastTerrainHeightMap",
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear,
+            };
+
+            var pixels = new Color[res * res];
+            float halfX = size.x * 0.5f;
+            float halfZ = size.y * 0.5f;
+
+            for (int zi = 0; zi < res; zi++)
+            {
+                float localZ = -halfZ + (zi + 0.5f) / res * size.y;
+                for (int xi = 0; xi < res; xi++)
+                {
+                    float localX = -halfX + (xi + 0.5f) / res * size.x;
+                    float h = SampleHeight(transform.position.x + localX,
+                                           transform.position.z + localZ);
+                    float normalized = Mathf.InverseLerp(minH, maxH, h);
+                    pixels[zi * res + xi] = new Color(normalized, 0f, 0f, 1f);
+                }
+            }
+
+            tex.SetPixels(pixels);
+            tex.Apply(false, false);
+
+            _heightMapRange = new Vector2(minH, maxH);
+            return tex;
+        }
+
+        private Vector2 _heightMapRange = new Vector2(-9f, 4f);
+
+        /// <summary>高度图对应的实际高度范围（min, max），shader 用来还原真实高度。</summary>
+        public Vector2 HeightMapRange => _heightMapRange;
     }
 }
