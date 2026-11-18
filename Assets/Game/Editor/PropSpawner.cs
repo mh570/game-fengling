@@ -10,7 +10,7 @@ namespace Fengling.EditorTools
     /// </summary>
     public static class PropSpawner
     {
-        public static void SpawnAll(Transform parent, Environment.CoastTerrain terrain)
+        public static void SpawnAll(Transform parent, Environment.CoastTerrain terrain, float sceneWidth = 200f)
         {
             var rockMat = MakeMaterial("PropRock", new Color(0.32f, 0.32f, 0.30f), 0.15f);
             var plantMat = MakeMaterial("PropPlant", new Color(0.18f, 0.42f, 0.26f), 0.3f);
@@ -29,8 +29,9 @@ namespace Fengling.EditorTools
                 go.name = "Rock_" + i;
                 go.transform.SetParent(root, false);
 
-                float x = -60f + (float)rockRng.NextDouble() * 120f;
-                float z = 20f + (float)rockRng.NextDouble() * 70f;
+                float spread = sceneWidth * 0.3f;
+                float x = -spread + (float)rockRng.NextDouble() * spread * 2f;
+                float z = terrain.shoreZ + sceneWidth * 0.12f + (float)rockRng.NextDouble() * sceneWidth * 0.3f;
                 float groundY = terrain.SampleHeight(x, z);
                 float s = 0.8f + (float)rockRng.NextDouble() * 1.6f;
 
@@ -47,8 +48,8 @@ namespace Fengling.EditorTools
                 go.name = "Plant_" + i;
                 go.transform.SetParent(root, false);
 
-                float x = -50f + (float)rockRng.NextDouble() * 100f;
-                float z = 25f + (float)rockRng.NextDouble() * 45f;
+                float x = -spread + (float)rockRng.NextDouble() * spread * 2f;
+                float z = terrain.shoreZ + sceneWidth * 0.14f + (float)rockRng.NextDouble() * sceneWidth * 0.2f;
                 float groundY = terrain.SampleHeight(x, z);
                 float height = Mathf.Clamp(waterY - groundY - 0.3f, 0.5f, 4f);
 
@@ -70,8 +71,9 @@ namespace Fengling.EditorTools
                 go.name = "Fish_" + i;
                 go.transform.SetParent(schoolGo.transform, false);
 
-                float x = -25f + (float)fishRng.NextDouble() * 50f;
-                float z = 30f + (float)fishRng.NextDouble() * 30f;
+                float fishSpread = sceneWidth * 0.15f;
+                float x = -fishSpread + (float)fishRng.NextDouble() * fishSpread * 2f;
+                float z = terrain.shoreZ + sceneWidth * 0.15f + (float)fishRng.NextDouble() * sceneWidth * 0.15f;
                 float y = -1.0f - (float)fishRng.NextDouble() * 1.5f;
 
                 go.transform.position = new Vector3(x, y, z);
