@@ -47,7 +47,7 @@ namespace Fengling.Water
         [Range(0f, 3f)] public float sunIntensity = 2f;
 
         [Header("风格：0 = 写实，1 = 风格化（奶蓝奶白）")]
-        [Range(0f, 1f)] public float stylized = 1f;
+        [Range(0f, 1f)] public float stylized = 0f;   // 默认写实，按 V 切换
         public Color stylizedShallow = new Color(0.72f, 0.90f, 0.92f);
         public Color stylizedDeep = new Color(0.10f, 0.38f, 0.52f);
         [Range(0f, 1f)] public float stylizedOpacity = 0.65f;
