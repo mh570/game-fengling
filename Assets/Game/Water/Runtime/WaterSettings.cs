@@ -12,6 +12,19 @@ namespace Fengling.Water
         Gerstner = 1,
     }
 
+    /// <summary>
+    /// 画质档位。
+    ///
+    /// 存在的理由：这台机器（2 核 + 核显）全开只有个位数帧率，
+    /// 而全关又看不出水的效果。三档让"能跑"和"好看"可以分开。
+    /// </summary>
+    public enum WaterQualityTier
+    {
+        Low = 0,
+        Medium = 1,
+        High = 2,
+    }
+
     /// <summary>单个 Gerstner 波。</summary>
     [System.Serializable]
     public class WaveSettings
@@ -41,6 +54,9 @@ namespace Fengling.Water
     {
         [Header("基础")]
         public WaterKind kind = WaterKind.Gerstner;
+
+        [Tooltip("画质档位：Low 优先帧率，High 优先效果")]
+        public WaterQualityTier tier = WaterQualityTier.High;
 
         [Tooltip("水域尺寸（米，正方形）")]
         public Vector2 size = new Vector2(200f, 200f);

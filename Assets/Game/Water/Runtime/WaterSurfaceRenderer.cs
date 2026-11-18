@@ -83,7 +83,53 @@ namespace Fengling.Water
         private void Update()
         {
             if (_material == null || water == null) return;
+            UpdateTier();
             PushDynamicProperties();
+        }
+
+        private WaterQualityTier _appliedTier = (WaterQualityTier)(-1);
+
+        /// <summary>
+        /// 按档位调参数。只在档位变化时执行一次，不对每帧造成负担。
+        /// 数值依据《水面复刻手册》第 8 章的性能预算。
+        /// </summary>
+        private void UpdateTier()
+        {
+            var tier = water.Settings.tier;
+            if (tier == _appliedTier) return;
+            _appliedTier = tier;
+
+            switch (tier)
+            {
+                case WaterQualityTier.Low:
+                    useFoam = false;
+                    useReflectionCube = false;
+                    normalStrength = 0.7f;
+                    absorptionDistance = 4f;
+                    roughness = 0.10f;
+                    foamDistance = 0.35f;
+                    break;
+
+                case WaterQualityTier.Medium:
+                    useFoam = true;
+                    useReflectionCube = true;
+                    normalStrength = 1.0f;
+                    absorptionDistance = 5f;
+                    roughness = 0.07f;
+                    foamDistance = 0.6f;
+                    break;
+
+                default: // High
+                    useFoam = true;
+                    useReflectionCube = true;
+                    normalStrength = 1.2f;
+                    absorptionDistance = 5f;
+                    roughness = 0.06f;
+                    foamDistance = 0.9f;
+                    break;
+            }
+
+            PushStaticProperties();
         }
 
         private void PushStaticProperties()
