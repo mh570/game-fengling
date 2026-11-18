@@ -52,6 +52,11 @@ Shader "Fengling/Water Surface"
 
         [Header(Time)]
         _WaterTime ("Water Time", Float) = 0
+
+        [Header(Toggles)]
+        [ToggleUI] _UseReflectionCube ("Use Reflection Cube", Float) = 1
+        [ToggleUI] _UseFoam ("Use Foam", Float) = 1
+        _CameraUnderwater ("Camera Underwater", Float) = 0
     }
 
     SubShader
@@ -63,7 +68,8 @@ Shader "Fengling/Water Surface"
             Name "ForwardUnlit"
             Tags { "LightMode" = "SRPDefaultUnlit" }
 
-            Cull Back
+            // 双面渲染：从水下往上看也要能看到水面
+            Cull Off
             ZWrite On
             ZTest LEqual
 
@@ -109,6 +115,11 @@ Shader "Fengling/Water Surface"
             float _AmplitudeScale;
 
             float _WaterTime;
+
+            float _UseReflectionCube;
+            float _UseFoam;
+            float _CameraUnderwater;
+            float _MaxWaveHeight;
 
             struct appdata
             {
@@ -209,11 +220,17 @@ Shader "Fengling/Water Surface"
                 float transmittance = exp(-depth / max(0.01, _AbsorptionDistance));
                 float3 waterColor = lerp(_DeepColor.rgb, _ShallowColor.rgb, transmittance);
 
-                // ---- 菲涅尔 + 环境反射（用球谐近似）
+                // ---- 菲涅尔 + 环境反射
                 float NoV = saturate(dot(N, V));
                 float fresnel = _F0 + (1.0 - _F0) * pow(1.0 - NoV, 5.0);
                 float3 reflectDir = reflect(-V, N);
-                float3 envColor = ShadeSH9(float4(reflectDir, 1.0));
+
+                // 优先用反射探针的立方体贴图（真实天空），退化时用球谐
+                float3 envColor;
+                if (_UseReflectionCube > 0.5)
+                    envColor = DecodeHDR(UNITY_SAMPLE_TEXCUBE(unity_SpecCube0, reflectDir), unity_SpecCube0_HDR);
+                else
+                    envColor = ShadeSH9(float4(reflectDir, 1.0));
 
                 float3 color = lerp(waterColor, envColor, fresnel);
 
@@ -230,12 +247,24 @@ Shader "Fengling/Water Surface"
                 float spec = D * F.x * NoL / max(4.0 * NoV * NoL, 1e-4);
                 color += _SunColor.rgb * spec * _SunIntensity;
 
-                // ---- 岸线泡沫：深度越浅越多，用噪声打散边缘
-                float foamMask = 1.0 - saturate(depth / max(0.01, _FoamDistance));
-                float2 foamUv = i.worldPos.xz * 0.35 + _WaterTime * 0.05;
-                float noise = tex2D(_NormalMap2, foamUv).r;
-                float foam = foamMask * foamMask * (0.55 + 0.45 * noise) * _FoamStrength;
+                // ---- 泡沫：岸线（深度差）+ 浪尖（高度）两路
+                float depthFoam = 1.0 - saturate(depth / max(0.01, _FoamDistance));
+                depthFoam *= depthFoam;
+
+                float2 foamUvA = i.worldPos.xz * 0.35 + _WaterTime * 0.05;
+                float2 foamUvB = i.worldPos.xz * 0.80 - _WaterTime * 0.09;
+                float noiseA = tex2D(_NormalMap2, foamUvA).r;
+                float noiseB = tex2D(_NormalMap1, foamUvB).r;
+
+                float crest = saturate((i.worldPos.y - _WaterLevel) / max(0.05, _MaxWaveHeight));
+                float foam = depthFoam * (0.55 + 0.45 * noiseA)
+                           + crest * 0.35 * noiseB;
+                foam *= _FoamStrength * _UseFoam;
+
                 color = lerp(color, _FoamColor.rgb, saturate(foam));
+
+                // ---- 相机在水下时整体偏青，模拟水体吸收
+                color = lerp(color, color * float3(0.35, 0.70, 0.90), _CameraUnderwater * 0.5);
 
                 return float4(color, 1.0);
             }

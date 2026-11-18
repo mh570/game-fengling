@@ -40,6 +40,10 @@ namespace Fengling.Water
         [Range(0f, 2f)] public float normalStrength = 1f;
         [Range(0f, 3f)] public float sunIntensity = 2f;
 
+        [Header("开关（阶段 7 品质档会用）")]
+        public bool useFoam = true;
+        public bool useReflectionCube = true;
+
         [Header("泡沫")]
         public Color foamColor = Color.white;
         [Range(0.05f, 3f)] public float foamDistance = 0.6f;
@@ -47,6 +51,7 @@ namespace Fengling.Water
 
         private Mesh _mesh;
         private Material _material;
+        private Camera _camera;
         private static readonly Vector4[] WaveDirs = new Vector4[8];
         private static readonly Vector4[] WaveParams = new Vector4[8];
 
@@ -102,6 +107,8 @@ namespace Fengling.Water
             _material.SetColor("_FoamColor", foamColor);
             _material.SetFloat("_FoamDistance", foamDistance);
             _material.SetFloat("_FoamStrength", foamStrength);
+            _material.SetFloat("_UseFoam", useFoam ? 1f : 0f);
+            _material.SetFloat("_UseReflectionCube", useReflectionCube ? 1f : 0f);
             _material.SetFloat("_WaterLevel", s.baseLevel);
         }
 
@@ -114,6 +121,7 @@ namespace Fengling.Water
             var s = water.Settings;
 
             int count = Mathf.Min(s.waves?.Length ?? 0, 8);
+            float maxHeight = 0f;
             for (int i = 0; i < count; i++)
             {
                 var w = s.waves[i];
@@ -123,6 +131,7 @@ namespace Fengling.Water
 
                 WaveDirs[i] = new Vector4(dir.x, dir.y, 0f, 0f);
                 WaveParams[i] = new Vector4(w.amplitude, k, omega, i * 1.37f);  // 相位也必须和 CPU 一致
+                maxHeight += Mathf.Abs(w.amplitude);
             }
 
             _material.SetInt("_WaveCount", count);
@@ -130,7 +139,26 @@ namespace Fengling.Water
             _material.SetVectorArray("_WaveParams", WaveParams);
             _material.SetFloat("_AmplitudeScale", s.amplitudeScale);
             _material.SetFloat("_WaterTime", water.WaterTime);
+            _material.SetFloat("_MaxWaveHeight", Mathf.Max(0.05f, maxHeight * s.amplitudeScale * 0.6f));
             _material.SetVector("_SunDirection", GetSunDirection());
+
+            UpdateUnderwater();
+        }
+
+        /// <summary>
+        /// 相机在水下时给 shader 一个标记，水面整体偏青（模拟水体吸收）。
+        /// 顺便把相机背景色也调成深水色，避免看到"天空中"的水下视角。
+        /// </summary>
+        private void UpdateUnderwater()
+        {
+            if (_camera == null) _camera = Camera.main;
+            if (_camera == null) return;
+
+            var camPos = _camera.transform.position;
+            var sample = water.Sample(new Vector2(camPos.x, camPos.z));
+            bool underwater = sample.Inside && camPos.y < sample.Height;
+
+            _material.SetFloat("_CameraUnderwater", underwater ? 1f : 0f);
         }
 
         private static Vector4 GetSunDirection()
