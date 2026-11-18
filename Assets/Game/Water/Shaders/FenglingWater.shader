@@ -335,7 +335,7 @@ Shader "Fengling/Water Surface"
                 float alpha = saturate(depth / max(0.01, _FadeDistance));
                 alpha = max(alpha, saturate(foam));
                 alpha = max(alpha, fresnel * 0.9);
-                alpha = saturate(alpha + 0.06);
+                alpha = saturate(alpha + 0.06);`r`n                alpha = max(alpha, 0.20);   // 保底：水始终可见
 
                 // 风格化：整体压低不透明度，让水下地形和鱼透出来
                 alpha = lerp(alpha, saturate(depth / max(0.01, _FadeDistance)) * _OpacityScale, _Stylized);
