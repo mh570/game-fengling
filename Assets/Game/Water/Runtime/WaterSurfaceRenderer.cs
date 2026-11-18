@@ -32,12 +32,12 @@ namespace Fengling.Water
         [Header("外观")]
         public Texture2D normalMap1;
         public Texture2D normalMap2;
-        public Color shallowColor = new Color(0.55f, 0.85f, 0.85f);
-        public Color deepColor = new Color(0.02f, 0.18f, 0.30f);
-        [Range(0.5f, 30f)] public float absorptionDistance = 4f;
+        public Color shallowColor = new Color(0.42f, 0.76f, 0.80f);
+        public Color deepColor = new Color(0.04f, 0.22f, 0.36f);
+        [Range(0.5f, 30f)] public float absorptionDistance = 6f;
 
         [Tooltip("水深超过这个值就完全不透明")]
-        [Range(0.5f, 40f)] public float opaqueAtDepth = 6f;
+        [Range(0.5f, 40f)] public float opaqueAtDepth = 9f;
         [Range(0.01f, 0.5f)] public float roughness = 0.06f;
         [Range(0f, 0.2f)] public float f0 = 0.02f;
         [Range(0f, 2f)] public float normalStrength = 1f;
@@ -120,7 +120,7 @@ namespace Fengling.Water
                     useFoam = false;
                     useReflectionCube = false;
                     normalStrength = 0.7f;
-                    absorptionDistance = 4f;
+                    absorptionDistance = 6f;
                     roughness = 0.10f;
                     foamDistance = 0.5f;
                     break;
@@ -129,7 +129,7 @@ namespace Fengling.Water
                     useFoam = true;
                     useReflectionCube = true;
                     normalStrength = 1.0f;
-                    absorptionDistance = 5f;
+                    absorptionDistance = 6f;
                     roughness = 0.07f;
                     foamDistance = 1.0f;
                     break;
@@ -138,7 +138,7 @@ namespace Fengling.Water
                     useFoam = true;
                     useReflectionCube = true;
                     normalStrength = 1.2f;
-                    absorptionDistance = 5f;
+                    absorptionDistance = 6f;
                     roughness = 0.06f;
                     foamDistance = 1.6f;
                     break;

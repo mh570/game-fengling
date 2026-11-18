@@ -86,6 +86,28 @@ namespace Fengling.EditorTools
             topDown.focus = new Vector3(0f, 0f, terrain.shoreZ + 14f);
             topDown.clampFocus = false;
 
+            // player capsule for third-person mode
+            var playerGo = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            playerGo.name = "Player";
+            playerGo.transform.position = new Vector3(0f, 2f, terrain.shoreZ + 12f);
+            var capsuleCollider = playerGo.GetComponent<CapsuleCollider>();
+            if (capsuleCollider != null) Object.DestroyImmediate(capsuleCollider);
+            var cc = playerGo.AddComponent<CharacterController>();
+            cc.height = 2f;
+            cc.radius = 0.5f;
+            playerGo.AddComponent<Player.PlayerMotor>();
+            playerGo.AddComponent<Player.PlayerBuoyancy>();
+
+            var tps = cam.gameObject.AddComponent<Player.ThirdPersonCamera>();
+            tps.target = playerGo.transform;
+            tps.offset = new Vector3(0f, 4.5f, -8f);
+            tps.followYaw = true;
+            tps.enabled = false;
+
+            var switcher = cam.gameObject.AddComponent<Player.CameraModeSwitch>();
+            switcher.thirdPerson = tps;
+            switcher.topDown = topDown;
+
             // 8. 保存
             Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);
