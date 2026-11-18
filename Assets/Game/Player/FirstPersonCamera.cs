@@ -25,6 +25,22 @@ namespace Fengling.Player
 
         private float _pitch;
 
+        private Camera _cam;
+
+        private void OnEnable()
+        {
+            // TopDownCamera 会把相机切成正交，切回第一人称必须恢复透视
+            _cam = GetComponent<Camera>();
+            if (_cam != null)
+            {
+                _cam.orthographic = false;
+                _cam.fieldOfView = 65f;
+                _cam.nearClipPlane = 0.05f;
+            }
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
         private void LateUpdate()
         {
             if (target == null)
@@ -39,7 +55,7 @@ namespace Fengling.Player
                 _pitch = Mathf.Clamp(_pitch - Input.GetAxisRaw("Mouse Y") * mouseSensitivity, -pitchLimit, pitchLimit);
             }
 
-            transform.position = target.position + Vector3.up * eyeHeight;
+            transform.position = target.position + Vector3.up * eyeHeight + target.forward * 0.15f;
             transform.rotation = target.rotation * Quaternion.Euler(_pitch, 0f, 0f);
         }
     }

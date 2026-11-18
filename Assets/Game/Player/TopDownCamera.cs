@@ -39,6 +39,12 @@ namespace Fengling.Player
         private Camera _cam;
         private Vector3 _lastMouse;
 
+        private void OnEnable()
+        {
+            var cam = GetComponent<Camera>();
+            if (cam != null) cam.orthographic = true;
+        }
+
         private void Awake()
         {
             _cam = GetComponent<Camera>();

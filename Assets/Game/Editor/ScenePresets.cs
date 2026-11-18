@@ -193,6 +193,9 @@ namespace Fengling.EditorTools
             mr.sharedMaterial = MakeMaterial("Mat_" + p.Name, new Color(0.66f, 0.60f, 0.46f), 0.05f);
             terrain.Generate();
 
+            if (p.Size.x >= 100f)
+                PropSpawner.SpawnAll(null, terrain);
+
             // ---- water
             var waterGo = new GameObject("Water");
             var wm = waterGo.AddComponent<Water.WaterModule>();
