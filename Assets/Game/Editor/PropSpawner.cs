@@ -23,13 +23,13 @@ namespace Fengling.EditorTools
 
             // ---- 石头：撒在浅水到深水
             var rockRng = new System.Random(20261118);
+            float spread = sceneWidth * 0.3f;
             for (int i = 0; i < 10; i++)
             {
                 var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 go.name = "Rock_" + i;
                 go.transform.SetParent(root, false);
 
-                float spread = sceneWidth * 0.3f;
                 float x = -spread + (float)rockRng.NextDouble() * spread * 2f;
                 float z = terrain.shoreZ + sceneWidth * 0.12f + (float)rockRng.NextDouble() * sceneWidth * 0.3f;
                 float groundY = terrain.SampleHeight(x, z);
