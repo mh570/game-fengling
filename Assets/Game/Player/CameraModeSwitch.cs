@@ -15,7 +15,7 @@ namespace Fengling.Player
 
         private void Start()
         {
-            ApplyMode(true);
+            ApplyMode(false);   // 默认俯视
         }
 
         private void Update()

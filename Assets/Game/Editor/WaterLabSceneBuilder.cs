@@ -45,6 +45,7 @@ namespace Fengling.EditorTools
             // 3.5 天空 + 曝光 + 色调映射 + 太阳
             //     没有这一步，水面反射是黑的、颜色是未映射的线性值 —— 画面必然又暗又灰
             SetupSkyAndSun();
+            PropSpawner.SpawnAll(null, terrain);
 
             // 4. 水模块
             var waterGo = new GameObject("Water");

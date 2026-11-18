@@ -1,0 +1,106 @@
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+
+namespace Fengling.EditorTools
+{
+    /// <summary>
+    /// 生成场景装饰：水下石头、水草、鱼群。
+    /// 石头用来验证"透过水能看见水下物体"，鱼用来验证"水下在动"。
+    /// </summary>
+    public static class PropSpawner
+    {
+        public static void SpawnAll(Transform parent, Environment.CoastTerrain terrain)
+        {
+            var rockMat = MakeMaterial("PropRock", new Color(0.32f, 0.32f, 0.30f), 0.15f);
+            var plantMat = MakeMaterial("PropPlant", new Color(0.18f, 0.42f, 0.26f), 0.3f);
+            var fishMat = MakeMaterial("PropFish", new Color(0.95f, 0.62f, 0.25f), 0.45f);
+
+            var root = new GameObject("Props").transform;
+            if (parent != null) root.SetParent(parent, false);
+
+            var waterY = 0f;
+
+            // ---- 石头：撒在浅水到深水
+            var rockRng = new System.Random(20261118);
+            for (int i = 0; i < 10; i++)
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                go.name = "Rock_" + i;
+                go.transform.SetParent(root, false);
+
+                float x = -60f + (float)rockRng.NextDouble() * 120f;
+                float z = 20f + (float)rockRng.NextDouble() * 70f;
+                float groundY = terrain.SampleHeight(x, z);
+                float s = 0.8f + (float)rockRng.NextDouble() * 1.6f;
+
+                go.transform.position = new Vector3(x, groundY + s * 0.25f, z);
+                go.transform.localScale = new Vector3(s, s * 0.7f, s);
+                go.transform.rotation = Quaternion.Euler(0f, (float)rockRng.NextDouble() * 360f, 0f);
+                go.GetComponent<Renderer>().sharedMaterial = rockMat;
+            }
+
+            // ---- 水草：从海底长到水面下
+            for (int i = 0; i < 14; i++)
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                go.name = "Plant_" + i;
+                go.transform.SetParent(root, false);
+
+                float x = -50f + (float)rockRng.NextDouble() * 100f;
+                float z = 25f + (float)rockRng.NextDouble() * 45f;
+                float groundY = terrain.SampleHeight(x, z);
+                float height = Mathf.Clamp(waterY - groundY - 0.3f, 0.5f, 4f);
+
+                go.transform.position = new Vector3(x, groundY + height * 0.5f, z);
+                go.transform.localScale = new Vector3(0.12f, height * 0.5f, 0.12f);
+                go.GetComponent<Renderer>().sharedMaterial = plantMat;
+            }
+
+            // ---- 鱼群
+            var schoolGo = new GameObject("FishSchool");
+            schoolGo.transform.SetParent(root, false);
+            var school = schoolGo.AddComponent<Environment.FishSchool>();
+
+            var fishRng = new System.Random(998877);
+            var list = new List<Transform>();
+            for (int i = 0; i < 18; i++)
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                go.name = "Fish_" + i;
+                go.transform.SetParent(schoolGo.transform, false);
+
+                float x = -25f + (float)fishRng.NextDouble() * 50f;
+                float z = 30f + (float)fishRng.NextDouble() * 30f;
+                float y = -1.0f - (float)fishRng.NextDouble() * 1.5f;
+
+                go.transform.position = new Vector3(x, y, z);
+                go.transform.localScale = new Vector3(0.18f, 0.28f, 0.18f);
+                go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+
+                var col = go.GetComponent<CapsuleCollider>();
+                if (col != null) Object.DestroyImmediate(col);
+                go.GetComponent<Renderer>().sharedMaterial = fishMat;
+
+                list.Add(go.transform);
+            }
+
+            school.fish = list.ToArray();
+            school.waterLevel = waterY;
+            school.areaCenter = new Vector2(0f, 45f);
+            school.areaSize = new Vector2(70f, 40f);
+        }
+
+        private static Material MakeMaterial(string name, Color color, float smoothness)
+        {
+            var shader = Shader.Find("HDRP/Lit");
+            if (shader == null) return null;
+
+            var mat = new Material(shader) { name = name };
+            mat.SetColor("_BaseColor", color);
+            mat.SetFloat("_Smoothness", smoothness);
+            mat.SetFloat("_Metallic", 0f);
+            return mat;
+        }
+    }
+}
