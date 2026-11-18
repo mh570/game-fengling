@@ -1,0 +1,90 @@
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace Fengling.Rendering
+{
+    /// <summary>
+    /// 最小 SRP：清屏 + 不透明 + 透明，两段绘制。
+    /// 阴影与天空盒在后续步骤加，先保证"能画出东西"。
+    /// </summary>
+    public sealed class FenglingPipeline : RenderPipeline
+    {
+        private readonly FenglingPipelineSettings _settings;
+
+        private static readonly ShaderTagId[] OpaqueTags =
+        {
+            new ShaderTagId("FenglingForward"),
+            new ShaderTagId("SRPDefaultUnlit"),
+        };
+
+        private static readonly ShaderTagId[] TransparentTags =
+        {
+            new ShaderTagId("SRPDefaultUnlit"),
+        };
+
+        public FenglingPipeline(FenglingPipelineSettings settings)
+        {
+            _settings = settings;
+        }
+
+        protected override void Render(ScriptableRenderContext context, Camera[] cameras)
+        {
+            foreach (var camera in cameras)
+            {
+                if (camera == null) continue;
+                if (camera.cameraType == CameraType.Reflection) continue;
+                RenderCamera(context, camera);
+            }
+        }
+
+        private void RenderCamera(ScriptableRenderContext context, Camera camera)
+        {
+            if (!camera.TryGetCullingParameters(out var cullingParams)) return;
+
+            context.SetupCameraProperties(camera);
+
+            var cmd = CommandBufferPool.Get("Fengling.Clear");
+
+            // 清屏：先用纯色天空，程序化天空盒后面替换这里
+            var clearColor = camera.clearFlags == CameraClearFlags.SolidColor
+                ? camera.backgroundColor
+                : _settings.skyColor;
+
+            cmd.ClearRenderTarget(
+                camera.clearFlags != CameraClearFlags.SolidColor,
+                camera.clearFlags != CameraClearFlags.Nothing,
+                clearColor);
+
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
+
+            var culling = context.Cull(ref cullingParams);
+
+            // ---- 不透明
+            var opaqueSettings = new DrawingSettings(OpaqueTags[0], new SortingSettings(camera))
+            {
+                perObjectData = PerObjectData.None,
+            };
+            for (int i = 1; i < OpaqueTags.Length; i++)
+                opaqueSettings.SetShaderPassName(i, OpaqueTags[i]);
+
+            var opaqueFilter = new FilteringSettings(RenderQueueRange.opaque);
+            context.DrawRenderers(culling, ref opaqueSettings, ref opaqueFilter);
+
+            // ---- 天空盒（先跳过，第二阶段换成程序化）
+            if (camera.clearFlags == CameraClearFlags.Skybox)
+                context.DrawSkybox(camera);
+
+            // ---- 透明
+            var transparentSorting = new SortingSettings(camera) { criteria = SortingCriteria.CommonTransparent };
+            var transparentSettings = new DrawingSettings(TransparentTags[0], transparentSorting)
+            {
+                perObjectData = PerObjectData.None,
+            };
+            var transparentFilter = new FilteringSettings(RenderQueueRange.transparent);
+            context.DrawRenderers(culling, ref transparentSettings, ref transparentFilter);
+
+            context.Submit();
+        }
+    }
+}
