@@ -37,7 +37,6 @@ namespace Fengling.EditorTools
             var terrain = terrainGo.AddComponent<Environment.CoastTerrain>();
 
             terrainRenderer.sharedMaterial = GetOrCreateSandMaterial();
-            ApplyTerrainAlbedo(terrainRenderer.sharedMaterial, terrain);
             terrain.Generate();
 
             // 3. 把地形高度烘焙成纹理（水面用它算水深和泡沫）
@@ -185,7 +184,6 @@ namespace Fengling.EditorTools
                 var bl = profile.Add<Bloom>(true);
                 bl.intensity.Override(0.35f);
                 bl.threshold.Override(0.9f);
-                bl.scatter.Override(0.7f);
             }
 
             if (!Has<Tonemapping>())
@@ -311,62 +309,4 @@ namespace Fengling.EditorTools
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
     }
-
-        private const string AlbedoPath = "Assets/Game/Environment/Terrain/CoastAlbedo.asset";
-
-        /// <summary>
-        /// 给地形烘一张反照率贴图：水上沙色、水下深青。
-        ///
-        /// 参考图里岛体水下部分是深色的，靠材质整体变色做不到（HDRP/Lit 只有一个基色），
-        /// 所以按高度把颜色烘进贴图，UV 直接用现有的 0..1 网格 UV。
-        /// </summary>
-        private static void ApplyTerrainAlbedo(Material mat, Environment.CoastTerrain terrain)
-        {
-            if (mat == null || terrain == null) return;
-
-            AssetDatabase.DeleteAsset(AlbedoPath);
-
-            const int res = 256;
-            var tex = new Texture2D(res, res, TextureFormat.RGBA32, true, true)
-            {
-                name = "CoastAlbedo",
-                wrapMode = TextureWrapMode.Clamp,
-                filterMode = FilterMode.Bilinear,
-            };
-
-            var sand = new Color(0.78f, 0.70f, 0.52f);
-            var wet = new Color(0.52f, 0.47f, 0.38f);
-            var shallowUnder = new Color(0.28f, 0.42f, 0.44f);
-            var deepUnder = new Color(0.10f, 0.22f, 0.28f);
-
-            float halfX = terrain.size.x * 0.5f;
-            float halfZ = terrain.size.y * 0.5f;
-
-            for (int y = 0; y < res; y++)
-            {
-                float wz = terrain.transform.position.z + (-halfZ + (y + 0.5f) / res * terrain.size.y);
-                for (int x = 0; x < res; x++)
-                {
-                    float wx = terrain.transform.position.x + (-halfX + (x + 0.5f) / res * terrain.size.x);
-                    float h = terrain.SampleHeight(wx, wz);
-
-                    Color col;
-                    if (h >= 0.15f)
-                        col = sand;
-                    else if (h >= -0.6f)
-                        col = Color.Lerp(wet, sand, Mathf.InverseLerp(-0.6f, 0.15f, h));
-                    else
-                        col = Color.Lerp(shallowUnder, deepUnder, Mathf.InverseLerp(-0.6f, -8f, h));
-
-                    tex.SetPixel(x, y, col);
-                }
-            }
-
-            tex.Apply(true, false);
-            AssetDatabase.CreateAsset(tex, AlbedoPath);
-
-            mat.SetTexture("_BaseColorMap", tex);
-            mat.SetColor("_BaseColor", Color.white);
-            EditorUtility.SetDirty(mat);
-        }
 }
