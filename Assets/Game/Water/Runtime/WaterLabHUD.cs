@@ -54,7 +54,7 @@ namespace Fengling.Water
                 water.SetTimeScale(water.Settings.timeScale > 0f ? 0f : 1f);
             if (Input.GetKeyDown(KeyCode.F1)) _visible = !_visible;
             if (Input.GetKeyDown(KeyCode.V) && _renderer != null)
-                _renderer.stylized = _renderer.stylized > 0.5f ? 0f : 1f;
+                { /* 只做写实，切换已停用 */ }
         }
 
         private void OnGUI()
@@ -71,7 +71,7 @@ namespace Fengling.Water
             GUILayout.Label($"实现           {s.kind}", style);
             GUILayout.Label($"画质档         {s.tier}", style);
             if (_renderer != null)
-                GUILayout.Label($"风格           {(_renderer.stylized > 0.5f ? "风格化" : "写实")}  [V] 切换", style);
+                GUILayout.Label("风格           写实", style);
             GUILayout.Label($"振幅倍率       {s.amplitudeScale:0.00}", style);
             GUILayout.Label($"时间缩放       {s.timeScale:0.00}", style);
             GUILayout.Label($"水面时间       {water.WaterTime:0.00} s", style);
@@ -90,7 +90,7 @@ namespace Fengling.Water
             }
 
             GUILayout.Space(6f);
-            GUILayout.Label("[1]Flat [2]Gerstner [6]Spectral  [3/4/5]画质档  [V]写实/风格化  [ ]振幅  [P]定格  [F1]隐藏", style);
+            GUILayout.Label("[1]Flat [2]Gerstner [6]Spectral  [3/4/5]画质档  [ ]振幅  [P]定格  [F1]隐藏", style);
             GUILayout.EndArea();
         }
     }
