@@ -26,5 +26,8 @@ namespace Fengling.Water
             bool inside = _bounds.Contains(new Vector3(worldXZ.x, _level, worldXZ.y));
             return new WaterSample(_level, Vector3.up, inside);
         }
+
+        /// <summary>平面没有波，返回 0 —— shader 会退化成静止水面。</summary>
+        public int FillWaveData(Vector4[] dirs, Vector4[] parameters, float amplitudeScale) => 0;
     }
 }

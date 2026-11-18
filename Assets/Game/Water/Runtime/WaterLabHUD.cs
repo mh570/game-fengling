@@ -45,6 +45,7 @@ namespace Fengling.Water
             if (Input.GetKeyDown(KeyCode.Alpha3)) water.Settings.tier = WaterQualityTier.Low;
             if (Input.GetKeyDown(KeyCode.Alpha4)) water.Settings.tier = WaterQualityTier.Medium;
             if (Input.GetKeyDown(KeyCode.Alpha5)) water.Settings.tier = WaterQualityTier.High;
+            if (Input.GetKeyDown(KeyCode.Alpha6)) water.SetKind(WaterKind.Spectral);
             if (Input.GetKeyDown(KeyCode.LeftBracket)) water.SetAmplitudeScale(water.Settings.amplitudeScale - 0.1f);
             if (Input.GetKeyDown(KeyCode.RightBracket)) water.SetAmplitudeScale(water.Settings.amplitudeScale + 0.1f);
             if (Input.GetKeyDown(KeyCode.P))
@@ -83,7 +84,7 @@ namespace Fengling.Water
             }
 
             GUILayout.Space(6f);
-            GUILayout.Label("[1]Flat [2]Gerstner  [3/4/5]画质档  [ ]振幅  [P]定格  [F1]隐藏", style);
+            GUILayout.Label("[1]Flat [2]Gerstner [6]Spectral  [3/4/5]画质档  [ ]振幅  [P]定格  [F1]隐藏", style);
             GUILayout.EndArea();
         }
     }

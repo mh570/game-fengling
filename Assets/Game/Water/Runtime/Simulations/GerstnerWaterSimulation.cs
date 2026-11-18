@@ -80,5 +80,21 @@ namespace Fengling.Water
             var normal = new Vector3(-dhdx, 1f, -dhdz).normalized;
             return new WaterSample(height, normal, true);
         }
+
+        /// <summary>
+        /// 导出手上正在用的波（振幅已乘过 amplitudeScale，是最终值）。
+        /// shader 侧不要再乘一次，否则画面和浮力会对不上。
+        /// </summary>
+        public int FillWaveData(Vector4[] dirs, Vector4[] parameters, float amplitudeScale)
+        {
+            int n = Mathf.Min(_waves.Length, Mathf.Min(dirs.Length, parameters.Length));
+            for (int i = 0; i < n; i++)
+            {
+                ref readonly Wave w = ref _waves[i];
+                dirs[i] = new Vector4(w.Dir.x, w.Dir.y, 0f, 0f);
+                parameters[i] = new Vector4(w.Amplitude, w.Wavenumber, w.Omega, w.Phase);
+            }
+            return n;
+        }
     }
 }

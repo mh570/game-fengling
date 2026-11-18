@@ -56,8 +56,18 @@ namespace Fengling.Water
             _simulation = _settings.kind switch
             {
                 WaterKind.Flat => new FlatWaterSimulation(_settings),
+                WaterKind.Spectral => new SpectralWaterSimulation(_settings),
                 _ => new GerstnerWaterSimulation(_settings),
             };
+        }
+
+        /// <summary>
+        /// 把当前模拟使用的波导出给渲染层。
+        /// 这是 CPU 和 GPU 保持一致的唯一通道：渲染层不自己读 settings.waves。
+        /// </summary>
+        public int FillWaveData(Vector4[] dirs, Vector4[] parameters)
+        {
+            return _simulation?.FillWaveData(dirs, parameters, _settings.amplitudeScale) ?? 0;
         }
 
         public WaterSample Sample(Vector2 worldXZ)

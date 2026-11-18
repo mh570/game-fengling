@@ -79,7 +79,7 @@ Shader "Fengling/Water Surface"
             #pragma target 3.5
             #include "UnityCG.cginc"
 
-            #define MAX_WAVES 8
+            #define MAX_WAVES 16
             #define PI 3.14159265359
 
             sampler2D _NormalMap1;

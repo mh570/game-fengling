@@ -52,8 +52,8 @@ namespace Fengling.Water
         private Mesh _mesh;
         private Material _material;
         private Camera _camera;
-        private static readonly Vector4[] WaveDirs = new Vector4[8];
-        private static readonly Vector4[] WaveParams = new Vector4[8];
+        private static readonly Vector4[] WaveDirs = new Vector4[16];
+        private static readonly Vector4[] WaveParams = new Vector4[16];
 
         private void Awake()
         {
@@ -160,32 +160,24 @@ namespace Fengling.Water
 
         /// <summary>
         /// 每帧把波参数和太阳方向推给 shader。
-        /// ω 的算法必须和 GerstnerWaterSimulation 完全一致：ω = sqrt(g·k)·speed
+        /// 波形数据一律从 WaterModule.FillWaveData 拿 —— 渲染层不自己读 settings，
+        /// 否则 Gerstner 和 Spectral 两种实现会出现两份数据源。
         /// </summary>
         private void PushDynamicProperties()
         {
-            var s = water.Settings;
+            int count = water.FillWaveData(WaveDirs, WaveParams);
 
-            int count = Mathf.Min(s.waves?.Length ?? 0, 8);
             float maxHeight = 0f;
             for (int i = 0; i < count; i++)
-            {
-                var w = s.waves[i];
-                float k = 2f * Mathf.PI / Mathf.Max(0.01f, w.wavelength);
-                float omega = Mathf.Sqrt(9.81f * k) * Mathf.Max(0f, w.speed);
-                var dir = w.direction.sqrMagnitude < 1e-4f ? Vector2.right : w.direction.normalized;
-
-                WaveDirs[i] = new Vector4(dir.x, dir.y, 0f, 0f);
-                WaveParams[i] = new Vector4(w.amplitude, k, omega, i * 1.37f);  // 相位也必须和 CPU 一致
-                maxHeight += Mathf.Abs(w.amplitude);
-            }
+                maxHeight += Mathf.Abs(WaveParams[i].x);
 
             _material.SetInt("_WaveCount", count);
             _material.SetVectorArray("_WaveDirs", WaveDirs);
             _material.SetVectorArray("_WaveParams", WaveParams);
-            _material.SetFloat("_AmplitudeScale", s.amplitudeScale);
+            // 振幅已在模拟器里乘过 amplitudeScale，这里必须固定 1，否则会重复放大
+            _material.SetFloat("_AmplitudeScale", 1f);
             _material.SetFloat("_WaterTime", water.WaterTime);
-            _material.SetFloat("_MaxWaveHeight", Mathf.Max(0.05f, maxHeight * s.amplitudeScale * 0.6f));
+            _material.SetFloat("_MaxWaveHeight", Mathf.Max(0.05f, maxHeight * 0.6f));
             _material.SetVector("_SunDirection", GetSunDirection());
 
             UpdateUnderwater();

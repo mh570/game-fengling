@@ -10,6 +10,9 @@ namespace Fengling.Water
 
         /// <summary>Gerstner 波叠加。第一版实现。</summary>
         Gerstner = 1,
+
+        /// <summary>频谱合成：Phillips 谱生成 N 个波再叠加（阶段 6）。</summary>
+        Spectral = 2,
     }
 
     /// <summary>
@@ -72,6 +75,31 @@ namespace Fengling.Water
 
         [Header("Gerstner 波（最多 8 个）")]
         public WaveSettings[] waves = DefaultWaves();
+
+        [Header("频谱合成（Spectral）")]
+        [Tooltip("生成多少个波。越多越像真海，但顶点着色器越贵")]
+        [Range(4, 16)] public int spectralWaveCount = 12;
+
+        [Tooltip("风速 km/h：决定峰值波长和能量集中度")]
+        [Range(1f, 60f)] public float windSpeed = 12f;
+
+        [Tooltip("风向（度，XZ 平面）")]
+        [Range(0f, 360f)] public float windDirectionDegrees = 30f;
+
+        [Tooltip("波向绕风向的散布范围（度）")]
+        [Range(0f, 180f)] public float windDirectionSpread = 60f;
+
+        [Tooltip("最短波长（米）")]
+        public float spectralMinWavelength = 4f;
+
+        [Tooltip("最长波长（米）")]
+        public float spectralMaxWavelength = 48f;
+
+        [Tooltip("所有波振幅之和（米），控制整体浪高")]
+        [Range(0.1f, 6f)] public float spectralTotalAmplitude = 1.6f;
+
+        [Tooltip("随机种子：同一个种子生成同一片海")]
+        public int spectralSeed = 20261118;
 
         /// <summary>
         /// 默认四波：波长几何级数（32/16/8/4），方向错开，速度略递进。
