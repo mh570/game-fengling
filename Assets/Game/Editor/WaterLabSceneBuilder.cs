@@ -16,7 +16,7 @@ namespace Fengling.EditorTools
     ///
     /// 菜单：Fengling / Build Water Lab Scene
     /// </summary>
-    public static class WaterLabSceneBuilder
+    public static partial class WaterLabSceneBuilder
     {
         private const string ScenePath = "Assets/Scenes/WaterLab.unity";
         private const string SandMatPath = "Assets/Game/Environment/Terrain/CoastSand.mat";

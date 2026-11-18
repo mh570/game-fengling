@@ -11,6 +11,24 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/OutdoorsScene.unity
     guid: 8124e5870f4fd4c779e7a5f994e84ad1
+  - enabled: 1
+    path: Assets/Scenes/Lake.unity
+    guid: 17d22de7a42a5e445b5f212303d184fa
+  - enabled: 1
+    path: Assets/Scenes/River.unity
+    guid: 600e448b026a3c74cad4b6240dc84f22
+  - enabled: 1
+    path: Assets/Scenes/Waterfall.unity
+    guid: ad9dec2d87f0cf542ab76bb862963569
+  - enabled: 1
+    path: Assets/Scenes/Pond.unity
+    guid: 25bc932dc956951469fe106a508ae96c
+  - enabled: 1
+    path: Assets/Scenes/Swamp.unity
+    guid: 62a8ddb15e45b8b488b295174c4ef7d4
+  - enabled: 1
+    path: Assets/Scenes/Estuary.unity
+    guid: ce547357ac1ada840a84f8bd7ce2c889
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
   m_UseUCBPForAssetBundles: 0
