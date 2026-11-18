@@ -196,6 +196,12 @@ namespace Fengling.Water
             // 振幅已在模拟器里乘过 amplitudeScale，这里必须固定 1，否则会重复放大
             _material.SetFloat("_AmplitudeScale", 1f);
             _material.SetFloat("_WaveNoise", waveIrregularity);
+
+            // 风格切换必须每帧推：HUD 按 V 改的是字段，不每帧推的话材质不会变
+            _material.SetFloat("_Stylized", stylized);
+            _material.SetFloat("_OpacityScale", stylizedOpacity);
+            _material.SetColor("_ShallowColor", Color.Lerp(shallowColor, stylizedShallow, stylized));
+            _material.SetColor("_DeepColor", Color.Lerp(deepColor, stylizedDeep, stylized));
             _material.SetFloat("_WaterTime", water.WaterTime);
             _material.SetFloat("_MaxWaveHeight", Mathf.Max(0.05f, maxHeight * 0.6f));
             _material.SetVector("_SunDirection", GetSunDirection());
