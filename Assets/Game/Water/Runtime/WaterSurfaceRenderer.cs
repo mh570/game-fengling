@@ -32,12 +32,18 @@ namespace Fengling.Water
         [Header("外观")]
         public Texture2D normalMap1;
         public Texture2D normalMap2;
-        public Color shallowColor = new Color(0.05f, 0.42f, 0.45f);
-        public Color deepColor = new Color(0.01f, 0.06f, 0.12f);
-        [Range(0.5f, 30f)] public float absorptionDistance = 5f;
+        public Color shallowColor = new Color(0.55f, 0.85f, 0.85f);
+        public Color deepColor = new Color(0.02f, 0.18f, 0.30f);
+        [Range(0.5f, 30f)] public float absorptionDistance = 4f;
+
+        [Tooltip("水深超过这个值就完全不透明")]
+        [Range(0.5f, 40f)] public float opaqueAtDepth = 6f;
         [Range(0.01f, 0.5f)] public float roughness = 0.06f;
         [Range(0f, 0.2f)] public float f0 = 0.02f;
         [Range(0f, 2f)] public float normalStrength = 1f;
+
+        [Tooltip("浪的不规则程度，0 = 完全规则")]
+        [Range(0f, 1f)] public float waveIrregularity = 0.35f;
         [Range(0f, 3f)] public float sunIntensity = 2f;
 
         [Header("开关（阶段 7 品质档会用）")]
@@ -46,8 +52,11 @@ namespace Fengling.Water
 
         [Header("泡沫")]
         public Color foamColor = Color.white;
-        [Range(0.05f, 3f)] public float foamDistance = 1.6f;
-        [Range(0f, 2f)] public float foamStrength = 2f;
+        [Range(0.05f, 3f)] public float foamDistance = 1.0f;
+        [Range(0f, 2f)] public float foamStrength = 0.85f;
+
+        [Tooltip("泡沫边缘的噪声扭曲量（米），越大越碎")]
+        [Range(0f, 10f)] public float foamWarp = 2.5f;
 
         private Mesh _mesh;
         private Material _material;
@@ -151,6 +160,8 @@ namespace Fengling.Water
             _material.SetFloat("_NormalStrength", normalStrength);
             _material.SetFloat("_SunIntensity", sunIntensity);
             _material.SetColor("_FoamColor", foamColor);
+            _material.SetFloat("_FadeDistance", opaqueAtDepth);
+            _material.SetFloat("_FoamWarp", foamWarp);
             _material.SetFloat("_FoamDistance", foamDistance);
             _material.SetFloat("_FoamStrength", foamStrength);
             _material.SetFloat("_UseFoam", useFoam ? 1f : 0f);
@@ -176,6 +187,7 @@ namespace Fengling.Water
             _material.SetVectorArray("_WaveParams", WaveParams);
             // 振幅已在模拟器里乘过 amplitudeScale，这里必须固定 1，否则会重复放大
             _material.SetFloat("_AmplitudeScale", 1f);
+            _material.SetFloat("_WaveNoise", waveIrregularity);
             _material.SetFloat("_WaterTime", water.WaterTime);
             _material.SetFloat("_MaxWaveHeight", Mathf.Max(0.05f, maxHeight * 0.6f));
             _material.SetVector("_SunDirection", GetSunDirection());

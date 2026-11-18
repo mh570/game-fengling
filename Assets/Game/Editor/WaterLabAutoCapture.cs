@@ -17,7 +17,7 @@ namespace Fengling.EditorTools
     public static class WaterLabAutoCapture
     {
         private const string ScenePath = "Assets/Scenes/WaterLab.unity";
-        private const string OutPath = "D:/item/game/waterlab_capture.png";
+        private const string OutPath = "D:/item/game/v2_capture.png";
 
         private const string PendingKey = "Fengling.Capture.Pending";
         private const string StartKey = "Fengling.Capture.Start";

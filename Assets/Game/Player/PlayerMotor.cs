@@ -36,8 +36,7 @@ namespace Fengling.Player
         private void Awake()
         {
             _cc = GetComponent<CharacterController>();
-            if (cameraPivot == null && Camera.main != null)
-                cameraPivot = Camera.main.transform;
+            // 第三人称相机自己跟随，不再自动挂到 Camera.main（否则会打架）
 
             _spawnPosition = transform.position;
             _spawnRotation = transform.rotation;

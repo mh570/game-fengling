@@ -1,12 +1,12 @@
-// 自包含水面 shader（不依赖 HDRP 光照管线，用 SRPDefaultUnlit 通道渲染）
+// 自包含水面 shader（HDRP 下走 SRPDefaultUnlit 通道）
 //
-// 为什么不用 HDRP 的 Lit/WaterSystem：
-//   1. HDRP 的 lit pass 需要一整套 SurfaceData/LightLoop 接口，改起来牵扯太多
-//   2. 我们要和 CPU 的 Gerstner 完全对齐，自己算最可控
-//   3. HDRP 官方明确保留了 SRPDefaultUnlit 作为 legacy unlit 的回退通道
+// 关键设计（对照 GitHub 上的成熟实现）：
+//   1. 世界空间 UV       —— 多块水面拼接无接缝（Uber-Stylized-Water 的做法）
+//   2. 深度差算泡沫       —— 不是画白边，而是浅的地方自然出现（Roystan/ToonWater）
+//   3. 噪声扭曲泡沫坐标   —— 边缘才会碎，而不是刀切一样平滑
+//   4. 按深度透明         —— 浅处能看见沙底，深处才不透明
 //
-// 光照模型：太阳 GGX 高光 + 菲涅尔 + 球谐环境色（近似反射）
-// 深度信息：不读深度缓冲，改采样地形高度图（见 CoastTerrain.BuildHeightMap）
+// 不依赖 HDRP 的 Lit/LightLoop，光照自己算，改起来可控。
 
 Shader "Fengling/Water Surface"
 {
@@ -22,25 +22,27 @@ Shader "Fengling/Water Surface"
         _NormalStrength ("Normal Strength", Range(0, 2)) = 1
         _NormalFadeStart ("Normal Fade Start (m)", Float) = 25
         _NormalFadeRange ("Normal Fade Range (m)", Float) = 120
-        _RoughnessFar ("Roughness Far", Range(0.01, 0.6)) = 0.22
 
         [Header(Sun)]
         _SunDirection ("Sun Direction (world)", Vector) = (0.3, 0.8, 0.5, 0)
         _SunColor ("Sun Color", Color) = (1, 0.95, 0.85, 1)
-        _SunIntensity ("Sun Intensity", Float) = 2
-        _Roughness ("Roughness", Range(0.01, 0.5)) = 0.06
+        _SunIntensity ("Sun Intensity", Float) = 3
+        _Roughness ("Roughness Near", Range(0.01, 0.5)) = 0.05
+        _RoughnessFar ("Roughness Far", Range(0.01, 0.6)) = 0.22
         _F0 ("Fresnel F0", Range(0, 0.2)) = 0.02
 
         [Header(Water Color)]
-        _ShallowColor ("Shallow Color", Color) = (0.05, 0.42, 0.45, 1)
-        _DeepColor ("Deep Color", Color) = (0.01, 0.06, 0.12, 1)
-        _AbsorptionDistance ("Absorption Distance (m)", Float) = 5
+        _ShallowColor ("Shallow Color", Color) = (0.55, 0.85, 0.85, 1)
+        _DeepColor ("Deep Color", Color) = (0.02, 0.18, 0.30, 1)
+        _AbsorptionDistance ("Absorption (m)", Float) = 4
+        _FadeDistance ("Opaque At Depth (m)", Float) = 6
         _WaterLevel ("Water Level Y", Float) = 0
 
         [Header(Foam)]
         _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
-        _FoamDistance ("Foam Depth (m)", Float) = 0.6
-        _FoamStrength ("Foam Strength", Range(0, 2)) = 1
+        _FoamDistance ("Foam Depth (m)", Float) = 1.4
+        _FoamStrength ("Foam Strength", Range(0, 2)) = 1.6
+        _FoamWarp ("Foam Warp (m)", Float) = 2.5
 
         [Header(Terrain Height Map)]
         _HeightMap ("Terrain Height Map", 2D) = "black" {}
@@ -48,10 +50,11 @@ Shader "Fengling/Water Surface"
         _HeightRange ("Height Range (min, max)", Vector) = (-9, 4, 0, 0)
 
         [Header(Waves)]
-        _WaveCount ("Wave Count", Int) = 4
+        _WaveCount ("Wave Count", Int) = 0
         _WaveDirs ("Wave Directions", Vector) = (1, 0, 0, 0)
         _WaveParams ("Wave Params (amp, k, omega, phase)", Vector) = (0.5, 0.2, 1, 0)
         _AmplitudeScale ("Amplitude Scale", Float) = 1
+        _WaveNoise ("Wave Irregularity", Range(0, 1)) = 0.35
 
         [Header(Time)]
         _WaterTime ("Water Time", Float) = 0
@@ -64,17 +67,22 @@ Shader "Fengling/Water Surface"
 
     SubShader
     {
-        Tags { "RenderType" = "Opaque" "Queue" = "Geometry" "RenderPipeline" = "HDRenderPipeline" }
+        Tags
+        {
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
+            "RenderPipeline" = "HDRenderPipeline"
+        }
 
         Pass
         {
             Name "ForwardUnlit"
             Tags { "LightMode" = "SRPDefaultUnlit" }
 
-            // 双面渲染：从水下往上看也要能看到水面
             Cull Off
-            ZWrite On
+            ZWrite Off
             ZTest LEqual
+            Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -94,22 +102,24 @@ Shader "Fengling/Water Surface"
             float _NormalStrength;
             float _NormalFadeStart;
             float _NormalFadeRange;
-            float _RoughnessFar;
 
             float4 _SunDirection;
             float4 _SunColor;
             float _SunIntensity;
             float _Roughness;
+            float _RoughnessFar;
             float _F0;
 
             float4 _ShallowColor;
             float4 _DeepColor;
             float _AbsorptionDistance;
+            float _FadeDistance;
             float _WaterLevel;
 
             float4 _FoamColor;
             float _FoamDistance;
             float _FoamStrength;
+            float _FoamWarp;
 
             sampler2D _HeightMap;
             float4 _HeightMapBounds;
@@ -119,37 +129,72 @@ Shader "Fengling/Water Surface"
             float4 _WaveDirs[MAX_WAVES];
             float4 _WaveParams[MAX_WAVES];
             float _AmplitudeScale;
+            float _WaveNoise;
 
             float _WaterTime;
-
             float _UseReflectionCube;
             float _UseFoam;
             float _CameraUnderwater;
-            float _MaxWaveHeight;
 
             struct appdata
             {
                 float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
             };
 
             struct v2f
             {
                 float4 pos      : SV_POSITION;
                 float3 worldPos : TEXCOORD0;
-                float3 normalWS : TEXCOORD1;
+                float2 uv       : TEXCOORD1;
             };
 
-            // Gerstner 高度 + 解析导数（与 CPU 的 GerstnerWaterSimulation 保持同一公式）
+            // ---------- 噪声 ----------
+            float hash21(float2 p)
+            {
+                p = frac(p * float2(123.34, 456.21));
+                p += dot(p, p + 45.32);
+                return frac(p.x * p.y);
+            }
+
+            float valueNoise(float2 p)
+            {
+                float2 i = floor(p);
+                float2 f = frac(p);
+                f = f * f * (3.0 - 2.0 * f);
+                float a = hash21(i);
+                float b = hash21(i + float2(1, 0));
+                float c = hash21(i + float2(0, 1));
+                float d = hash21(i + float2(1, 1));
+                return lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+            }
+
+            // ---------- 地形深度 ----------
+            float TerrainDepth(float3 worldPos)
+            {
+                float2 center = _HeightMapBounds.xy;
+                float2 size = max(_HeightMapBounds.zw, 1e-4);
+                float2 uv = (worldPos.xz - (center - size * 0.5)) / size;
+                float h = tex2Dlod(_HeightMap, float4(saturate(uv), 0, 0)).r;
+                float terrainY = lerp(_HeightRange.x, _HeightRange.y, h);
+                return max(0.0, worldPos.y - terrainY);
+            }
+
+            // ---------- Gerstner（与 CPU 侧同一公式） ----------
             void EvaluateWaves(float2 xz, out float height, out float2 slope)
             {
                 height = 0;
                 slope = 0;
+
+                // 低频噪声调制振幅：破掉"所有波同时到峰"的规则感
+                float irregular = 1.0 + _WaveNoise * (valueNoise(xz * 0.03) - 0.5) * 2.0;
+
                 int count = min(_WaveCount, MAX_WAVES);
                 for (int i = 0; i < count; i++)
                 {
                     float4 dir = _WaveDirs[i];
-                    float4 p = _WaveParams[i];          // amp, k, omega, phase
-                    float amp = p.x * _AmplitudeScale;
+                    float4 p = _WaveParams[i];
+                    float amp = p.x * _AmplitudeScale * irregular;
                     float k = p.y;
                     float omega = p.z;
                     float phase = p.w;
@@ -163,19 +208,16 @@ Shader "Fengling/Water Surface"
             v2f vert(appdata v)
             {
                 v2f o;
-
                 float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 
                 float height;
                 float2 slope;
                 EvaluateWaves(worldPos.xz, height, slope);
-
                 worldPos.y += height;
 
                 o.worldPos = worldPos;
+                o.uv = v.uv;
                 o.pos = mul(UNITY_MATRIX_VP, float4(worldPos, 1.0));
-                // 高度场 y = h(x,z) 的法线 = normalize(-∂h/∂x, 1, -∂h/∂z)
-                o.normalWS = normalize(float3(-slope.x, 1.0, -slope.y));
                 return o;
             }
 
@@ -191,44 +233,36 @@ Shader "Fengling/Water Surface"
                 return f0 + (1.0 - f0) * pow(saturate(1.0 - VoH), 5.0);
             }
 
-            // 用两张法线做 whiteout blend（直接相加会让 Z 超 1，归一化后变平）
-            float3 SampleWaterNormal(float2 worldXZ)
+            float3 SampleDetailNormal(float2 worldXZ)
             {
                 float2 uv1 = worldXZ * (_NormalTiling1 / 10.0) + _NormalSpeed1.xy * _WaterTime;
                 float2 uv2 = worldXZ * (_NormalTiling2 / 10.0) + _NormalSpeed2.xy * _WaterTime;
-
                 float3 n1 = UnpackNormal(tex2D(_NormalMap1, uv1));
                 float3 n2 = UnpackNormal(tex2D(_NormalMap2, uv2));
-
+                // whiteout blend：直接相加会让 Z 超 1，归一化后变平
                 return normalize(float3(n1.xy + n2.xy, n1.z * n2.z));
             }
 
             float4 frag(v2f i) : SV_Target
             {
                 float3 V = normalize(_WorldSpaceCameraPos - i.worldPos);
-                float3 Ngeo = normalize(i.normalWS);
-
-                // ---- 法线贴图：切线空间 → 世界空间（水面基本水平，用世界轴近似即可）
-                float3 tN = SampleWaterNormal(i.worldPos.xz);
-
-                // 距离衰减：远处一个像素覆盖的水面大得多，法线方差也大，
-                // 不压下去就会满屏噪点（手册第 4.4 节）
                 float viewDist = distance(i.worldPos, _WorldSpaceCameraPos);
+
+                // ---- 法线：几何法线（由波推导）+ 细节法线（按距离衰减）
+                float height;
+                float2 slope;
+                EvaluateWaves(i.worldPos.xz, height, slope);
+                float3 Ngeo = normalize(float3(-slope.x, 1.0, -slope.y));
+
                 float fade = saturate(1.0 - (viewDist - _NormalFadeStart) / max(1.0, _NormalFadeRange));
                 float nStrength = lerp(0.22, 1.0, fade) * _NormalStrength;
                 float rough = lerp(_RoughnessFar, _Roughness, fade);
 
+                float3 tN = SampleDetailNormal(i.worldPos.xz);
                 float3 N = normalize(Ngeo + float3(tN.x * nStrength, 0.0, tN.y * nStrength));
 
-                // ---- 地形深度（采样烘焙高度图，不依赖深度缓冲）
-                float2 boundsCenter = _HeightMapBounds.xy;
-                float2 boundsSize = _HeightMapBounds.zw;
-                float2 huv = (i.worldPos.xz - (boundsCenter - boundsSize * 0.5)) / max(boundsSize, 1e-4);
-                float hNormalized = tex2D(_HeightMap, saturate(huv)).r;
-                float terrainY = lerp(_HeightRange.x, _HeightRange.y, hNormalized);
-                float depth = max(0.0, i.worldPos.y - terrainY);
-
-                // ---- 水体颜色：Beer-Lambert 吸收
+                // ---- 深度（决定颜色和透明度）
+                float depth = TerrainDepth(i.worldPos);
                 float transmittance = exp(-depth / max(0.01, _AbsorptionDistance));
                 float3 waterColor = lerp(_DeepColor.rgb, _ShallowColor.rgb, transmittance);
 
@@ -237,7 +271,6 @@ Shader "Fengling/Water Surface"
                 float fresnel = _F0 + (1.0 - _F0) * pow(1.0 - NoV, 5.0);
                 float3 reflectDir = reflect(-V, N);
 
-                // 优先用反射探针的立方体贴图（真实天空），退化时用球谐
                 float3 envColor;
                 if (_UseReflectionCube > 0.5)
                     envColor = DecodeHDR(UNITY_SAMPLE_TEXCUBE(unity_SpecCube0, reflectDir), unity_SpecCube0_HDR);
@@ -252,38 +285,43 @@ Shader "Fengling/Water Surface"
                 float NoL = saturate(dot(N, L));
                 float NoH = saturate(dot(N, H));
                 float VoH = saturate(dot(V, H));
-
                 float a = max(0.002, rough * rough);
                 float D = DistributionGGX(NoH, a);
                 float3 F = FresnelSchlick(VoH, float3(_F0, _F0, _F0));
                 float spec = D * F.x * NoL / max(4.0 * NoV * NoL, 1e-4);
                 color += _SunColor.rgb * spec * _SunIntensity;
 
-                // ---- 岸线泡沫
-                // 三层合成：深度带（宽）+ 硬核心线（贴水线）+ 两层噪声打碎边缘
+                // ---- 岸边泡沫：深度差 + 噪声扭曲坐标（让边缘碎掉）
+                float2 warp = float2(
+                    valueNoise(i.worldPos.xz * 0.35 + _WaterTime * 0.05),
+                    valueNoise(i.worldPos.xz * 0.35 + 31.7 - _WaterTime * 0.04)) - 0.5;
+                float3 warpedPos = i.worldPos + float3(warp.x, 0.0, warp.y) * _FoamWarp;
+                float warpedDepth = TerrainDepth(warpedPos);
+
                 float foamWidth = max(0.01, _FoamDistance);
-                float depthMask = saturate(1.0 - depth / foamWidth);
+                float depthMask = saturate(1.0 - warpedDepth / foamWidth);
                 depthMask *= depthMask;
-                float coreLine = saturate(1.0 - depth / (foamWidth * 0.22));
+                float coreLine = saturate(1.0 - depth / (foamWidth * 0.2));
 
-                float2 fuv1 = i.worldPos.xz * 0.9 + _WaterTime * 0.06;
-                float2 fuv2 = i.worldPos.xz * 2.3 - _WaterTime * 0.11;
-                float n1 = tex2D(_NormalMap1, fuv1).r;
-                float n2 = tex2D(_NormalMap2, fuv2).r;
-                float foamNoise = saturate((n1 * 0.6 + n2 * 0.4 - 0.32) * 2.4);
+                float foamNoise = valueNoise(i.worldPos.xz * 1.7 + _WaterTime * 0.12);
+                foamNoise = saturate((foamNoise - 0.35) * 2.2);
 
-                float crest = saturate((i.worldPos.y - _WaterLevel) / max(0.05, _MaxWaveHeight));
-                float foam = depthMask * (0.40 + 0.60 * foamNoise)
-                           + coreLine * 0.55
-                           + crest * 0.18 * foamNoise;
-                foam *= _FoamStrength * _UseFoam;
+                float crest = saturate((i.worldPos.y - _WaterLevel) / 1.2);
+                float foam = (depthMask * (0.35 + 0.65 * foamNoise) + coreLine * 0.55 + crest * 0.15 * foamNoise)
+                             * _FoamStrength * _UseFoam;
 
                 color = lerp(color, _FoamColor.rgb, saturate(foam));
 
-                // ---- 相机在水下时整体偏青，模拟水体吸收
+                // ---- 透明度：浅处几乎全透（看得见沙底），深处不透明
+                float alpha = saturate(depth / max(0.01, _FadeDistance));
+                alpha = max(alpha, saturate(foam));        // 泡沫不透明
+                alpha = max(alpha, fresnel * 0.9);         // 掠射角反光不透明
+                alpha = saturate(alpha + 0.06);            // 保底一点存在感
+
+                // ---- 水下整体偏青
                 color = lerp(color, color * float3(0.35, 0.70, 0.90), _CameraUnderwater * 0.5);
 
-                return float4(color, 1.0);
+                return float4(color, alpha);
             }
             ENDHLSL
         }

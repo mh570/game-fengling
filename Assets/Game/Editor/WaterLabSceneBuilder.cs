@@ -71,7 +71,7 @@ namespace Fengling.EditorTools
 
             // 6. 玩家：站在水线上，相机贴水面看向海 —— 对标参考图构图
             var player = new GameObject("Player");
-            player.transform.position = new Vector3(-6f, 2f, terrain.shoreZ + 8f);
+            player.transform.position = new Vector3(-6f, 2f, terrain.shoreZ + 28f);
             player.transform.rotation = Quaternion.Euler(0f, 32f, 0f);
 
             var cc = player.AddComponent<CharacterController>();
@@ -90,9 +90,15 @@ namespace Fengling.EditorTools
                 camGo.tag = "MainCamera";
                 cam = camGo.AddComponent<Camera>();
             }
-            cam.transform.SetParent(player.transform, false);
-            cam.transform.localPosition = new Vector3(0f, 1.45f, 0f);
-            cam.transform.localRotation = Quaternion.Euler(4f, 0f, 0f);   // 略微俯视
+            // 第三人称俯视：相机不再挂在玩家头上，而是独立物体跟随
+            cam.transform.SetParent(null, false);
+            var tpc = cam.gameObject.GetComponent<Player.ThirdPersonCamera>();
+            if (tpc == null) tpc = cam.gameObject.AddComponent<Player.ThirdPersonCamera>();
+            tpc.target = player.transform;
+            tpc.offset = new Vector3(0f, 3.6f, -12f);    // 后上方，低俯角，画面里同时有水和天
+            tpc.followYaw = false;                       // 固定方位，等距视角
+            cam.transform.position = player.transform.position + tpc.offset;
+            cam.transform.LookAt(player.transform.position + Vector3.up * tpc.lookAtHeight);
 
             // 8. 保存
             Directory.CreateDirectory("Assets/Scenes");
@@ -133,13 +139,15 @@ namespace Fengling.EditorTools
             sun.color = new Color(1f, 0.93f, 0.80f);
             sun.intensity = 9f;
             sun.shadows = LightShadows.Soft;
-            sunGo.transform.rotation = Quaternion.Euler(38f, -140f, 0f);
+            sunGo.transform.rotation = Quaternion.Euler(42f, -138f, 0f);
             RenderSettings.sun = sun;
 
             // ---- Volume：纯粹靠 HDRP 的 Volume 组件提供天空和环境
             try
             {
-                var profile = GetOrCreateVolumeProfile();
+                var sunDir = -sunGo.transform.forward;
+                var sky = SkyCubemapGenerator.GetOrCreate("Assets/Settings/WaterLabSky.asset", 256, sunDir);
+                var profile = GetOrCreateVolumeProfile(sky);
 
                 var volGo = new GameObject("Global Volume");
                 var vol = volGo.AddComponent<Volume>();
@@ -155,15 +163,12 @@ namespace Fengling.EditorTools
 
         private const string VolumePath = "Assets/Settings/WaterLabVolume.asset";
 
-        private static VolumeProfile GetOrCreateVolumeProfile()
+        private static VolumeProfile GetOrCreateVolumeProfile(Cubemap sky)
         {
-            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(VolumePath);
-            if (profile == null)
-            {
-                profile = ScriptableObject.CreateInstance<VolumeProfile>();
-                Directory.CreateDirectory(Path.GetDirectoryName(VolumePath) ?? "Assets");
-                AssetDatabase.CreateAsset(profile, VolumePath);
-            }
+            AssetDatabase.DeleteAsset(VolumePath);
+            var profile = ScriptableObject.CreateInstance<VolumeProfile>();
+            Directory.CreateDirectory(Path.GetDirectoryName(VolumePath) ?? "Assets");
+            AssetDatabase.CreateAsset(profile, VolumePath);
 
             bool Has<T>() where T : VolumeComponent =>
                 profile.components.Exists(c => c != null && c is T);
@@ -171,11 +176,14 @@ namespace Fengling.EditorTools
             if (!Has<VisualEnvironment>())
             {
                 var ve = profile.Add<VisualEnvironment>(true);
-                ve.skyType.Override((int)UnityEngine.Rendering.HighDefinition.SkyType.PhysicallyBased);
+                ve.skyType.Override((int)UnityEngine.Rendering.HighDefinition.SkyType.HDRI);
             }
 
-            if (!Has<PhysicallyBasedSky>())
-                profile.Add<PhysicallyBasedSky>(true);
+            if (!Has<HDRISky>())
+            {
+                var hs = profile.Add<HDRISky>(true);
+                if (sky != null) hs.hdriSky.Override(sky);
+            }
 
             if (!Has<Exposure>())
             {

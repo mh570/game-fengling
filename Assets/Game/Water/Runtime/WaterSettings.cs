@@ -56,7 +56,7 @@ namespace Fengling.Water
     public class WaterSettings
     {
         [Header("基础")]
-        public WaterKind kind = WaterKind.Gerstner;
+        public WaterKind kind = WaterKind.Spectral;   // 16 波频谱合成，浪形不规则
 
         [Tooltip("画质档位：Low 优先帧率，High 优先效果")]
         public WaterQualityTier tier = WaterQualityTier.High;
@@ -87,7 +87,7 @@ namespace Fengling.Water
         [Range(0f, 360f)] public float windDirectionDegrees = 30f;
 
         [Tooltip("波向绕风向的散布范围（度）")]
-        [Range(0f, 180f)] public float windDirectionSpread = 60f;
+        [Range(0f, 180f)] public float windDirectionSpread = 130f;   // 方向充分散开，避免规则条纹
 
         [Tooltip("最短波长（米）")]
         public float spectralMinWavelength = 4f;
