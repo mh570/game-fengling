@@ -4,7 +4,8 @@
     "references": [
         "Fengling.Water",
         "Fengling.Water.Abstractions",
-        "Fengling.Player"
+        "Fengling.Player",
+        "Fengling.Environment"
     ],
     "includePlatforms": [
         "Editor"
