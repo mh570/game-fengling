@@ -99,14 +99,13 @@ namespace Fengling.EditorTools
             playerGo.AddComponent<Player.PlayerMotor>();
             playerGo.AddComponent<Player.PlayerBuoyancy>();
 
-            var tps = cam.gameObject.AddComponent<Player.ThirdPersonCamera>();
-            tps.target = playerGo.transform;
-            tps.offset = new Vector3(0f, 4.5f, -8f);
-            tps.followYaw = true;
-            tps.enabled = false;
+            var fps = cam.gameObject.AddComponent<Player.FirstPersonCamera>();
+            fps.target = playerGo.transform;
+            fps.eyeHeight = 1.62f;
+            fps.enabled = false;
 
             var switcher = cam.gameObject.AddComponent<Player.CameraModeSwitch>();
-            switcher.thirdPerson = tps;
+            switcher.firstPerson = fps;
             switcher.topDown = topDown;
 
             // 8. 保存
