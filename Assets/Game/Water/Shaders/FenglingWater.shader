@@ -58,6 +58,9 @@ Shader "Fengling/Water Surface"
 
         [Header(Time)]
         _WaterTime ("Water Time", Float) = 0
+        _FlowDir ("Flow Direction (xz)", Vector) = (1, 0, 0, 0)
+        _FlowSpeed ("Flow Speed", Float) = 0
+        _Vertical ("Vertical Flow (waterfall)", Range(0,1)) = 0
 
         [Header(Toggles)]
         [ToggleUI] _UseReflectionCube ("Use Reflection Cube", Float) = 1
@@ -134,6 +137,9 @@ Shader "Fengling/Water Surface"
             float _WaveNoise;
 
             float _WaterTime;
+            float4 _FlowDir;
+            float _FlowSpeed;
+            float _Vertical;
             float _UseReflectionCube;
             float _UseFoam;
             float _CameraUnderwater;
@@ -217,6 +223,8 @@ Shader "Fengling/Water Surface"
                 float height;
                 float2 slope;
                 EvaluateWaves(worldPos.xz, height, slope);
+                height *= (1.0 - _Vertical);
+                slope *= (1.0 - _Vertical);
                 worldPos.y += height;
 
                 o.worldPos = worldPos;
@@ -239,6 +247,7 @@ Shader "Fengling/Water Surface"
 
             float3 SampleDetailNormal(float2 worldXZ)
             {
+                worldXZ += _FlowDir.xy * _FlowSpeed * _WaterTime;
                 float2 uv1 = worldXZ * (_NormalTiling1 / 10.0) + _NormalSpeed1.xy * _WaterTime;
                 float2 uv2 = worldXZ * (_NormalTiling2 / 10.0) + _NormalSpeed2.xy * _WaterTime;
                 float3 n1 = UnpackNormal(tex2D(_NormalMap1, uv1));
@@ -264,6 +273,8 @@ Shader "Fengling/Water Surface"
 
                 float3 tN = SampleDetailNormal(i.worldPos.xz);
                 float3 N = normalize(Ngeo + float3(tN.x * nStrength, 0.0, tN.y * nStrength));
+                if (_Vertical > 0.5)
+                    N = normalize(float3(tN.x, 1.0, tN.y));
 
                 // ---- 深度（决定颜色和透明度）
                 float depth = TerrainDepth(i.worldPos);

@@ -56,6 +56,14 @@ namespace Fengling.Water
         public bool useFoam = true;
         public bool useReflectionCube = true;
 
+        [Header("流向 / 垂直流")]
+        [Tooltip("水面流动方向（XZ），小河用")]
+        public Vector2 flowDirection = new Vector2(1f, 0f);
+        [Tooltip("流动速度，0 = 静止")]
+        [Range(0f, 3f)] public float flowSpeed = 0f;
+        [Tooltip("1 = 瀑布模式（垂直流，跳过波动）")]
+        [Range(0f, 1f)] public float verticalFlow = 0f;
+
         [Header("泡沫")]
         public Color foamColor = Color.white;
         [Range(0.05f, 3f)] public float foamDistance = 1.0f;
@@ -196,6 +204,9 @@ namespace Fengling.Water
             // 振幅已在模拟器里乘过 amplitudeScale，这里必须固定 1，否则会重复放大
             _material.SetFloat("_AmplitudeScale", 1f);
             _material.SetFloat("_WaveNoise", waveIrregularity);
+            _material.SetVector("_FlowDir", new Vector4(flowDirection.x, flowDirection.y, 0f, 0f));
+            _material.SetFloat("_FlowSpeed", flowSpeed);
+            _material.SetFloat("_Vertical", verticalFlow);
 
             _material.SetFloat("_WaterTime", water.WaterTime);
             _material.SetFloat("_MaxWaveHeight", Mathf.Max(0.05f, maxHeight * 0.6f));

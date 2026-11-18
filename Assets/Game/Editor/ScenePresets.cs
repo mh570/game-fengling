@@ -211,6 +211,9 @@ namespace Fengling.EditorTools
             sm.foamDistance = p.FoamDistance;
             sm.foamStrength = p.FoamStrength;
             sm.stylized = 0f;
+            sm.flowDirection = new Vector2(0f, 1f);
+            sm.flowSpeed = p.Name == "River" ? 0.8f : 0.05f;
+            sm.verticalFlow = p.VerticalWater ? 1f : 0f;
 
             if (p.VerticalWater) BuildWaterfallSheet(surface.transform, p);
 
