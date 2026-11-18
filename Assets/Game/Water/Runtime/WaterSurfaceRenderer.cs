@@ -46,8 +46,8 @@ namespace Fengling.Water
 
         [Header("泡沫")]
         public Color foamColor = Color.white;
-        [Range(0.05f, 3f)] public float foamDistance = 0.6f;
-        [Range(0f, 2f)] public float foamStrength = 1f;
+        [Range(0.05f, 3f)] public float foamDistance = 1.6f;
+        [Range(0f, 2f)] public float foamStrength = 2f;
 
         private Mesh _mesh;
         private Material _material;
@@ -107,7 +107,7 @@ namespace Fengling.Water
                     normalStrength = 0.7f;
                     absorptionDistance = 4f;
                     roughness = 0.10f;
-                    foamDistance = 0.35f;
+                    foamDistance = 0.5f;
                     break;
 
                 case WaterQualityTier.Medium:
@@ -116,7 +116,7 @@ namespace Fengling.Water
                     normalStrength = 1.0f;
                     absorptionDistance = 5f;
                     roughness = 0.07f;
-                    foamDistance = 0.6f;
+                    foamDistance = 1.0f;
                     break;
 
                 default: // High
@@ -125,7 +125,7 @@ namespace Fengling.Water
                     normalStrength = 1.2f;
                     absorptionDistance = 5f;
                     roughness = 0.06f;
-                    foamDistance = 0.9f;
+                    foamDistance = 1.6f;
                     break;
             }
 

@@ -3,6 +3,8 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace Fengling.EditorTools
 {
@@ -40,9 +42,14 @@ namespace Fengling.EditorTools
             // 3. 把地形高度烘焙成纹理（水面用它算水深和泡沫）
             var heightMap = BakeHeightMap(terrain);
 
+            // 3.5 天空 + 曝光 + 色调映射 + 太阳
+            //     没有这一步，水面反射是黑的、颜色是未映射的线性值 —— 画面必然又暗又灰
+            SetupSkyAndSun();
+
             // 4. 水模块
             var waterGo = new GameObject("Water");
             var waterModule = waterGo.AddComponent<Water.WaterModule>();
+            waterModule.Settings.amplitudeScale = 1.5f;   // 参考图的浪比较明显
             waterGo.AddComponent<Water.WaterFieldGizmo>();
             waterGo.AddComponent<Water.WaterLabHUD>();
 
@@ -62,9 +69,10 @@ namespace Fengling.EditorTools
             surfaceRenderer.normalMap1 = GetOrCreateNormalMap(NormalMap1Path, 1337, 5);
             surfaceRenderer.normalMap2 = GetOrCreateNormalMap(NormalMap2Path, 4242, 9);
 
-            // 6. 玩家（站在陆地上）
+            // 6. 玩家：站在水线上，相机贴水面看向海 —— 对标参考图构图
             var player = new GameObject("Player");
-            player.transform.position = new Vector3(0f, terrain.landHeight + 1.5f, terrain.shoreZ - 20f);
+            player.transform.position = new Vector3(-6f, 2f, terrain.shoreZ + 8f);
+            player.transform.rotation = Quaternion.Euler(0f, 32f, 0f);
 
             var cc = player.AddComponent<CharacterController>();
             cc.height = 1.8f;
@@ -83,8 +91,8 @@ namespace Fengling.EditorTools
                 cam = camGo.AddComponent<Camera>();
             }
             cam.transform.SetParent(player.transform, false);
-            cam.transform.localPosition = new Vector3(0f, 1.6f, 0f);
-            cam.transform.localRotation = Quaternion.identity;
+            cam.transform.localPosition = new Vector3(0f, 1.45f, 0f);
+            cam.transform.localRotation = Quaternion.Euler(4f, 0f, 0f);   // 略微俯视
 
             // 8. 保存
             Directory.CreateDirectory("Assets/Scenes");
@@ -102,6 +110,91 @@ namespace Fengling.EditorTools
         }
 
         // ---------------- 资源生成 ----------------
+
+        /// <summary>
+        /// 天空 + 曝光 + 色调映射 + 太阳。
+        ///
+        /// 为什么必须有：HDRP 是线性 HDR 管线，没有天空就没有环境反射，
+        /// 水面采样到的是黑的；没有 Exposure/Tonemapping，颜色是未映射的原始值。
+        /// 这两样缺任何一个，水都会"又暗又灰"—— 而它们跟水面 shader 一点关系都没有。
+        /// </summary>
+        private static void SetupSkyAndSun()
+        {
+            // ---- 太阳：低角度逆光，水面才能拉出长条碎光
+            var sunGo = GameObject.Find("Directional Light");
+            Light sun = null;
+            if (sunGo != null) sun = sunGo.GetComponent<Light>();
+            if (sun == null)
+            {
+                sunGo = new GameObject("Directional Light");
+                sun = sunGo.AddComponent<Light>();
+                sun.type = LightType.Directional;
+            }
+            sun.color = new Color(1f, 0.93f, 0.80f);
+            sun.intensity = 9f;
+            sun.shadows = LightShadows.Soft;
+            sunGo.transform.rotation = Quaternion.Euler(38f, -140f, 0f);
+            RenderSettings.sun = sun;
+
+            // ---- Volume：纯粹靠 HDRP 的 Volume 组件提供天空和环境
+            try
+            {
+                var profile = GetOrCreateVolumeProfile();
+
+                var volGo = new GameObject("Global Volume");
+                var vol = volGo.AddComponent<Volume>();
+                vol.isGlobal = true;
+                vol.priority = 1f;
+                vol.profile = profile;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("[Fengling] Volume 创建失败（画面会偏暗）: " + e.Message);
+            }
+        }
+
+        private const string VolumePath = "Assets/Settings/WaterLabVolume.asset";
+
+        private static VolumeProfile GetOrCreateVolumeProfile()
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(VolumePath);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                Directory.CreateDirectory(Path.GetDirectoryName(VolumePath) ?? "Assets");
+                AssetDatabase.CreateAsset(profile, VolumePath);
+            }
+
+            bool Has<T>() where T : VolumeComponent =>
+                profile.components.Exists(c => c != null && c is T);
+
+            if (!Has<VisualEnvironment>())
+            {
+                var ve = profile.Add<VisualEnvironment>(true);
+                ve.skyType.Override((int)UnityEngine.Rendering.HighDefinition.SkyType.PhysicallyBased);
+            }
+
+            if (!Has<PhysicallyBasedSky>())
+                profile.Add<PhysicallyBasedSky>(true);
+
+            if (!Has<Exposure>())
+            {
+                var ex = profile.Add<Exposure>(true);
+                ex.mode.Override(ExposureMode.Fixed);
+                ex.fixedExposure.Override(13.5f);
+                ex.limitMax.Override(14f);
+            }
+
+            if (!Has<Tonemapping>())
+            {
+                var tm = profile.Add<Tonemapping>(true);
+                tm.mode.Override(TonemappingMode.ACES);
+            }
+
+            EditorUtility.SetDirty(profile);
+            AssetDatabase.SaveAssets();
+            return profile;
+        }
 
         private static Material GetOrCreateSandMaterial()
         {

@@ -27,6 +27,8 @@ namespace Fengling.Player
         private Vector3 _velocity;
         private float _pitch;
         private bool _cursorLocked;
+        private Vector3 _spawnPosition;
+        private Quaternion _spawnRotation;
 
         public Vector3 Velocity => _velocity;
         public bool IsGrounded => _cc != null && _cc.isGrounded;
@@ -36,6 +38,9 @@ namespace Fengling.Player
             _cc = GetComponent<CharacterController>();
             if (cameraPivot == null && Camera.main != null)
                 cameraPivot = Camera.main.transform;
+
+            _spawnPosition = transform.position;
+            _spawnRotation = transform.rotation;
             LockCursor(true);
         }
 
@@ -44,6 +49,22 @@ namespace Fengling.Player
             HandleCursor();
             if (_cursorLocked) HandleLook();
             HandleMove();
+        }
+
+        /// <summary>
+        /// 掉出世界的保险：没有碰撞体、或者穿模掉下去时，把人拉回出生点，
+        /// 而不是让他一直自由落体到 Y=-15374（第一次跑就踩了这个坑）。
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (transform.position.y < -100f)
+            {
+                Debug.LogWarning("[Player] 掉出世界，已重置到出生点");
+                _cc.enabled = false;
+                transform.SetPositionAndRotation(_spawnPosition, _spawnRotation);
+                _cc.enabled = true;
+                _velocity = Vector3.zero;
+            }
         }
 
         private void HandleCursor()

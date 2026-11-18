@@ -137,6 +137,12 @@ namespace Fengling.Environment
 
             var mf = GetComponent<MeshFilter>();
             if (mf != null) mf.sharedMesh = _mesh;
+
+            // 碰撞体：没有它地形只是"看起来有地面"，玩家会直接掉穿世界
+            var mc = GetComponent<MeshCollider>();
+            if (mc == null) mc = gameObject.AddComponent<MeshCollider>();
+            mc.sharedMesh = null;          // 先清空，避免复用旧网格导致碰撞不更新
+            mc.sharedMesh = _mesh;
         }
 
         private void OnDrawGizmosSelected()

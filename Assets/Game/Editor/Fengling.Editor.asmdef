@@ -5,7 +5,9 @@
         "Fengling.Water",
         "Fengling.Water.Abstractions",
         "Fengling.Player",
-        "Fengling.Environment"
+        "Fengling.Environment",
+        "Unity.RenderPipelines.HighDefinition.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [
         "Editor"

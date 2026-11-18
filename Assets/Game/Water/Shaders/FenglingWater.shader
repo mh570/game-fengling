@@ -15,11 +15,14 @@ Shader "Fengling/Water Surface"
         [Header(Normals)]
         _NormalMap1 ("Normal Map 1", 2D) = "bump" {}
         _NormalMap2 ("Normal Map 2", 2D) = "bump" {}
-        _NormalTiling1 ("Tiling 1 (per 100m)", Float) = 8
-        _NormalTiling2 ("Tiling 2 (per 100m)", Float) = 24
+        _NormalTiling1 ("Tiling 1 (per 10m)", Float) = 8
+        _NormalTiling2 ("Tiling 2 (per 10m)", Float) = 24
         _NormalSpeed1 ("Scroll 1 (xy)", Vector) = (0.02, 0.011, 0, 0)
         _NormalSpeed2 ("Scroll 2 (xy)", Vector) = (-0.013, 0.021, 0, 0)
         _NormalStrength ("Normal Strength", Range(0, 2)) = 1
+        _NormalFadeStart ("Normal Fade Start (m)", Float) = 25
+        _NormalFadeRange ("Normal Fade Range (m)", Float) = 120
+        _RoughnessFar ("Roughness Far", Range(0.01, 0.6)) = 0.22
 
         [Header(Sun)]
         _SunDirection ("Sun Direction (world)", Vector) = (0.3, 0.8, 0.5, 0)
@@ -89,6 +92,9 @@ Shader "Fengling/Water Surface"
             float4 _NormalSpeed1;
             float4 _NormalSpeed2;
             float _NormalStrength;
+            float _NormalFadeStart;
+            float _NormalFadeRange;
+            float _RoughnessFar;
 
             float4 _SunDirection;
             float4 _SunColor;
@@ -188,15 +194,13 @@ Shader "Fengling/Water Surface"
             // 用两张法线做 whiteout blend（直接相加会让 Z 超 1，归一化后变平）
             float3 SampleWaterNormal(float2 worldXZ)
             {
-                float2 uv1 = worldXZ * (_NormalTiling1 / 100.0) + _NormalSpeed1.xy * _WaterTime;
-                float2 uv2 = worldXZ * (_NormalTiling2 / 100.0) + _NormalSpeed2.xy * _WaterTime;
+                float2 uv1 = worldXZ * (_NormalTiling1 / 10.0) + _NormalSpeed1.xy * _WaterTime;
+                float2 uv2 = worldXZ * (_NormalTiling2 / 10.0) + _NormalSpeed2.xy * _WaterTime;
 
                 float3 n1 = UnpackNormal(tex2D(_NormalMap1, uv1));
                 float3 n2 = UnpackNormal(tex2D(_NormalMap2, uv2));
 
-                float3 blended = normalize(float3(n1.xy + n2.xy, n1.z * n2.z));
-                blended.xy *= _NormalStrength;
-                return normalize(blended);
+                return normalize(float3(n1.xy + n2.xy, n1.z * n2.z));
             }
 
             float4 frag(v2f i) : SV_Target
@@ -206,7 +210,15 @@ Shader "Fengling/Water Surface"
 
                 // ---- 法线贴图：切线空间 → 世界空间（水面基本水平，用世界轴近似即可）
                 float3 tN = SampleWaterNormal(i.worldPos.xz);
-                float3 N = normalize(Ngeo + float3(tN.x, 0.0, tN.y));
+
+                // 距离衰减：远处一个像素覆盖的水面大得多，法线方差也大，
+                // 不压下去就会满屏噪点（手册第 4.4 节）
+                float viewDist = distance(i.worldPos, _WorldSpaceCameraPos);
+                float fade = saturate(1.0 - (viewDist - _NormalFadeStart) / max(1.0, _NormalFadeRange));
+                float nStrength = lerp(0.22, 1.0, fade) * _NormalStrength;
+                float rough = lerp(_RoughnessFar, _Roughness, fade);
+
+                float3 N = normalize(Ngeo + float3(tN.x * nStrength, 0.0, tN.y * nStrength));
 
                 // ---- 地形深度（采样烘焙高度图，不依赖深度缓冲）
                 float2 boundsCenter = _HeightMapBounds.xy;
@@ -241,24 +253,29 @@ Shader "Fengling/Water Surface"
                 float NoH = saturate(dot(N, H));
                 float VoH = saturate(dot(V, H));
 
-                float a = max(0.002, _Roughness * _Roughness);
+                float a = max(0.002, rough * rough);
                 float D = DistributionGGX(NoH, a);
                 float3 F = FresnelSchlick(VoH, float3(_F0, _F0, _F0));
                 float spec = D * F.x * NoL / max(4.0 * NoV * NoL, 1e-4);
                 color += _SunColor.rgb * spec * _SunIntensity;
 
-                // ---- 泡沫：岸线（深度差）+ 浪尖（高度）两路
-                float depthFoam = 1.0 - saturate(depth / max(0.01, _FoamDistance));
-                depthFoam *= depthFoam;
+                // ---- 岸线泡沫
+                // 三层合成：深度带（宽）+ 硬核心线（贴水线）+ 两层噪声打碎边缘
+                float foamWidth = max(0.01, _FoamDistance);
+                float depthMask = saturate(1.0 - depth / foamWidth);
+                depthMask *= depthMask;
+                float coreLine = saturate(1.0 - depth / (foamWidth * 0.22));
 
-                float2 foamUvA = i.worldPos.xz * 0.35 + _WaterTime * 0.05;
-                float2 foamUvB = i.worldPos.xz * 0.80 - _WaterTime * 0.09;
-                float noiseA = tex2D(_NormalMap2, foamUvA).r;
-                float noiseB = tex2D(_NormalMap1, foamUvB).r;
+                float2 fuv1 = i.worldPos.xz * 0.9 + _WaterTime * 0.06;
+                float2 fuv2 = i.worldPos.xz * 2.3 - _WaterTime * 0.11;
+                float n1 = tex2D(_NormalMap1, fuv1).r;
+                float n2 = tex2D(_NormalMap2, fuv2).r;
+                float foamNoise = saturate((n1 * 0.6 + n2 * 0.4 - 0.32) * 2.4);
 
                 float crest = saturate((i.worldPos.y - _WaterLevel) / max(0.05, _MaxWaveHeight));
-                float foam = depthFoam * (0.55 + 0.45 * noiseA)
-                           + crest * 0.35 * noiseB;
+                float foam = depthMask * (0.40 + 0.60 * foamNoise)
+                           + coreLine * 0.55
+                           + crest * 0.18 * foamNoise;
                 foam *= _FoamStrength * _UseFoam;
 
                 color = lerp(color, _FoamColor.rgb, saturate(foam));
