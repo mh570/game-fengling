@@ -34,15 +34,34 @@ namespace Fengling.EditorTools
             return mat;
         }
 
-        /// <summary>克隆基础材质并设置颜色/光滑度。</summary>
+        /// <summary>
+        /// 生成（或复用）一个材质资产。
+        ///
+        /// 必须落成资产：运行时的内存材质写进场景后引用的是一份不可靠的临时对象，
+        /// 实测会导致道具全粉。落成 .mat 后场景引用的是稳定 GUID。
+        /// </summary>
         public static Material Make(string name, Color color, float smoothness)
         {
             var baseMat = GetBase();
             if (baseMat == null) return null;
 
+            var dir = Path.GetDirectoryName(BaseMaterialPath) ?? "Assets";
+            var path = dir + "/" + name + ".mat";
+
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null)
+            {
+                existing.shader = baseMat.shader;
+                existing.SetColor("_BaseColor", color);
+                existing.SetFloat("_Smoothness", Mathf.Clamp01(smoothness));
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
             var mat = new Material(baseMat) { name = name };
             mat.SetColor("_BaseColor", color);
             mat.SetFloat("_Smoothness", Mathf.Clamp01(smoothness));
+            AssetDatabase.CreateAsset(mat, path);
             return mat;
         }
     }
