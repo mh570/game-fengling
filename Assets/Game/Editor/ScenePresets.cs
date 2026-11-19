@@ -295,11 +295,25 @@ namespace Fengling.EditorTools
 
         private static void BuildWaterfallSheet(Transform parent, Preset p)
         {
+            // 程序化地形是缓坡，不是崖壁；给 Waterfall 单独加一面竖直岩壁，
+            // 否则低机位会看到一面“土墙”或者直接看穿坡面。
+            var cliff = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            cliff.name = "WaterfallCliff";
+            cliff.transform.SetParent(parent, false);
+            cliff.transform.localScale = new Vector3(p.Size.x, p.LandHeight, 1f);
+            cliff.transform.position = new Vector3(0f, p.LandHeight * 0.5f,
+                p.ShoreZ + p.SlopeLength + 0.3f);
+            cliff.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            var cliffCol = cliff.GetComponent<MeshCollider>();
+            if (cliffCol != null) Object.DestroyImmediate(cliffCol);
+            cliff.GetComponent<Renderer>().sharedMaterial =
+                MakeMaterial("Mat_WaterfallCliff", new Color(0.34f, 0.32f, 0.29f), 0.08f);
+
             var plane = GameObject.CreatePrimitive(PrimitiveType.Quad);
             plane.name = "WaterfallSheet";
             plane.transform.SetParent(parent, false);
             plane.transform.localScale = new Vector3(24f, p.LandHeight, 1f);
-            // 放在坡面海侧，避免整块 sheet 埋进地形里。
+            // 放在崖壁海侧，避免整块 sheet 埋进崖壁/地形里。
             plane.transform.position = new Vector3(0f, p.LandHeight * 0.5f,
                 p.ShoreZ + p.SlopeLength + 0.5f);
             plane.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
