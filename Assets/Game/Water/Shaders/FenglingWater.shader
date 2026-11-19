@@ -222,10 +222,13 @@ Shader "Fengling/Water Surface"
 
                 float height;
                 float2 slope;
-                EvaluateWaves(worldPos.xz, height, slope);
-                height *= (1.0 - _Vertical);
-                slope *= (1.0 - _Vertical);
-                worldPos.y += height;
+                if (_Vertical < 0.5)
+                {
+                    EvaluateWaves(worldPos.xz, height, slope);
+                    height *= (1.0 - _Vertical);
+                    slope *= (1.0 - _Vertical);
+                    worldPos.y += height;
+                }
 
                 o.worldPos = worldPos;
                 o.uv = v.uv;
@@ -256,8 +259,37 @@ Shader "Fengling/Water Surface"
                 return normalize(float3(n1.xy + n2.xy, n1.z * n2.z));
             }
 
+            // 垂直瀑布：不采样地形深度，用 UV 纵向流动 + 噪声泡沫。
+            // 这是 P0 的轻量实现，真正的垂直流体/碰撞飞沫以后再补。
+            float4 VerticalWater(v2f i) : SV_Target
+            {
+                float speed = max(0.2, _FlowSpeed);
+                float2 uv1 = float2(i.uv.x * 3.0, i.uv.y * 1.2 + _WaterTime * speed * 1.4);
+                float2 uv2 = float2(i.uv.x * 7.0 + 0.13, i.uv.y * 2.0 + _WaterTime * speed * 2.1);
+
+                float3 n1 = UnpackNormal(tex2D(_NormalMap1, uv1));
+                float3 n2 = UnpackNormal(tex2D(_NormalMap2, uv2));
+                float3 n = normalize(float3(n1.x + n2.x, n1.z * n2.z, n1.y + n2.y));
+
+                float streak = valueNoise(float2(i.uv.x * 18.0, i.uv.y * 3.0 - _WaterTime * speed * 3.0));
+                float streak2 = valueNoise(float2(i.uv.x * 46.0 + 13.0, i.uv.y * 7.0 - _WaterTime * speed * 5.0));
+                float foam = saturate((streak * 0.65 + streak2 * 0.35 - 0.34) * 2.0);
+
+                float edge = smoothstep(0.0, 0.10, i.uv.x) * smoothstep(1.0, 0.90, i.uv.x);
+                float topFade = smoothstep(1.0, 0.72, i.uv.y);
+                float3 baseCol = lerp(_DeepColor.rgb, _ShallowColor.rgb, saturate(i.uv.y * 1.1));
+                float3 col = lerp(baseCol, _FoamColor.rgb, foam * 0.9);
+                col += n.x * 0.04;
+
+                float alpha = saturate(0.55 + foam * 0.35) * edge * topFade;
+                return float4(col, alpha);
+            }
+
             float4 frag(v2f i) : SV_Target
             {
+                if (_Vertical > 0.5)
+                    return VerticalWater(i);
+
                 float3 V = normalize(_WorldSpaceCameraPos - i.worldPos);
                 float viewDist = distance(i.worldPos, _WorldSpaceCameraPos);
 

@@ -22,6 +22,9 @@ namespace Fengling.Water
         [Tooltip("每边分段数。128 段 = 16,641 顶点，对 200m 水面每格 1.5m")]
         [Range(16, 256)] public int segments = 128;
 
+        [Tooltip("运行时重建水面网格。瀑布 sheet 用 Quad 时必须关掉，否则会被替换成水平网格")]
+        public bool buildMesh = true;
+
         [Header("地形高度图（用于水深、泡沫）")]
         public Texture2D terrainHeightMap;
         [Tooltip("(中心X, 中心Z, 尺寸X, 尺寸Z)")]
@@ -82,10 +85,13 @@ namespace Fengling.Water
         {
             if (water == null) water = FindFirstObjectByType<WaterModule>();
 
-            _mesh = WaterMeshBuilder.Build(
-                water != null ? water.Settings.size : new Vector2(200f, 200f),
-                segments, "WaterSurface");
-            GetComponent<MeshFilter>().sharedMesh = _mesh;
+            if (buildMesh)
+            {
+                _mesh = WaterMeshBuilder.Build(
+                    water != null ? water.Settings.size : new Vector2(200f, 200f),
+                    segments, "WaterSurface");
+                GetComponent<MeshFilter>().sharedMesh = _mesh;
+            }
 
             var shader = Shader.Find("Fengling/Water Surface");
             if (shader == null)

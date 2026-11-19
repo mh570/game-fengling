@@ -13,6 +13,10 @@ namespace Fengling.EditorTools
     /// </summary>
     public static class ScenePresets
     {
+        private const string HeightMapDir = "Assets/Game/Environment/Terrain";
+        private const string NormalMap1Path = "Assets/Game/Water/Textures/WaterNormal1.asset";
+        private const string NormalMap2Path = "Assets/Game/Water/Textures/WaterNormal2.asset";
+
         private struct Preset
         {
             public string Name;
@@ -193,17 +197,25 @@ namespace Fengling.EditorTools
             mr.sharedMaterial = MakeMaterial("Mat_" + p.Name, new Color(0.66f, 0.60f, 0.46f), 0.05f);
             terrain.Generate();
 
+            var heightMap = BakeHeightMap(terrain, p.Name);
+
             PropSpawner.SpawnAll(null, terrain, p.Size.x);
 
             // ---- water
             var waterGo = new GameObject("Water");
             var wm = waterGo.AddComponent<Water.WaterModule>();
+            wm.Settings.size = p.Size;
             wm.Settings.baseLevel = p.WaterLevel;
             wm.Settings.amplitudeScale = p.Amplitude;
 
             var surface = new GameObject("WaterSurface");
             var sm = surface.AddComponent<Water.WaterSurfaceRenderer>();
             sm.water = wm;
+            sm.terrainHeightMap = heightMap;
+            sm.heightMapBounds = new Vector4(0f, 0f, p.Size.x, p.Size.y);
+            sm.heightRange = terrain.HeightMapRange;
+            sm.normalMap1 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap1Path);
+            sm.normalMap2 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap2Path);
             sm.shallowColor = p.Shallow;
             sm.deepColor = p.Deep;
             sm.absorptionDistance = p.Absorption;
@@ -213,7 +225,7 @@ namespace Fengling.EditorTools
             sm.stylized = 0f;
             sm.flowDirection = new Vector2(0f, 1f);
             sm.flowSpeed = p.Name == "River" ? 0.8f : 0.05f;
-            sm.verticalFlow = p.VerticalWater ? 1f : 0f;
+            sm.verticalFlow = 0f;
 
             if (p.VerticalWater) BuildWaterfallSheet(surface.transform, p);
 
@@ -221,6 +233,8 @@ namespace Fengling.EditorTools
             var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             player.name = "Player";
             player.transform.position = new Vector3(0f, p.WaterLevel + 2f, p.ShoreZ + 10f);
+            var playerMat = MakeMaterial("PlayerBody", new Color(0.72f, 0.32f, 0.24f), 0.2f);
+            player.GetComponent<Renderer>().sharedMaterial = playerMat;
             var cap = player.GetComponent<CapsuleCollider>();
             if (cap != null) Object.DestroyImmediate(cap);
             var cc = player.AddComponent<CharacterController>();
@@ -287,10 +301,27 @@ namespace Fengling.EditorTools
 
             var sm = plane.AddComponent<Water.WaterSurfaceRenderer>();
             sm.water = Object.FindFirstObjectByType<Water.WaterModule>();
+            sm.buildMesh = false;              // 保留 Quad 的竖直网格
+            sm.verticalFlow = 1f;
+            sm.flowSpeed = 1.6f;
             sm.shallowColor = p.Shallow;
             sm.deepColor = p.Deep;
             sm.normalStrength = 1.6f;
             sm.foamStrength = 2.4f;
+        }
+
+        private static Texture2D BakeHeightMap(Environment.CoastTerrain terrain, string sceneName)
+        {
+            var path = HeightMapDir + "/CoastHeightMap_" + sceneName + ".asset";
+            AssetDatabase.DeleteAsset(path);
+
+            var tex = terrain.BuildHeightMap(256);
+            tex.name = "CoastHeightMap_" + sceneName;
+
+            Directory.CreateDirectory(HeightMapDir);
+            AssetDatabase.CreateAsset(tex, path);
+            AssetDatabase.SaveAssets();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
 
         private static void AddVolume()
