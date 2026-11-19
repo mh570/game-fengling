@@ -95,7 +95,7 @@ namespace Fengling.EditorTools
 
         private static Material MakeMaterial(string name, Color color, float smoothness)
         {
-            var shader = Shader.Find("HDRP/Lit");
+            var shader = Shader.Find("Fengling/Lit") ?? Shader.Find("HDRP/Lit");
             if (shader == null) return null;
 
             var mat = new Material(shader) { name = name };

@@ -6,6 +6,7 @@
         "Fengling.Water.Abstractions",
         "Fengling.Player",
         "Fengling.Environment",
+        "Fengling.Rendering",
         "Unity.RenderPipelines.HighDefinition.Runtime",
         "Unity.RenderPipelines.Core.Runtime"
     ],
