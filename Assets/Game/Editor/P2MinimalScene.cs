@@ -106,7 +106,7 @@ namespace Fengling.EditorTools
             var sm = surfaceGo.AddComponent<Water.WaterSurfaceRenderer>();
             sm.water = wm;
             sm.autoTier = false;
-            sm.useFoam = false;
+            sm.useFoam = true;
             sm.useReflectionCube = false;
             sm.waterMaterialTemplate = WaterMaterialProvider.GetOrCreate();
             sm.buildMesh = true;
@@ -114,19 +114,19 @@ namespace Fengling.EditorTools
             sm.terrainHeightMap = heightMap;
             sm.heightMapBounds = new Vector4(0f, 0f, terrain.size.x, terrain.size.y);
             sm.heightRange = terrain.HeightMapRange;
-            sm.normalMap1 = null;
-            sm.normalMap2 = null;
+            sm.normalMap1 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap1Path);
+            sm.normalMap2 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap2Path);
             sm.normalTiling1 = 2f;
             sm.normalTiling2 = 5f;
-            sm.normalStrength = 0f;
+            sm.normalStrength = 0.45f;
             sm.roughness = 0.3f;
             sm.sunIntensity = 0.5f;
             sm.shallowColor = new Color(0.08f, 0.48f, 0.55f);
             sm.deepColor = new Color(0.01f, 0.10f, 0.22f);
             sm.absorptionDistance = 2.5f;
             sm.opaqueAtDepth = 2f;
-            sm.foamDistance = 0.8f;
-            sm.foamStrength = 0.45f;
+            sm.foamDistance = 1.2f;
+            sm.foamStrength = 0.9f;
             sm.foamWarp = 1.2f;
 
             Directory.CreateDirectory("Assets/Scenes");
