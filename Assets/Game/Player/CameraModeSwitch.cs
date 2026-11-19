@@ -12,10 +12,12 @@ namespace Fengling.Player
         public FirstPersonCamera firstPerson;
         public TopDownCamera topDown;
         public KeyCode toggleKey = KeyCode.C;
+        [Tooltip("启动时用第一人称；默认 false = 俯视 RPG 机位")]
+        public bool startInFirstPerson = false;
 
         private void Start()
         {
-            ApplyMode(true);
+            ApplyMode(startInFirstPerson);
         }
 
         private void Update()

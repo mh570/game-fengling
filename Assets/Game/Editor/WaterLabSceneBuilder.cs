@@ -71,6 +71,21 @@ namespace Fengling.EditorTools
             surfaceRenderer.heightRange = terrain.HeightMapRange;
             surfaceRenderer.normalMap1 = GetOrCreateNormalMap(NormalMap1Path, 1337, 5);
             surfaceRenderer.normalMap2 = GetOrCreateNormalMap(NormalMap2Path, 4242, 9);
+            // P4 topdown baseline: low-frequency normals, weak specular, shore foam only.
+            surfaceRenderer.autoTier = false;
+            surfaceRenderer.useFoam = true;
+            surfaceRenderer.useReflectionCube = false;
+            surfaceRenderer.normalTiling1 = 2f;
+            surfaceRenderer.normalTiling2 = 5f;
+            surfaceRenderer.normalStrength = 0.45f;
+            surfaceRenderer.roughness = 0.5f;
+            surfaceRenderer.sunIntensity = 0.2f;
+            surfaceRenderer.f0 = 0f;
+            surfaceRenderer.opaqueAtDepth = 4f;
+            surfaceRenderer.shallowColor = new Color(0.08f, 0.48f, 0.55f);
+            surfaceRenderer.deepColor = new Color(0.01f, 0.10f, 0.22f);
+            surfaceRenderer.foamDistance = 1.2f;
+            surfaceRenderer.foamStrength = 0.9f;
 
             // 6. 相机：正交俯视（地图视角，没有角色）
             var cam = Camera.main;
@@ -83,25 +98,28 @@ namespace Fengling.EditorTools
             cam.transform.SetParent(null, false);
             var topDown = cam.gameObject.GetComponent<Player.TopDownCamera>();
             if (topDown == null) topDown = cam.gameObject.AddComponent<Player.TopDownCamera>();
-            topDown.pitch = 45f;
-            topDown.yaw = 0f;
-            topDown.orthoSize = 42f;
-            topDown.focus = new Vector3(0f, 0f, terrain.shoreZ + 14f);
+            topDown.pitch = 55f;
+            topDown.yaw = 45f;
+            topDown.orthoSize = 22f;
+            topDown.focus = new Vector3(0f, 0f, terrain.shoreZ + 30f);
             topDown.clampFocus = false;
 
-            // player capsule for third-person mode
-            var playerGo = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            // player cylinder for top-down RPG
+            var playerGo = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             playerGo.name = "Player";
             playerGo.transform.position = new Vector3(0f, 2f, terrain.shoreZ + 12f);
+            playerGo.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
             var capsuleCollider = playerGo.GetComponent<CapsuleCollider>();
             if (capsuleCollider != null) Object.DestroyImmediate(capsuleCollider);
             var cc = playerGo.AddComponent<CharacterController>();
             cc.height = 2f;
-            cc.radius = 0.5f;
+            cc.radius = 0.45f;
             playerGo.AddComponent<Player.PlayerMotor>();
             playerGo.AddComponent<Player.PlayerBuoyancy>();
             playerGo.GetComponent<Renderer>().sharedMaterial =
                 LitMaterialProvider.Make("PlayerBody", new Color(0.72f, 0.32f, 0.24f), 0.2f);
+            topDown.followTarget = playerGo.transform;
+            topDown.followOffset = new Vector3(0f, 0f, 14f);
 
             var fps = cam.gameObject.AddComponent<Player.FirstPersonCamera>();
             fps.target = playerGo.transform;
@@ -111,6 +129,7 @@ namespace Fengling.EditorTools
             var switcher = cam.gameObject.AddComponent<Player.CameraModeSwitch>();
             switcher.firstPerson = fps;
             switcher.topDown = topDown;
+            switcher.startInFirstPerson = false;
 
             // 8. 保存
             Directory.CreateDirectory("Assets/Scenes");
