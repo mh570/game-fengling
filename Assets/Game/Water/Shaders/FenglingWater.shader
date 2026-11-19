@@ -40,7 +40,7 @@ Shader "Fengling/Water Surface"
         _HorizonColor ("Horizon Color", Color) = (0.65, 0.78, 0.90, 1)
         _HorizonFadeStart ("Horizon Fade Start (m)", Float) = 30
         _HorizonFadeRange ("Horizon Fade Range (m)", Float) = 120
-        _ShoreColor ("Shore / Wet Sand Color", Color) = (0.66, 0.60, 0.46, 1)
+        _ShoreColor ("Shore / Wet Sand Color", Color) = (0.55, 0.50, 0.38, 1)
 
         [Header(Foam)]
         _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
@@ -333,13 +333,8 @@ Shader "Fengling/Water Surface"
                     depth = TerrainDepth(i.worldPos);
                 }
 
-                // 水线裁切：太薄的贴边水层最容易产生暗线/锯齿，直接让地形露出来。
-                if (depth < 2.0)
-                    discard;
-
-                // 裁切边缘补一条泡沫，避免出现一刀切的硬水线。
-                float edgeFoam = smoothstep(2.0, 2.15, depth) * (1.0 - smoothstep(2.35, 2.7, depth));
-                edgeFoam *= 0.45 + 0.55 * valueNoise(i.worldPos.xz * 3.0 + _WaterTime * 0.1);
+                // ---- 水线裁切已移除：海平线淡出已改成水平距离，
+                // 近岸暗带的根因不再是相机高度；保留完整浅水带。
 
                 // 写实：Beer-Lambert 连续吸收
                 float transmittance = exp(-depth / max(0.01, _AbsorptionDistance));
@@ -403,10 +398,10 @@ Shader "Fengling/Water Surface"
                 float foam = lerp(realFoam, stylFoam, _Stylized) * _FoamStrength * _UseFoam;
 
                 // 岸线湿沙带：浅水直接混到沙色，而不是让深水色在岸边拉出一条暗带。
-                float shoreMask = saturate(1.0 - depth / 4.0);
-                color = lerp(color, _ShoreColor.rgb, shoreMask * 0.9);
+                float shoreMask = saturate(1.0 - depth / 1.0);
+                color = lerp(color, _ShoreColor.rgb, shoreMask * 0.65);
 
-                color = lerp(color, _FoamColor.rgb, saturate(max(foam, edgeFoam * 1.2)));
+                color = lerp(color, _FoamColor.rgb, saturate(foam));
 
                 // ---- 透明度：浅处几乎全透（看得见沙底），深处不透明
                 float alpha = saturate(depth / max(0.01, _FadeDistance));
@@ -416,8 +411,7 @@ Shader "Fengling/Water Surface"
                 // 岸线：水深趋近 0 时淡出，避免水/沙滩共面处出现黑边。
                 alpha *= saturate(depth / 0.5);
                 alpha = max(alpha, 0.04 * saturate(depth / 0.5));
-                alpha = max(alpha, shoreMask * 0.70);
-                alpha = max(alpha, edgeFoam * 0.85);
+                alpha = max(alpha, shoreMask * 0.45);
 
                 // 远处：用水平距离，而不是相机到水面的 3D 距离。
                 // 俯视相机离水面很高，用 3D 距离会把整片水都判成“远景”而淡成透明。

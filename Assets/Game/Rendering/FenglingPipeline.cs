@@ -12,6 +12,7 @@ namespace Fengling.Rendering
         private readonly FenglingPipelineSettings _settings;
         private readonly FenglingShadows _shadows = new FenglingShadows();
         private readonly Material _postMaterial;
+        private Light _fillLight;
 
         private static readonly ShaderTagId[] OpaqueTags =
         {
@@ -89,6 +90,29 @@ namespace Fengling.Rendering
             Color sunColor = sun != null ? sun.color * (sun.intensity * 0.12f) : Color.white;
             cmd.SetGlobalVector("_FenglingSunDir", sunDir);
             cmd.SetGlobalColor("_FenglingSunColor", sunColor);
+
+            if (_fillLight == null)
+            {
+                foreach (var light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+                {
+                    if (light != null && light.type == LightType.Directional && light.name == "Fill Light")
+                    {
+                        _fillLight = light;
+                        break;
+                    }
+                }
+            }
+            if (_fillLight != null)
+            {
+                var fillDir = -_fillLight.transform.forward;
+                cmd.SetGlobalVector("_FenglingFillDir", new Vector4(fillDir.x, fillDir.y, fillDir.z, 0f));
+                cmd.SetGlobalColor("_FenglingFillColor",
+                    _fillLight.color * (_fillLight.intensity * 0.08f));
+            }
+            else
+            {
+                cmd.SetGlobalColor("_FenglingFillColor", Color.black);
+            }
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);

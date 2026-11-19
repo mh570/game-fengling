@@ -36,6 +36,14 @@ namespace Fengling.EditorTools
             RenderSettings.sun = sun;
             SkyboxSetup.Apply();
 
+            var fillGo = new GameObject("Fill Light");
+            var fill = fillGo.AddComponent<Light>();
+            fill.type = LightType.Directional;
+            fill.intensity = 2.5f;
+            fill.color = new Color(0.65f, 0.78f, 1f);
+            fill.shadows = LightShadows.None;
+            fill.transform.rotation = Quaternion.Euler(20f, 60f, 0f);
+
             var cam = Camera.main;
             if (cam == null)
             {
@@ -46,7 +54,7 @@ namespace Fengling.EditorTools
             var top = cam.gameObject.AddComponent<Player.TopDownCamera>();
             top.pitch = 55f;
             top.yaw = 45f;
-            top.orthoSize = 30f;
+            top.orthoSize = 24f;
             top.focus = Vector3.zero;
             top.enabled = true;
 
@@ -83,7 +91,7 @@ namespace Fengling.EditorTools
             player.GetComponent<Renderer>().sharedMaterial =
                 LitMaterialProvider.Make("PlayerBody", new Color(0.72f, 0.32f, 0.24f), 0.2f);
             top.followTarget = player.transform;
-            top.followOffset = Vector3.zero;
+            top.followOffset = new Vector3(0f, 0f, 14f);
 
             var waterGo = new GameObject("Water");
             var wm = waterGo.AddComponent<Water.WaterModule>();
@@ -104,6 +112,12 @@ namespace Fengling.EditorTools
             sm.heightRange = terrain.HeightMapRange;
             sm.normalMap1 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap1Path);
             sm.normalMap2 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap2Path);
+            sm.shallowColor = new Color(0.08f, 0.48f, 0.55f);
+            sm.deepColor = new Color(0.01f, 0.10f, 0.22f);
+            sm.absorptionDistance = 2.5f;
+            sm.opaqueAtDepth = 2f;
+            sm.foamDistance = 1.2f;
+            sm.foamStrength = 1.2f;
 
             Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -162,7 +176,7 @@ namespace Fengling.EditorTools
                 top.enabled = true;
                 top.pitch = 55f;
                 top.yaw = 45f;
-                top.orthoSize = 25f;
+                top.orthoSize = 24f;
             }
             cam.nearClipPlane = 0.3f;
             cam.farClipPlane = 500f;

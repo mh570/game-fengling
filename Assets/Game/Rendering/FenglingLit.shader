@@ -43,6 +43,8 @@ Shader "Fengling/Lit"
             // 由 FenglingPipeline 每帧写入
             float4 _FenglingSunDir;
             float4 _FenglingSunColor;
+            float4 _FenglingFillDir;
+            float4 _FenglingFillColor;
 
             sampler2D _FenglingShadowMap;
             float4x4 _FenglingShadowView;
@@ -86,6 +88,11 @@ Shader "Fengling/Lit"
                 // 漫反射
                 float ndl = saturate(dot(N, L));
                 float3 diffuse = albedo * _FenglingSunColor.rgb * ndl;
+
+                // 很弱的填充光：只负责把逆光面从纯黑拉起来
+                float3 fillL = normalize(_FenglingFillDir.xyz);
+                float fillNdl = saturate(dot(N, fillL));
+                diffuse += albedo * _FenglingFillColor.rgb * fillNdl;
 
                 // 环境光（球谐，来自天空盒）。加一个很小的保底，避免逆光面纯黑。
                 float3 ambient = ShadeSH9(float4(N, 1.0)) * albedo * _AmbientBoost;
