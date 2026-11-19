@@ -59,7 +59,8 @@ namespace Fengling.Rendering
             // 主光全局参数：自建管线没有 HDRP 的 LightLoop，统一用全局变量传给 shader
             var sun = RenderSettings.sun;
             Vector4 sunDir = sun != null ? (Vector4)(-sun.transform.forward) : new Vector4(0f, 1f, 0f, 0f);
-            Color sunColor = sun != null ? sun.color * sun.intensity : Color.white;
+            // 曝光归一：Light intensity 9 直接当颜色会过曝，自建管线没有 tonemap
+            Color sunColor = sun != null ? sun.color * (sun.intensity * 0.12f) : Color.white;
             cmd.SetGlobalVector("_FenglingSunDir", sunDir);
             cmd.SetGlobalColor("_FenglingSunColor", sunColor);
 
