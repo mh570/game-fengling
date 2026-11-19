@@ -42,12 +42,14 @@ namespace Fengling.Water
         private void Awake()
         {
             Rebuild();
+            Shader.SetGlobalFloat("_FenglingWaterLevel", _settings.baseLevel);
         }
 
         private void Update()
         {
             // 水面时间自己走，外部不要传时间进来 —— 保证所有调用方看到的波形一致
             _waterTime += Time.deltaTime * _settings.timeScale;
+            Shader.SetGlobalFloat("_FenglingWaterLevel", _settings.baseLevel);
         }
 
         /// <summary>按当前设置重建模拟。改参数后调用。</summary>

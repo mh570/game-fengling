@@ -13,6 +13,8 @@ namespace Fengling.Rendering
         private readonly FenglingShadows _shadows = new FenglingShadows();
         private readonly Material _postMaterial;
         private Light _fillLight;
+        private Camera _reflectionCamera;
+        private RenderTexture _reflectionRT;
 
         private static readonly ShaderTagId[] OpaqueTags =
         {
@@ -119,6 +121,18 @@ namespace Fengling.Rendering
 
             var culling = context.Cull(ref cullingParams);
 
+            // ---- 平面反射（半分辨率）
+            float waterLevel = Shader.GetGlobalFloat("_FenglingWaterLevel");
+            if (camera.cameraType != CameraType.Reflection &&
+                camera.transform.position.y > waterLevel + 0.01f)
+            {
+                RenderReflection(context, camera, waterLevel, colorTarget, depthTarget, width, height);
+            }
+            else
+            {
+                FenglingReflection.Publish(null, Matrix4x4.identity);
+            }
+
             // 阴影：在不透明之前画进深度图
             var sunForShadow = RenderSettings.sun;
             if (_settings.shadowsEnabled && sunForShadow != null)
@@ -203,6 +217,116 @@ namespace Fengling.Rendering
             RenderTexture.ReleaseTemporary(depthRT);
             RenderTexture.ReleaseTemporary(sceneColorRT);
             RenderTexture.ReleaseTemporary(linearDepthRT);
+        }
+
+        private void RenderReflection(ScriptableRenderContext context, Camera camera, float waterLevel,
+                                      RenderTargetIdentifier mainColor, RenderTargetIdentifier mainDepth,
+                                      int width, int height)
+        {
+            int rw = Mathf.Max(1, width / 2);
+            int rh = Mathf.Max(1, height / 2);
+            if (_reflectionRT == null || _reflectionRT.width != rw || _reflectionRT.height != rh)
+            {
+                if (_reflectionRT != null)
+                {
+                    _reflectionRT.Release();
+                    Object.DestroyImmediate(_reflectionRT);
+                }
+                _reflectionRT = new RenderTexture(rw, rh, 24, RenderTextureFormat.DefaultHDR)
+                {
+                    name = "FenglingReflectionHalf",
+                    filterMode = FilterMode.Bilinear,
+                    wrapMode = TextureWrapMode.Clamp,
+                };
+                _reflectionRT.Create();
+            }
+
+            EnsureReflectionCamera();
+            var t = camera.transform;
+            Vector3 pos = t.position;
+            pos.y = 2f * waterLevel - pos.y;
+            Vector3 forward = t.forward;
+            forward.y = -forward.y;
+            Vector3 up = t.up;
+            up.y = -up.y;
+
+            var cam = _reflectionCamera;
+            cam.CopyFrom(camera);
+            cam.enabled = true;
+            cam.cameraType = CameraType.Reflection;
+            cam.targetTexture = _reflectionRT;
+            cam.transform.SetPositionAndRotation(pos, Quaternion.LookRotation(forward, up));
+            cam.allowHDR = true;
+            cam.allowMSAA = false;
+            cam.clearFlags = CameraClearFlags.Skybox;
+
+            var clipPlane = CameraSpacePlane(cam, new Vector3(0f, waterLevel, 0f), Vector3.up, 1f);
+            cam.projectionMatrix = cam.CalculateObliqueMatrix(clipPlane);
+
+            if (!cam.TryGetCullingParameters(out var reflectionParams))
+            {
+                cam.enabled = false;
+                FenglingReflection.Publish(null, Matrix4x4.identity);
+                context.SetupCameraProperties(camera);
+                return;
+            }
+
+            var reflectionCulling = context.Cull(ref reflectionParams);
+            context.SetupCameraProperties(cam);
+
+            var clear = CommandBufferPool.Get("Fengling.ReflectionClear");
+            clear.SetRenderTarget(_reflectionRT);
+            clear.ClearRenderTarget(true, true, _settings.skyColor);
+            context.ExecuteCommandBuffer(clear);
+            CommandBufferPool.Release(clear);
+
+            var drawing = new DrawingSettings(OpaqueTags[0], new SortingSettings(cam))
+            {
+                perObjectData = PerObjectData.None,
+            };
+            for (int i = 1; i < OpaqueTags.Length; i++)
+                drawing.SetShaderPassName(i, OpaqueTags[i]);
+
+            var filter = new FilteringSettings(RenderQueueRange.opaque);
+            GL.invertCulling = true;
+            context.DrawRenderers(reflectionCulling, ref drawing, ref filter);
+            // 俯视反射不画天空盒：云会被投成大片白斑。
+            // 反射只保留岸线/地形/大物体，天空用清屏色兜底。
+            GL.invertCulling = false;
+            context.Submit();
+
+            context.SetupCameraProperties(camera);
+            var restore = CommandBufferPool.Get("Fengling.ReflectionRestore");
+            restore.SetRenderTarget(mainColor, mainDepth);
+            context.ExecuteCommandBuffer(restore);
+            CommandBufferPool.Release(restore);
+            cam.enabled = false;
+
+            var vp = cam.projectionMatrix * cam.worldToCameraMatrix;
+            Shader.SetGlobalTexture("_FenglingReflectionTex", _reflectionRT);
+            Shader.SetGlobalMatrix("_FenglingReflectionVP", vp);
+            Shader.SetGlobalFloat("_FenglingReflectionEnabled", 1f);
+            FenglingReflection.Publish(_reflectionRT, vp);
+        }
+
+        private void EnsureReflectionCamera()
+        {
+            if (_reflectionCamera != null) return;
+            var go = new GameObject("FenglingReflectionCamera")
+            {
+                hideFlags = HideFlags.HideAndDontSave,
+            };
+            _reflectionCamera = go.AddComponent<Camera>();
+            _reflectionCamera.enabled = false;
+        }
+
+        private static Vector4 CameraSpacePlane(Camera cam, Vector3 pos, Vector3 normal, float sideSign)
+        {
+            Vector3 offsetPos = pos + normal * sideSign * cam.nearClipPlane;
+            Matrix4x4 m = cam.worldToCameraMatrix;
+            Vector3 cpos = m.MultiplyPoint(offsetPos);
+            Vector3 cnormal = m.MultiplyVector(normal).normalized * sideSign;
+            return new Vector4(cnormal.x, cnormal.y, cnormal.z, -Vector3.Dot(cpos, cnormal));
         }
 
         private void PostProcess(ScriptableRenderContext context, Camera camera, RenderTexture colorRT,

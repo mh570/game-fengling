@@ -140,6 +140,9 @@ Shader "Fengling/Water Surface"
             sampler2D _FenglingSceneColor;
             float _FenglingSceneDepthAvailable;
             float _FenglingSceneColorAvailable;
+            sampler2D _FenglingReflectionTex;
+            float4x4 _FenglingReflectionVP;
+            float _FenglingReflectionEnabled;
             float _RefractionStrength;
 
             int _FenglingWaveCount;
@@ -376,6 +379,20 @@ Shader "Fengling/Water Surface"
                     float3 sceneRefr = tex2D(_FenglingSceneColor, saturate(refrUV)).rgb;
                     float refractMask = saturate(1.0 - depth / 2.5) * 0.25;
                     color = lerp(color, sceneRefr, refractMask);
+                }
+
+                // 半分辨率平面反射。
+                if (_FenglingReflectionEnabled > 0.5)
+                {
+                    float4 rp = mul(_FenglingReflectionVP, float4(i.worldPos, 1.0));
+                    float2 ruv = rp.xy / max(1e-4, rp.w) * 0.5 + 0.5;
+                    ruv += N.xz * 0.01;
+                    if (all(ruv > 0.001) && all(ruv < 0.999))
+                    {
+                        float3 refl = tex2D(_FenglingReflectionTex, ruv).rgb;
+                        // 俯视下反射只做“天空/大形状”的低强度染色，避免云朵变成白斑。
+                        color = lerp(color, refl * 0.82, 0.18);
+                    }
                 }
 
 

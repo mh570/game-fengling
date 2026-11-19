@@ -102,11 +102,13 @@ namespace Fengling.Water
         private void OnEnable()
         {
             FenglingSceneTextures.Ready += BindSceneTextures;
+            FenglingReflection.Ready += BindReflection;
         }
 
         private void OnDisable()
         {
             FenglingSceneTextures.Ready -= BindSceneTextures;
+            FenglingReflection.Ready -= BindReflection;
         }
 
         private void Awake()
@@ -310,6 +312,19 @@ namespace Fengling.Water
                 _material.SetTexture("_FenglingSceneColor", color);
                 _material.SetFloat("_FenglingSceneColorAvailable", 1f);
             }
+        }
+
+        private void BindReflection(Texture reflection, Matrix4x4 viewProjection)
+        {
+            if (_material == null) return;
+            if (reflection == null)
+            {
+                _material.SetFloat("_FenglingReflectionEnabled", 0f);
+                return;
+            }
+            _material.SetTexture("_FenglingReflectionTex", reflection);
+            _material.SetMatrix("_FenglingReflectionVP", viewProjection);
+            _material.SetFloat("_FenglingReflectionEnabled", 1f);
         }
 
         /// <summary>
