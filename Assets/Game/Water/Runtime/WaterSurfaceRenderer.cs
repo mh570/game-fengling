@@ -200,14 +200,6 @@ namespace Fengling.Water
         {
             int count = water.FillWaveData(WaveDirs, WaveParams);
 
-            float maxHeight = 0f;
-            for (int i = 0; i < count; i++)
-                maxHeight += Mathf.Abs(WaveParams[i].x);
-
-            _material.SetInt("_WaveCount", count);
-            _material.SetVectorArray("_WaveDirs", WaveDirs);
-            _material.SetVectorArray("_WaveParams", WaveParams);
-            // 振幅已在模拟器里乘过 amplitudeScale，这里必须固定 1，否则会重复放大
             _material.SetFloat("_AmplitudeScale", 1f);
             _material.SetFloat("_WaveNoise", waveIrregularity);
             _material.SetVector("_FlowDir", new Vector4(flowDirection.x, flowDirection.y, 0f, 0f));
@@ -215,8 +207,13 @@ namespace Fengling.Water
             _material.SetFloat("_Vertical", verticalFlow);
 
             _material.SetFloat("_WaterTime", water.WaterTime);
-            _material.SetFloat("_MaxWaveHeight", Mathf.Max(0.05f, maxHeight * 0.6f));
             _material.SetVector("_SunDirection", GetSunDirection());
+
+            // 波数组用全局数组传递：运行时 new Material 的数组属性默认只有 1 个元素，
+            // SetVectorArray(16) 会被 Unity cap 到 1，导致 GPU 只拿到第 1 个波。
+            Shader.SetGlobalInt("_FenglingWaveCount", count);
+            Shader.SetGlobalVectorArray("_FenglingWaveDirs", WaveDirs);
+            Shader.SetGlobalVectorArray("_FenglingWaveParams", WaveParams);
 
             UpdateUnderwater();
         }

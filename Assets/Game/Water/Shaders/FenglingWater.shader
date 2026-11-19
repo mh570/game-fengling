@@ -50,9 +50,6 @@ Shader "Fengling/Water Surface"
         _HeightRange ("Height Range (min, max)", Vector) = (-9, 4, 0, 0)
 
         [Header(Waves)]
-        _WaveCount ("Wave Count", Int) = 0
-        _WaveDirs ("Wave Directions", Vector) = (1, 0, 0, 0)
-        _WaveParams ("Wave Params (amp, k, omega, phase)", Vector) = (0.5, 0.2, 1, 0)
         _AmplitudeScale ("Amplitude Scale", Float) = 1
         _WaveNoise ("Wave Irregularity", Range(0, 1)) = 0.35
 
@@ -130,9 +127,9 @@ Shader "Fengling/Water Surface"
             float4 _HeightMapBounds;
             float4 _HeightRange;
 
-            int _WaveCount;
-            float4 _WaveDirs[MAX_WAVES];
-            float4 _WaveParams[MAX_WAVES];
+            int _FenglingWaveCount;
+            float4 _FenglingWaveDirs[MAX_WAVES];
+            float4 _FenglingWaveParams[MAX_WAVES];
             float _AmplitudeScale;
             float _WaveNoise;
 
@@ -199,11 +196,11 @@ Shader "Fengling/Water Surface"
                 // 低频噪声调制振幅：破掉"所有波同时到峰"的规则感
                 float irregular = 1.0 + _WaveNoise * (valueNoise(xz * 0.03) - 0.5) * 2.0;
 
-                int count = min(_WaveCount, MAX_WAVES);
+                int count = min(_FenglingWaveCount, MAX_WAVES);
                 for (int i = 0; i < count; i++)
                 {
-                    float4 dir = _WaveDirs[i];
-                    float4 p = _WaveParams[i];
+                    float4 dir = _FenglingWaveDirs[i];
+                    float4 p = _FenglingWaveParams[i];
                     float amp = p.x * _AmplitudeScale * irregular;
                     float k = p.y;
                     float omega = p.z;
