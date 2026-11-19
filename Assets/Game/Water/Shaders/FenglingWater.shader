@@ -51,7 +51,6 @@ Shader "Fengling/Water Surface"
 
         [Header(Waves)]
         _AmplitudeScale ("Amplitude Scale", Float) = 1
-        _WaveNoise ("Wave Irregularity", Range(0, 1)) = 0.35
 
         [Header(Time)]
         _WaterTime ("Water Time", Float) = 0
@@ -131,7 +130,6 @@ Shader "Fengling/Water Surface"
             float4 _FenglingWaveDirs[MAX_WAVES];
             float4 _FenglingWaveParams[MAX_WAVES];
             float _AmplitudeScale;
-            float _WaveNoise;
 
             float _WaterTime;
             float4 _FlowDir;
@@ -193,15 +191,12 @@ Shader "Fengling/Water Surface"
                 height = 0;
                 slope = 0;
 
-                // 低频噪声调制振幅：破掉"所有波同时到峰"的规则感
-                float irregular = 1.0 + _WaveNoise * (valueNoise(xz * 0.03) - 0.5) * 2.0;
-
                 int count = min(_FenglingWaveCount, MAX_WAVES);
                 for (int i = 0; i < count; i++)
                 {
                     float4 dir = _FenglingWaveDirs[i];
                     float4 p = _FenglingWaveParams[i];
-                    float amp = p.x * _AmplitudeScale * irregular;
+                    float amp = p.x * _AmplitudeScale;
                     float k = p.y;
                     float omega = p.z;
                     float phase = p.w;

@@ -45,7 +45,7 @@ namespace Fengling.Water
         [Range(0f, 0.2f)] public float f0 = 0.02f;
         [Range(0f, 2f)] public float normalStrength = 1f;
 
-        [Tooltip("浪的不规则程度，0 = 完全规则")]
+        [Tooltip("预留：空间浪高扰动。当前未使用，避免 CPU 浮力采样与 GPU 波形不一致")]
         [Range(0f, 1f)] public float waveIrregularity = 0.35f;
         [Range(0f, 3f)] public float sunIntensity = 2f;
 
@@ -201,7 +201,6 @@ namespace Fengling.Water
             int count = water.FillWaveData(WaveDirs, WaveParams);
 
             _material.SetFloat("_AmplitudeScale", 1f);
-            _material.SetFloat("_WaveNoise", waveIrregularity);
             _material.SetVector("_FlowDir", new Vector4(flowDirection.x, flowDirection.y, 0f, 0f));
             _material.SetFloat("_FlowSpeed", flowSpeed);
             _material.SetFloat("_Vertical", verticalFlow);
