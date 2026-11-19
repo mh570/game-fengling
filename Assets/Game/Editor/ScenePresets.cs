@@ -247,7 +247,17 @@ namespace Fengling.EditorTools
             // ---- camera (topdown RPG default; C 切第一人称)
             var player = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             player.name = "Player";
-            player.transform.position = new Vector3(0f, p.WaterLevel + 2f, p.ShoreZ + 10f);
+            // 玩家放在水平线往陆地 2m，保证落地且在镜头里能同时看到水。
+            float waterlineZ = p.ShoreZ;
+            for (int i = 0; i <= 100; i++)
+            {
+                float z = p.ShoreZ + terrain.slopeLength * (i / 100f);
+                waterlineZ = z;
+                if (terrain.SampleHeight(0f, z) <= 0f) break;
+            }
+            float playerZ = waterlineZ - 2f;
+            float playerY = terrain.SampleHeight(0f, playerZ) + 1f;
+            player.transform.position = new Vector3(0f, playerY, playerZ);
             player.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
             var playerMat = MakeMaterial("PlayerBody", new Color(0.72f, 0.32f, 0.24f), 0.2f);
             player.GetComponent<Renderer>().sharedMaterial = playerMat;
@@ -271,9 +281,9 @@ namespace Fengling.EditorTools
             top.pitch = 55f;
             top.yaw = 45f;
             top.orthoSize = Mathf.Clamp(p.Size.x * 0.12f, 18f, 28f);
-            top.focus = new Vector3(0f, p.WaterLevel, p.ShoreZ + 20f);
+            top.focus = new Vector3(0f, playerY, playerZ);
             top.followTarget = player.transform;
-            top.followOffset = new Vector3(0f, 0f, -8f);
+            top.followOffset = Vector3.zero;
             top.enabled = true;
             var sw = cam.gameObject.AddComponent<Player.CameraModeSwitch>();
             sw.firstPerson = fps;

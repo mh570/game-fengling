@@ -42,7 +42,7 @@ Shader "Fengling/Water Surface"
         _HorizonFadeRange ("Horizon Fade Range (m)", Float) = 120
         _ShoreColor ("Shore / Wet Sand Color", Color) = (0.55, 0.50, 0.38, 1)
         _RefractionStrength ("Refraction Strength", Range(0, 0.1)) = 0.015
-        _ReflectionStrength ("Reflection Strength", Range(0, 1)) = 0.18
+        _ReflectionStrength ("Reflection Strength", Range(0, 1)) = 0.3
 
         [Header(Foam)]
         _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
