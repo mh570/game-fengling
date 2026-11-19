@@ -98,6 +98,7 @@ namespace Fengling.EditorTools
             wm.Settings.kind = Water.WaterKind.Spectral;
             wm.Settings.size = new Vector2(200f, 200f);
             wm.Settings.baseLevel = 0f;
+            wm.Settings.tier = Water.WaterQualityTier.Low;
 
             var surfaceGo = new GameObject("WaterSurface");
             surfaceGo.AddComponent<MeshFilter>();
@@ -110,8 +111,8 @@ namespace Fengling.EditorTools
             sm.terrainHeightMap = heightMap;
             sm.heightMapBounds = new Vector4(0f, 0f, terrain.size.x, terrain.size.y);
             sm.heightRange = terrain.HeightMapRange;
-            sm.normalMap1 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap1Path);
-            sm.normalMap2 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap2Path);
+            sm.normalMap1 = null;
+            sm.normalMap2 = null;
             sm.shallowColor = new Color(0.08f, 0.48f, 0.55f);
             sm.deepColor = new Color(0.01f, 0.10f, 0.22f);
             sm.absorptionDistance = 2.5f;

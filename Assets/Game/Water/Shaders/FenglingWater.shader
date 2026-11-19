@@ -309,6 +309,8 @@ Shader "Fengling/Water Surface"
 
                 float fade = saturate(1.0 - (viewDist - _NormalFadeStart) / max(1.0, _NormalFadeRange));
                 float nStrength = lerp(0.22, 1.0, fade) * _NormalStrength;
+                if (unity_OrthoParams.w > 0.5)
+                    nStrength *= 0.45; // 俯视下细节法线密度太高，压掉高频条纹
                 float rough = lerp(_RoughnessFar, _Roughness, fade);
 
                 float3 tN = SampleDetailNormal(i.worldPos.xz);
@@ -396,6 +398,8 @@ Shader "Fengling/Water Surface"
                 float stylFoam = coreLine * dotMask * 1.4 + depthMask * dotMask * 0.5;
 
                 float foam = lerp(realFoam, stylFoam, _Stylized) * _FoamStrength * _UseFoam;
+                // 深水不该有白浪；只保留岸边浅水泡沫。
+                foam *= saturate(1.0 - depth / 6.0);
 
                 // 岸线湿沙带：浅水直接混到沙色，而不是让深水色在岸边拉出一条暗带。
                 float shoreMask = saturate(1.0 - depth / 1.0);
