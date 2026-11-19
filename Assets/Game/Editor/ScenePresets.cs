@@ -222,10 +222,10 @@ namespace Fengling.EditorTools
             sm.normalMap2 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap2Path);
             sm.shallowColor = new Color(0.08f, 0.48f, 0.55f);
             sm.deepColor = new Color(0.01f, 0.10f, 0.22f);
-            sm.absorptionDistance = 2.5f;
-            sm.opaqueAtDepth = 2.5f;
-            sm.foamDistance = p.FoamDistance;
-            sm.foamStrength = p.FoamStrength;
+            sm.absorptionDistance = 4f;
+            sm.opaqueAtDepth = 4f;
+            sm.foamDistance = Mathf.Min(0.8f, p.FoamDistance);
+            sm.foamStrength = Mathf.Min(0.65f, p.FoamStrength);
             sm.stylized = 0f;
             sm.flowDirection = new Vector2(0f, 1f);
             sm.flowSpeed = p.Name == "River" ? 0.8f : 0.05f;
