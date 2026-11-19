@@ -418,6 +418,10 @@ Shader "Fengling/Water Surface"
                 float2 horizonDelta = i.worldPos.xz - _WorldSpaceCameraPos.xz;
                 float horizonDist = length(horizonDelta);
                 float horizonFade = saturate((horizonDist - _HorizonFadeStart) / max(1.0, _HorizonFadeRange));
+                // 正交俯视没有“海平线”概念：相机水平偏移很大，但画面是平面地图。
+                // 继续按相机距离淡出会把整片水洗成天空色，所以正交下关闭 horizon fade。
+                if (unity_OrthoParams.w > 0.5)
+                    horizonFade = 0.0;
                 color = lerp(color, _HorizonColor.rgb, horizonFade);
                 alpha *= (1.0 - horizonFade);
 
