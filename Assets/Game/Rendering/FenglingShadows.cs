@@ -67,7 +67,12 @@ namespace Fengling.Rendering
             var filtering = new FilteringSettings(RenderQueueRange.all);
             context.DrawRenderers(culling, ref drawing, ref filtering);
 
-            // 恢复相机矩阵，后续 pass 才能正常绘制
+            // 恢复相机状态：矩阵 + 渲染目标
+            // 少了 SetRenderTarget，后面的不透明/透明会全部画进阴影图里，屏幕上只剩清屏色
+            var restore = CommandBufferPool.Get("Fengling.ShadowRestore");
+            restore.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
+            context.ExecuteCommandBuffer(restore);
+            CommandBufferPool.Release(restore);
             context.SetupCameraProperties(camera);
 
             // 传给 shader
