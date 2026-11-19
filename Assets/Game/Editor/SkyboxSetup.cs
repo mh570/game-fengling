@@ -43,6 +43,10 @@ namespace Fengling.EditorTools
                 mat.SetVector("_SunDirection", new Vector4(d.x, d.y, d.z, 0f));
             }
 
+            // P0 的曝光校准：太阳光晕不要大到吞掉画面；整体略压一点。
+            mat.SetFloat("_SunSize", 220f);
+            mat.SetFloat("_Exposure", 0.9f);
+
             RenderSettings.skybox = mat;
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Skybox;
             RenderSettings.ambientIntensity = 1.2f;

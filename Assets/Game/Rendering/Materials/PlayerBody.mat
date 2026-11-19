@@ -30,6 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AmbientBoost: 1
+    - _AmbientFloor: 0.08
     - _Metallic: 0
     - _Smoothness: 0.2
     m_Colors:

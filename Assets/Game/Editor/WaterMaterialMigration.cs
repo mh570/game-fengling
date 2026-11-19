@@ -84,14 +84,43 @@ namespace Fengling.EditorTools
                 }
             }
 
-            if (changed > 0 || waterChanged > 0)
+            // 自建管线不消费 HDRP Volume，旧场景里的 Global Volume 只会误导。
+            int removedVolume = 0;
+            var globalVolume = GameObject.Find("Global Volume");
+            if (globalVolume != null)
+            {
+                Undo.DestroyObjectImmediate(globalVolume);
+                removedVolume = 1;
+            }
+
+            // 把 200m 水面扩到 1000m，避免低机位看到水面网格边缘的黑线。
+            int resizedWater = 0;
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                foreach (var wm in root.GetComponentsInChildren<Water.WaterModule>(true))
+                {
+                    var size = wm.Settings.size;
+                    if (size.x >= 1000f && size.y >= 1000f) continue;
+                    Undo.RecordObject(wm, "Resize WaterLab water");
+                    wm.Settings.size = new Vector2(1000f, 1000f);
+                    EditorUtility.SetDirty(wm);
+                    resizedWater++;
+                }
+            }
+
+            // 自建管线使用程序化天空盒 + Skybox 环境光；曝光/ACES/Bloom 由后处理负责。
+            SkyboxSetup.Apply();
+
+            if (changed > 0 || waterChanged > 0 || removedVolume > 0 || resizedWater > 0)
             {
                 EditorSceneManager.MarkSceneDirty(scene);
                 EditorSceneManager.SaveScene(scene);
                 AssetDatabase.SaveAssets();
             }
 
-            Debug.Log($"[Migrate] WaterLab 扫描 {scanned} 个 Renderer，替换 {changed} 个材质，绑定 {waterChanged} 个水面材质模板。");
+            Debug.Log($"[Migrate] WaterLab 扫描 {scanned} 个 Renderer，替换 {changed} 个材质，" +
+                      $"绑定 {waterChanged} 个水面材质模板，移除 {removedVolume} 个 HDRP Global Volume，" +
+                      $"扩展 {resizedWater} 个水面。");
             LogRemainingLegacy(scene);
         }
 

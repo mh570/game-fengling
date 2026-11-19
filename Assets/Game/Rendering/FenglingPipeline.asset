@@ -14,5 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fengling.Rendering::Fengling.Rendering.FenglingPipelineAsset
   settings:
     skyColor: {r: 0.42, g: 0.62, b: 0.85, a: 1}
+    shadowsEnabled: 0
     shadowResolution: 2048
     shadowDistance: 80
+    exposure: 0
+    bloomIntensity: 0.15
+    bloomThreshold: 1.2
+    contrast: 1.05
+    saturation: 1
+  postProcessMaterial: {fileID: 2100000, guid: 4c2e1fe74ffd1a948abe611cf398d91b, type: 2}

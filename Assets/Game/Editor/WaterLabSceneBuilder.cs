@@ -50,6 +50,7 @@ namespace Fengling.EditorTools
             // 4. 水模块
             var waterGo = new GameObject("Water");
             var waterModule = waterGo.AddComponent<Water.WaterModule>();
+            waterModule.Settings.size = new Vector2(1000f, 1000f); // 让海平线远离 200m 地形边缘
             waterModule.Settings.amplitudeScale = 1.5f;   // 参考图的浪比较明显
             waterGo.AddComponent<Water.WaterFieldGizmo>();
             waterGo.AddComponent<Water.WaterLabHUD>();
@@ -99,6 +100,8 @@ namespace Fengling.EditorTools
             cc.radius = 0.5f;
             playerGo.AddComponent<Player.PlayerMotor>();
             playerGo.AddComponent<Player.PlayerBuoyancy>();
+            playerGo.GetComponent<Renderer>().sharedMaterial =
+                LitMaterialProvider.Make("PlayerBody", new Color(0.72f, 0.32f, 0.24f), 0.2f);
 
             var fps = cam.gameObject.AddComponent<Player.FirstPersonCamera>();
             fps.target = playerGo.transform;
@@ -151,23 +154,9 @@ namespace Fengling.EditorTools
             sunGo.transform.rotation = Quaternion.Euler(42f, -138f, 0f);
             RenderSettings.sun = sun;
 
-            // ---- Volume：纯粹靠 HDRP 的 Volume 组件提供天空和环境
-            try
-            {
-                var sunDir = -sunGo.transform.forward;
-                var sky = SkyCubemapGenerator.GetOrCreate("Assets/Settings/WaterLabSky.asset", 256, sunDir);
-                var profile = GetOrCreateVolumeProfile(sky);
-
-                var volGo = new GameObject("Global Volume");
-                var vol = volGo.AddComponent<Volume>();
-                vol.isGlobal = true;
-                vol.priority = 1f;
-                vol.profile = profile;
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning("[Fengling] Volume 创建失败（画面会偏暗）: " + e.Message);
-            }
+            // 自建管线不读 HDRP Volume。直接用程序化天空盒 + Skybox 环境光，
+            // 曝光/ACES/Bloom 由 FenglingPipeline 的后处理负责。
+            SkyboxSetup.Apply();
         }
 
         private const string VolumePath = "Assets/Settings/WaterLabVolume.asset";

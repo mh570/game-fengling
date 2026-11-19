@@ -204,7 +204,10 @@ namespace Fengling.EditorTools
             // ---- water
             var waterGo = new GameObject("Water");
             var wm = waterGo.AddComponent<Water.WaterModule>();
-            wm.Settings.size = p.Size;
+            // 封闭的小水体（池塘/沼泽）严格贴合地形；开放水体向外延伸，
+            // 避免 200m 水面边缘在低机位下变成一条黑色海平线。
+            bool enclosed = p.Name == "Pond" || p.Name == "Swamp";
+            wm.Settings.size = enclosed ? p.Size : p.Size * 4f;
             wm.Settings.baseLevel = p.WaterLevel;
             wm.Settings.amplitudeScale = p.Amplitude;
 
@@ -273,7 +276,8 @@ namespace Fengling.EditorTools
             sunGo.transform.rotation = Quaternion.Euler(42f, -138f, 0f);
             RenderSettings.sun = sun;
 
-            AddVolume();
+            // 自建管线不读 HDRP Volume；天空/环境光/曝光都由 Fengling 自己负责。
+            SkyboxSetup.Apply();
 
             // ---- save
             Directory.CreateDirectory("Assets/Scenes");
@@ -295,7 +299,9 @@ namespace Fengling.EditorTools
             plane.name = "WaterfallSheet";
             plane.transform.SetParent(parent, false);
             plane.transform.localScale = new Vector3(24f, p.LandHeight, 1f);
-            plane.transform.position = new Vector3(0f, p.LandHeight * 0.5f, p.ShoreZ - 1f);
+            // 放在坡面海侧，避免整块 sheet 埋进地形里。
+            plane.transform.position = new Vector3(0f, p.LandHeight * 0.5f,
+                p.ShoreZ + p.SlopeLength + 0.5f);
             plane.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             var col = plane.GetComponent<MeshCollider>();
             if (col != null) Object.DestroyImmediate(col);

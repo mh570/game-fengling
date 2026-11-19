@@ -37,6 +37,9 @@ Shader "Fengling/Water Surface"
         _AbsorptionDistance ("Absorption (m)", Float) = 4
         _FadeDistance ("Opaque At Depth (m)", Float) = 6
         _WaterLevel ("Water Level Y", Float) = 0
+        _HorizonColor ("Horizon Color", Color) = (0.65, 0.78, 0.90, 1)
+        _HorizonFadeStart ("Horizon Fade Start (m)", Float) = 120
+        _HorizonFadeRange ("Horizon Fade Range (m)", Float) = 320
 
         [Header(Foam)]
         _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
@@ -115,6 +118,9 @@ Shader "Fengling/Water Surface"
             float _AbsorptionDistance;
             float _FadeDistance;
             float _WaterLevel;
+            float4 _HorizonColor;
+            float _HorizonFadeStart;
+            float _HorizonFadeRange;
 
             float4 _FoamColor;
             float _FoamDistance;
@@ -174,14 +180,18 @@ Shader "Fengling/Water Surface"
             }
 
             // ---------- 地形深度 ----------
-            float TerrainDepth(float3 worldPos)
+            float TerrainHeight(float3 worldPos)
             {
                 float2 center = _HeightMapBounds.xy;
                 float2 size = max(_HeightMapBounds.zw, 1e-4);
                 float2 uv = (worldPos.xz - (center - size * 0.5)) / size;
                 float h = tex2Dlod(_HeightMap, float4(saturate(uv), 0, 0)).r;
-                float terrainY = lerp(_HeightRange.x, _HeightRange.y, h);
-                return max(0.0, worldPos.y - terrainY);
+                return lerp(_HeightRange.x, _HeightRange.y, h);
+            }
+
+            float TerrainDepth(float3 worldPos)
+            {
+                return max(0.0, worldPos.y - TerrainHeight(worldPos));
             }
 
             // ---------- Gerstner（与 CPU 侧同一公式） ----------
@@ -300,6 +310,11 @@ Shader "Fengling/Water Surface"
                     N = normalize(float3(tN.x, 1.0, tN.y));
 
                 // ---- 深度（决定颜色和透明度）
+                // 水面略高于地形时才是水；地形已经露出水面的地方直接 discard，
+                // 避免水面/沙滩在掠射角下 z-fighting 出黑边。
+                float terrainY = TerrainHeight(i.worldPos);
+                if (terrainY > i.worldPos.y + 0.02)
+                    discard;
                 float depth = TerrainDepth(i.worldPos);
 
                 // 写实：Beer-Lambert 连续吸收
@@ -318,11 +333,9 @@ Shader "Fengling/Water Surface"
                 float fresnel = _F0 + (1.0 - _F0) * pow(1.0 - NoV, 5.0);
                 float3 reflectDir = reflect(-V, N);
 
-                float3 envColor;
-                if (_UseReflectionCube > 0.5)
-                    envColor = DecodeHDR(UNITY_SAMPLE_TEXCUBE(unity_SpecCube0, reflectDir), unity_SpecCube0_HDR);
-                else
-                    envColor = ShadeSH9(float4(reflectDir, 1.0));
+                // 自建 SRP 还没有绑定反射探针；unity_SpecCube0 在打包/无探针时不可靠。
+                // P0 先用天空 SH 兜底，等平面反射做好后再替换。
+                float3 envColor = ShadeSH9(float4(reflectDir, 1.0));
 
                 float3 color = lerp(waterColor, envColor, fresnel);
 
@@ -367,10 +380,20 @@ Shader "Fengling/Water Surface"
 
                 // ---- 透明度：浅处几乎全透（看得见沙底），深处不透明
                 float alpha = saturate(depth / max(0.01, _FadeDistance));
-                alpha = max(alpha, saturate(foam));
                 alpha = max(alpha, fresnel * 0.9);
                 alpha = saturate(alpha + 0.06);
                 alpha = max(alpha, 0.20);   // 保底：水始终可见
+
+                // 岸线：水深趋近 0 时淡出，避免水/沙滩共面处出现黑边。
+                alpha *= saturate(depth / 0.25);
+
+                // 远处：颜色和 alpha 都淡入海平线色，避免看到水面网格的硬边缘。
+                float horizonFade = saturate((viewDist - _HorizonFadeStart) / max(1.0, _HorizonFadeRange));
+                color = lerp(color, _HorizonColor.rgb, horizonFade);
+                alpha *= (1.0 - horizonFade);
+
+                // 泡沫不受岸线淡出影响，但受海平线淡出影响。
+                alpha = max(alpha, saturate(foam) * (1.0 - horizonFade));
 
                 // 风格化：整体压低不透明度，让水下地形和鱼透出来
                 alpha = lerp(alpha, saturate(depth / max(0.01, _FadeDistance)) * _OpacityScale, _Stylized);

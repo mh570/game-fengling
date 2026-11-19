@@ -19,5 +19,21 @@ namespace Fengling.Rendering
 
         [Tooltip("阴影距离")]
         public float shadowDistance = 80f;
+
+        [Header("Post Processing")]
+        [Tooltip("曝光（EV）。0 = 原始亮度，1 = 提亮一档")]
+        [Range(-5f, 5f)] public float exposure = 0.0f;
+
+        [Tooltip("Bloom 强度")]
+        [Range(0f, 2f)] public float bloomIntensity = 0.15f;
+
+        [Tooltip("Bloom 高光阈值")]
+        [Range(0f, 4f)] public float bloomThreshold = 1.2f;
+
+        [Tooltip("对比度")]
+        [Range(0f, 2f)] public float contrast = 1.05f;
+
+        [Tooltip("饱和度")]
+        [Range(0f, 2f)] public float saturation = 1.0f;
     }
 }

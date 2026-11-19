@@ -14,12 +14,13 @@ namespace Fengling.Rendering
     public sealed class FenglingPipelineAsset : RenderPipelineAsset<FenglingPipeline>
     {
         [SerializeField] private FenglingPipelineSettings settings = new FenglingPipelineSettings();
+        [SerializeField] private Material postProcessMaterial;
 
         private Material _defaultMaterial;
 
         protected override RenderPipeline CreatePipeline()
         {
-            return new FenglingPipeline(settings);
+            return new FenglingPipeline(settings, postProcessMaterial);
         }
 
         public override string renderPipelineShaderTag => "FenglingForward";

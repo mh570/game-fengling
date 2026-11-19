@@ -28,14 +28,14 @@ Material:
     - _CloudCoverage: 0.45
     - _CloudScale: 0.9
     - _CloudSpeed: 0.01
-    - _Exposure: 1
-    - _SunSize: 90
+    - _Exposure: 0.9
+    - _SunSize: 220
     m_Colors:
     - _CloudColor: {r: 1, g: 1, b: 1, a: 1}
     - _CloudDark: {r: 0.62, g: 0.65999997, b: 0.72, a: 1}
     - _HorizonColor: {r: 0.78, g: 0.85, b: 0.9, a: 1}
     - _SunColor: {r: 1, g: 0.92, b: 0.78, a: 1}
-    - _SunDirection: {r: 0.3, g: 0.8, b: 0.5, a: 0}
+    - _SunDirection: {r: 0.4972609, g: 0.66913056, b: 0.55226415, a: 0}
     - _ZenithColor: {r: 0.15999997, g: 0.33999997, b: 0.62, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

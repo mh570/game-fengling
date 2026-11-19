@@ -11,6 +11,7 @@ Shader "Fengling/Lit"
         _Smoothness ("Smoothness", Range(0, 1)) = 0.15
         _Metallic ("Metallic", Range(0, 1)) = 0
         _AmbientBoost ("Ambient Boost", Range(0, 3)) = 1
+        _AmbientFloor ("Ambient Floor", Range(0, 0.5)) = 0.08
     }
 
     SubShader
@@ -37,6 +38,7 @@ Shader "Fengling/Lit"
             float _Smoothness;
             float _Metallic;
             float _AmbientBoost;
+            float _AmbientFloor;
 
             // 由 FenglingPipeline 每帧写入
             float4 _FenglingSunDir;
@@ -85,8 +87,9 @@ Shader "Fengling/Lit"
                 float ndl = saturate(dot(N, L));
                 float3 diffuse = albedo * _FenglingSunColor.rgb * ndl;
 
-                // 环境光（球谐，来自天空盒）
+                // 环境光（球谐，来自天空盒）。加一个很小的保底，避免逆光面纯黑。
                 float3 ambient = ShadeSH9(float4(N, 1.0)) * albedo * _AmbientBoost;
+                ambient = max(ambient, albedo * _AmbientFloor);
 
                 // Blinn-Phong 高光
                 float3 H = normalize(L + V);
