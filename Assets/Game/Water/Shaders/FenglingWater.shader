@@ -362,6 +362,7 @@ Shader "Fengling/Water Surface"
                 float shoreFactor = saturate(depth / 0.75);
                 float3 color = lerp(waterColor, envColor, fresnel * shoreFactor);
 
+
                 // ---- 太阳高光（GGX）
                 float3 L = normalize(_SunDirection.xyz);
                 float3 H = normalize(L + V);
@@ -372,6 +373,9 @@ Shader "Fengling/Water Surface"
                 float D = DistributionGGX(NoH, a);
                 float3 F = FresnelSchlick(VoH, float3(_F0, _F0, _F0));
                 float spec = D * F.x * NoL / max(4.0 * NoV * NoL, 1e-4);
+                // 正交俯视下太阳高光会被波浪法线放大成大片白斑；先压到很弱。
+                if (unity_OrthoParams.w > 0.5)
+                    spec *= 0.03;
                 color += _SunColor.rgb * spec * _SunIntensity * (1.0 - _Stylized);
 
                 // ---- 岸边泡沫：深度差 + 噪声扭曲坐标（让边缘碎掉）
