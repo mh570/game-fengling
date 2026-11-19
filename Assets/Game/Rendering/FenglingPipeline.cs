@@ -71,7 +71,7 @@ namespace Fengling.Rendering
 
             // 阴影：在不透明之前画进深度图
             var sunForShadow = RenderSettings.sun;
-            if (sunForShadow != null)
+            if (_settings.shadowsEnabled && sunForShadow != null)
             {
                 _shadows.Render(context, camera, culling, sunForShadow.transform.forward,
                                 _settings.shadowDistance, _settings.shadowResolution);
