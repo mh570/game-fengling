@@ -10,6 +10,7 @@ namespace Fengling.Rendering
     public sealed class FenglingPipeline : RenderPipeline
     {
         private readonly FenglingPipelineSettings _settings;
+        private readonly FenglingShadows _shadows = new FenglingShadows();
 
         private static readonly ShaderTagId[] OpaqueTags =
         {
@@ -66,6 +67,14 @@ namespace Fengling.Rendering
             CommandBufferPool.Release(cmd);
 
             var culling = context.Cull(ref cullingParams);
+
+            // 阴影：在不透明之前画进深度图
+            var sunForShadow = RenderSettings.sun;
+            if (sunForShadow != null)
+            {
+                _shadows.Render(context, camera, culling, sunForShadow.transform.forward,
+                                _settings.shadowDistance, _settings.shadowResolution);
+            }
 
             // ---- 不透明
             var opaqueSettings = new DrawingSettings(OpaqueTags[0], new SortingSettings(camera))

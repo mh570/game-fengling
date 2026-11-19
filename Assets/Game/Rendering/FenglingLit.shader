@@ -42,6 +42,12 @@ Shader "Fengling/Lit"
             float4 _FenglingSunDir;
             float4 _FenglingSunColor;
 
+            sampler2D _FenglingShadowMap;
+            float4x4 _FenglingShadowView;
+            float4x4 _FenglingShadowProj;
+            float _FenglingShadowDistance;
+            float _FenglingShadowEnabled;
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -87,8 +93,68 @@ Shader "Fengling/Lit"
                 float spec = pow(saturate(dot(N, H)), exp2(lerp(1.0, 10.0, _Smoothness)));
                 float3 specular = _FenglingSunColor.rgb * spec * _Smoothness * (1.0 - _Metallic);
 
-                float3 color = diffuse + ambient + specular;
+                // 阴影
+                float shadow = 1.0;
+                if (_FenglingShadowEnabled > 0.5)
+                {
+                    float4 shadowCoord = mul(_FenglingShadowProj, mul(_FenglingShadowView, float4(i.worldPos, 1.0)));
+                    shadowCoord.xyz /= shadowCoord.w;
+                    float2 uv = shadowCoord.xy * 0.5 + 0.5;
+                    if (all(uv > 0.001) && all(uv < 0.999))
+                    {
+                        float depth = shadowCoord.z * 0.5 + 0.5;
+                        float bias = 0.0025;
+                        float2 texel = float2(1.0 / 2048.0, 1.0 / 2048.0);
+                        float lit = 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x, -texel.y)).r > depth - bias ? 1 : 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x, -texel.y)).r > depth - bias ? 1 : 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x,  texel.y)).r > depth - bias ? 1 : 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x,  texel.y)).r > depth - bias ? 1 : 0;
+                        shadow = lit / 4.0;
+                    }
+                }
+
+                float3 color = diffuse * shadow + ambient + specular * shadow;
                 return float4(color, 1.0);
+            }
+            ENDHLSL
+        }
+    }
+
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+            Cull Back
+            ZWrite On
+            ZTest LEqual
+            ColorMask 0
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+            };
+
+            struct v2f
+            {
+                float4 pos : SV_POSITION;
+            };
+
+            v2f vert(appdata v)
+            {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                return o;
+            }
+
+            float4 frag(v2f i) : SV_Target
+            {
+                return 0;
             }
             ENDHLSL
         }
