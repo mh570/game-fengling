@@ -88,7 +88,10 @@ namespace Fengling.Rendering
 
         public void Disable()
         {
-            // 没有阴影时也要给 shader 一个合法纹理，避免采样到黑
+            // 关闭时必须显式复位：否则上一次会话/帧留下的 1 会让 Lit shader
+            // 继续采样已经失效的阴影图，表现为地形整片发黑。
+            Shader.SetGlobalFloat("_FenglingShadowEnabled", 0f);
+            Shader.SetGlobalTexture("_FenglingShadowMap", Texture2D.blackTexture);
         }
     }
 }

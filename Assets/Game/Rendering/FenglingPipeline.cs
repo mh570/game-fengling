@@ -76,6 +76,11 @@ namespace Fengling.Rendering
                 _shadows.Render(context, camera, culling, sunForShadow.transform.forward,
                                 _settings.shadowDistance, _settings.shadowResolution);
             }
+            else
+            {
+                // 必须复位全局开关；否则 shader 可能沿用上一帧/上一次会话的 1。
+                _shadows.Disable();
+            }
 
             // ---- 不透明
             var opaqueSettings = new DrawingSettings(OpaqueTags[0], new SortingSettings(camera))
