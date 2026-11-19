@@ -12,6 +12,9 @@ namespace Fengling.EditorTools
     public static class P2MinimalScene
     {
         private const string ScenePath = "Assets/Scenes/P2Minimal.unity";
+        private const string HeightMapPath = "Assets/Game/Environment/Terrain/P2MinimalHeightMap.asset";
+        private const string NormalMap1Path = "Assets/Game/Water/Textures/WaterNormal1.asset";
+        private const string NormalMap2Path = "Assets/Game/Water/Textures/WaterNormal2.asset";
         private const string PendingKey = "P2.Minimal.Pending";
         private const string StartKey = "P2.Minimal.Start";
 
@@ -43,27 +46,33 @@ namespace Fengling.EditorTools
             var top = cam.gameObject.AddComponent<Player.TopDownCamera>();
             top.pitch = 55f;
             top.yaw = 45f;
-            top.orthoSize = 25f;
+            top.orthoSize = 30f;
             top.focus = Vector3.zero;
             top.enabled = true;
 
-            var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            ground.name = "Ground";
-            ground.transform.position = new Vector3(0f, -3f, 0f);
-            ground.transform.localScale = new Vector3(80f, 4f, 80f);
-            ground.GetComponent<Renderer>().sharedMaterial =
+            // 海岸浅滩地形：沙滩 → 缓坡 → 深水
+            var terrainGo = new GameObject("CoastTerrain");
+            terrainGo.AddComponent<MeshFilter>();
+            var terrainRenderer = terrainGo.AddComponent<MeshRenderer>();
+            var terrain = terrainGo.AddComponent<Environment.CoastTerrain>();
+            terrain.size = new Vector2(200f, 200f);
+            terrain.resolution = 128;
+            terrain.shoreZ = 0f;
+            terrain.landHeight = 3f;
+            terrain.seaDepth = 8f;
+            terrain.slopeLength = 60f;
+            terrain.noiseAmplitude = 0.6f;
+            terrain.noiseScale = 0.04f;
+            terrainRenderer.sharedMaterial =
                 LitMaterialProvider.Make("P2MinimalGround", new Color(0.66f, 0.60f, 0.46f), 0.05f);
+            terrain.Generate();
 
-            var island = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            island.name = "Island";
-            island.transform.position = new Vector3(0f, -0.2f, 0f);
-            island.transform.localScale = new Vector3(20f, 1.4f, 20f);
-            island.GetComponent<Renderer>().sharedMaterial =
-                LitMaterialProvider.Make("P2MinimalIsland", new Color(0.72f, 0.66f, 0.50f), 0.05f);
+            var heightMap = BakeHeightMap(terrain);
 
             var player = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             player.name = "Player";
-            player.transform.position = new Vector3(0f, 1.5f, 0f);
+            float playerZ = 12f;
+            player.transform.position = new Vector3(0f, terrain.SampleHeight(0f, playerZ) + 1.0f, playerZ);
             player.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
             var cap = player.GetComponent<CapsuleCollider>();
             if (cap != null) Object.DestroyImmediate(cap);
@@ -78,7 +87,7 @@ namespace Fengling.EditorTools
 
             var waterGo = new GameObject("Water");
             var wm = waterGo.AddComponent<Water.WaterModule>();
-            wm.Settings.kind = Water.WaterKind.Flat;
+            wm.Settings.kind = Water.WaterKind.Spectral;
             wm.Settings.size = new Vector2(200f, 200f);
             wm.Settings.baseLevel = 0f;
 
@@ -89,19 +98,28 @@ namespace Fengling.EditorTools
             sm.water = wm;
             sm.waterMaterialTemplate = WaterMaterialProvider.GetOrCreate();
             sm.buildMesh = true;
-            sm.segments = 64;
-
-            var marker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            marker.name = "Marker";
-            marker.transform.position = new Vector3(0f, 3f, 0f);
-            marker.transform.localScale = new Vector3(2f, 2f, 2f);
-            marker.GetComponent<Renderer>().sharedMaterial =
-                LitMaterialProvider.Make("P2MinimalMarker", new Color(1f, 0.05f, 0.02f), 0.2f);
+            sm.segments = 128;
+            sm.terrainHeightMap = heightMap;
+            sm.heightMapBounds = new Vector4(0f, 0f, terrain.size.x, terrain.size.y);
+            sm.heightRange = terrain.HeightMapRange;
+            sm.normalMap1 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap1Path);
+            sm.normalMap2 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap2Path);
 
             Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.Refresh();
             Debug.Log("[P2Minimal] built " + ScenePath);
+        }
+
+        private static Texture2D BakeHeightMap(Environment.CoastTerrain terrain)
+        {
+            AssetDatabase.DeleteAsset(HeightMapPath);
+            var tex = terrain.BuildHeightMap(256);
+            tex.name = "P2MinimalHeightMap";
+            Directory.CreateDirectory(Path.GetDirectoryName(HeightMapPath) ?? "Assets");
+            AssetDatabase.CreateAsset(tex, HeightMapPath);
+            AssetDatabase.SaveAssets();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(HeightMapPath);
         }
 
         public static void Capture()
