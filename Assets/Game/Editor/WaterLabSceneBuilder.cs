@@ -60,6 +60,7 @@ namespace Fengling.EditorTools
             surfaceGo.AddComponent<MeshRenderer>();
             var surfaceRenderer = surfaceGo.AddComponent<Water.WaterSurfaceRenderer>();
             surfaceRenderer.water = waterModule;
+            surfaceRenderer.waterMaterialTemplate = WaterMaterialProvider.GetOrCreate();
             surfaceRenderer.terrainHeightMap = heightMap;
             surfaceRenderer.heightMapBounds = new Vector4(
                 terrain.transform.position.x,

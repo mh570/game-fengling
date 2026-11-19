@@ -72,7 +72,6 @@ Shader "Fengling/Water Surface"
         {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "RenderPipeline" = "HDRenderPipeline"
         }
 
         Pass

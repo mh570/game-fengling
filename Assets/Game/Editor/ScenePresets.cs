@@ -211,6 +211,7 @@ namespace Fengling.EditorTools
             var surface = new GameObject("WaterSurface");
             var sm = surface.AddComponent<Water.WaterSurfaceRenderer>();
             sm.water = wm;
+            sm.waterMaterialTemplate = WaterMaterialProvider.GetOrCreate();
             sm.terrainHeightMap = heightMap;
             sm.heightMapBounds = new Vector4(0f, 0f, p.Size.x, p.Size.y);
             sm.heightRange = terrain.HeightMapRange;
@@ -301,6 +302,7 @@ namespace Fengling.EditorTools
 
             var sm = plane.AddComponent<Water.WaterSurfaceRenderer>();
             sm.water = Object.FindFirstObjectByType<Water.WaterModule>();
+            sm.waterMaterialTemplate = WaterMaterialProvider.GetOrCreate();
             sm.buildMesh = false;              // 保留 Quad 的竖直网格
             sm.verticalFlow = 1f;
             sm.flowSpeed = 1.6f;

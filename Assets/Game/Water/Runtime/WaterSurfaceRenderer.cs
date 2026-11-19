@@ -32,6 +32,10 @@ namespace Fengling.Water
         [Tooltip("高度图对应的真实高度范围 (min, max)")]
         public Vector2 heightRange = new Vector2(-9f, 4f);
 
+        [Header("材质")]
+        [Tooltip("引用 Fengling/Water Surface 的材质资产。为空时回退到 Shader.Find（仅编辑器可靠）")]
+        public Material waterMaterialTemplate;
+
         [Header("外观")]
         public Texture2D normalMap1;
         public Texture2D normalMap2;
@@ -93,14 +97,18 @@ namespace Fengling.Water
                 GetComponent<MeshFilter>().sharedMesh = _mesh;
             }
 
-            var shader = Shader.Find("Fengling/Water Surface");
+            var shader = waterMaterialTemplate != null && waterMaterialTemplate.shader != null
+                ? waterMaterialTemplate.shader
+                : Shader.Find("Fengling/Water Surface");
             if (shader == null)
             {
                 Debug.LogError("[Water] 找不到 shader 'Fengling/Water Surface'，水面不会渲染");
                 return;
             }
 
-            _material = new Material(shader) { name = "WaterSurface (instance)" };
+            _material = waterMaterialTemplate != null
+                ? new Material(waterMaterialTemplate) { name = "WaterSurface (instance)" }
+                : new Material(shader) { name = "WaterSurface (instance)" };
             var mr = GetComponent<MeshRenderer>();
             mr.sharedMaterial = _material;
             mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;

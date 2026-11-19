@@ -70,14 +70,28 @@ namespace Fengling.EditorTools
                 changed++;
             }
 
-            if (changed > 0)
+            var waterTemplate = WaterMaterialProvider.GetOrCreate();
+            int waterChanged = 0;
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                foreach (var sm in root.GetComponentsInChildren<Water.WaterSurfaceRenderer>(true))
+                {
+                    if (sm.waterMaterialTemplate == waterTemplate) continue;
+                    Undo.RecordObject(sm, "Assign water material template");
+                    sm.waterMaterialTemplate = waterTemplate;
+                    EditorUtility.SetDirty(sm);
+                    waterChanged++;
+                }
+            }
+
+            if (changed > 0 || waterChanged > 0)
             {
                 EditorSceneManager.MarkSceneDirty(scene);
                 EditorSceneManager.SaveScene(scene);
                 AssetDatabase.SaveAssets();
             }
 
-            Debug.Log($"[Migrate] WaterLab 扫描 {scanned} 个 Renderer，替换 {changed} 个材质。");
+            Debug.Log($"[Migrate] WaterLab 扫描 {scanned} 个 Renderer，替换 {changed} 个材质，绑定 {waterChanged} 个水面材质模板。");
             LogRemainingLegacy(scene);
         }
 
