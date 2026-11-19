@@ -168,10 +168,18 @@ namespace Fengling.EditorTools
                 sun.type = LightType.Directional;
             }
             sun.color = new Color(1f, 0.93f, 0.80f);
-            sun.intensity = 9f;
-            sun.shadows = LightShadows.Soft;
-            sunGo.transform.rotation = Quaternion.Euler(42f, -138f, 0f);
+            sun.intensity = 8f;
+            sun.shadows = LightShadows.None;
+            sunGo.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
             RenderSettings.sun = sun;
+
+            var fillGo = new GameObject("Fill Light");
+            var fill = fillGo.AddComponent<Light>();
+            fill.type = LightType.Directional;
+            fill.intensity = 2.5f;
+            fill.color = new Color(0.65f, 0.78f, 1f);
+            fill.shadows = LightShadows.None;
+            fillGo.transform.rotation = Quaternion.Euler(20f, 60f, 0f);
 
             // 自建管线不读 HDRP Volume。直接用程序化天空盒 + Skybox 环境光，
             // 曝光/ACES/Bloom 由 FenglingPipeline 的后处理负责。

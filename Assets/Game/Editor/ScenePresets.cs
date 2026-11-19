@@ -241,6 +241,7 @@ namespace Fengling.EditorTools
             sm.roughness = 0.5f;
             sm.sunIntensity = 0.2f;
             sm.f0 = 0f;
+            sm.reflectionStrength = 0.18f;
 
             if (p.VerticalWater) BuildWaterfallSheet(surface.transform, p);
 
@@ -299,10 +300,19 @@ namespace Fengling.EditorTools
                 sun = sunGo.AddComponent<Light>();
                 sun.type = LightType.Directional;
             }
-            sun.intensity = 9f;
+            sun.intensity = 8f;
             sun.color = new Color(1f, 0.93f, 0.80f);
-            sunGo.transform.rotation = Quaternion.Euler(42f, -138f, 0f);
+            sunGo.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
             RenderSettings.sun = sun;
+
+            // 主光从侧后方时，圆柱玩家正面会死黑；补一盏很弱的填充方向光。
+            var fillGo = new GameObject("Fill Light");
+            var fill = fillGo.AddComponent<Light>();
+            fill.type = LightType.Directional;
+            fill.intensity = 2.5f;
+            fill.color = new Color(0.65f, 0.78f, 1f);
+            fill.shadows = LightShadows.None;
+            fillGo.transform.rotation = Quaternion.Euler(20f, 60f, 0f);
 
             // 自建管线不读 HDRP Volume；天空/环境光/曝光都由 Fengling 自己负责。
             SkyboxSetup.Apply();
