@@ -112,14 +112,15 @@ Shader "Fengling/Lit"
                     float2 uv = shadowCoord.xy * 0.5 + 0.5;
                     if (all(uv > 0.001) && all(uv < 0.999))
                     {
-                        float depth = shadowCoord.z * 0.5 + 0.5;
-                        float bias = 0.0025;
+                        float3 shadowViewPos = mul(_FenglingShadowView, float4(i.worldPos, 1.0)).xyz;
+                        float surfaceDepth = -shadowViewPos.z;
+                        float bias = 0.05; // world units
                         float2 texel = float2(1.0 / 2048.0, 1.0 / 2048.0);
                         float lit = 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x, -texel.y)).r > depth - bias ? 1 : 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x, -texel.y)).r > depth - bias ? 1 : 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x,  texel.y)).r > depth - bias ? 1 : 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x,  texel.y)).r > depth - bias ? 1 : 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x, -texel.y)).r > surfaceDepth - bias ? 1 : 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x, -texel.y)).r > surfaceDepth - bias ? 1 : 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x,  texel.y)).r > surfaceDepth - bias ? 1 : 0;
+                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x,  texel.y)).r > surfaceDepth - bias ? 1 : 0;
                         shadow = lit / 4.0;
                     }
                 }
