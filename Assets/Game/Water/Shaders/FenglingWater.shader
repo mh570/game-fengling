@@ -399,7 +399,7 @@ Shader "Fengling/Water Surface"
 
                 float foam = lerp(realFoam, stylFoam, _Stylized) * _FoamStrength * _UseFoam;
                 // 深水不该有白浪；只保留岸边浅水泡沫。
-                foam *= saturate(1.0 - depth / 6.0);
+                foam *= saturate(1.0 - depth / 2.0);
 
                 // 岸线湿沙带：浅水直接混到沙色，而不是让深水色在岸边拉出一条暗带。
                 float shoreMask = saturate(1.0 - depth / 1.0);

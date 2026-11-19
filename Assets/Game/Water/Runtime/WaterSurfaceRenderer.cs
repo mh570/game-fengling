@@ -48,6 +48,10 @@ namespace Fengling.Water
         [Range(0.01f, 0.5f)] public float roughness = 0.06f;
         [Range(0f, 0.2f)] public float f0 = 0.02f;
         [Range(0f, 2f)] public float normalStrength = 1f;
+        [Header("Normal Tiling")]
+        [Tooltip("每 10m 的法线重复次数；正交俯视下太高会产生横向条纹")]
+        [Range(0.5f, 24f)] public float normalTiling1 = 8f;
+        [Range(0.5f, 48f)] public float normalTiling2 = 24f;
 
         [Header("远处 / 海平线")]
         public Color horizonColor = new Color(0.65f, 0.78f, 0.90f);
@@ -66,6 +70,8 @@ namespace Fengling.Water
         [Range(0f, 1f)] public float stylizedOpacity = 0.65f;
 
         [Header("开关（阶段 7 品质档会用）")]
+        [Tooltip("关闭后不再按 Quality Tier 覆盖 manual 参数")]
+        public bool autoTier = true;
         public bool useFoam = true;
         public bool useReflectionCube = true;
 
@@ -138,6 +144,7 @@ namespace Fengling.Water
         /// </summary>
         private void UpdateTier()
         {
+            if (!autoTier) return;
             var tier = water.Settings.tier;
             if (tier == _appliedTier) return;
             _appliedTier = tier;
@@ -192,6 +199,8 @@ namespace Fengling.Water
             _material.SetFloat("_Roughness", roughness);
             _material.SetFloat("_F0", f0);
             _material.SetFloat("_NormalStrength", normalStrength);
+            _material.SetFloat("_NormalTiling1", normalTiling1);
+            _material.SetFloat("_NormalTiling2", normalTiling2);
             _material.SetFloat("_SunIntensity", sunIntensity);
             _material.SetColor("_FoamColor", foamColor);
             _material.SetFloat("_FadeDistance", opaqueAtDepth);
@@ -219,6 +228,15 @@ namespace Fengling.Water
             int count = water.FillWaveData(WaveDirs, WaveParams);
 
             _material.SetFloat("_AmplitudeScale", 1f);
+            _material.SetFloat("_NormalStrength", normalStrength);
+            _material.SetFloat("_NormalTiling1", normalTiling1);
+            _material.SetFloat("_NormalTiling2", normalTiling2);
+            _material.SetColor("_ShallowColor", shallowColor);
+            _material.SetColor("_DeepColor", deepColor);
+            _material.SetFloat("_FadeDistance", opaqueAtDepth);
+            _material.SetFloat("_FoamDistance", foamDistance);
+            _material.SetFloat("_FoamStrength", foamStrength);
+            _material.SetFloat("_UseFoam", useFoam ? 1f : 0f);
             _material.SetVector("_FlowDir", new Vector4(flowDirection.x, flowDirection.y, 0f, 0f));
             _material.SetFloat("_FlowSpeed", flowSpeed);
             _material.SetFloat("_Vertical", verticalFlow);

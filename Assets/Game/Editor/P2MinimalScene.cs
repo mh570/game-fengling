@@ -98,13 +98,16 @@ namespace Fengling.EditorTools
             wm.Settings.kind = Water.WaterKind.Spectral;
             wm.Settings.size = new Vector2(200f, 200f);
             wm.Settings.baseLevel = 0f;
-            wm.Settings.tier = Water.WaterQualityTier.Low;
+            wm.Settings.tier = Water.WaterQualityTier.Medium;
 
             var surfaceGo = new GameObject("WaterSurface");
             surfaceGo.AddComponent<MeshFilter>();
             surfaceGo.AddComponent<MeshRenderer>();
             var sm = surfaceGo.AddComponent<Water.WaterSurfaceRenderer>();
             sm.water = wm;
+            sm.autoTier = false;
+            sm.useFoam = false;
+            sm.useReflectionCube = false;
             sm.waterMaterialTemplate = WaterMaterialProvider.GetOrCreate();
             sm.buildMesh = true;
             sm.segments = 128;
@@ -113,12 +116,18 @@ namespace Fengling.EditorTools
             sm.heightRange = terrain.HeightMapRange;
             sm.normalMap1 = null;
             sm.normalMap2 = null;
+            sm.normalTiling1 = 2f;
+            sm.normalTiling2 = 5f;
+            sm.normalStrength = 0f;
+            sm.roughness = 0.3f;
+            sm.sunIntensity = 0.5f;
             sm.shallowColor = new Color(0.08f, 0.48f, 0.55f);
             sm.deepColor = new Color(0.01f, 0.10f, 0.22f);
             sm.absorptionDistance = 2.5f;
             sm.opaqueAtDepth = 2f;
-            sm.foamDistance = 1.2f;
-            sm.foamStrength = 1.2f;
+            sm.foamDistance = 0.8f;
+            sm.foamStrength = 0.45f;
+            sm.foamWarp = 1.2f;
 
             Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);
