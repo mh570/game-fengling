@@ -119,7 +119,6 @@ Shader "Fengling/Lit"
             }
             ENDHLSL
         }
-    }
 
         Pass
         {
