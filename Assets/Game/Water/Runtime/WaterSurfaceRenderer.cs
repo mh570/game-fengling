@@ -1,4 +1,5 @@
 using UnityEngine;
+using Fengling.Rendering;
 
 namespace Fengling.Water
 {
@@ -48,6 +49,7 @@ namespace Fengling.Water
         [Range(0.01f, 0.5f)] public float roughness = 0.06f;
         [Range(0f, 0.2f)] public float f0 = 0.02f;
         [Range(0f, 2f)] public float normalStrength = 1f;
+        [Range(0f, 0.1f)] public float refractionStrength = 0.015f;
         [Header("Normal Tiling")]
         [Tooltip("每 10m 的法线重复次数；正交俯视下太高会产生横向条纹")]
         [Range(0.5f, 24f)] public float normalTiling1 = 8f;
@@ -96,6 +98,16 @@ namespace Fengling.Water
         private Camera _camera;
         private static readonly Vector4[] WaveDirs = new Vector4[16];
         private static readonly Vector4[] WaveParams = new Vector4[16];
+
+        private void OnEnable()
+        {
+            FenglingSceneTextures.Ready += BindSceneTextures;
+        }
+
+        private void OnDisable()
+        {
+            FenglingSceneTextures.Ready -= BindSceneTextures;
+        }
 
         private void Awake()
         {
@@ -199,6 +211,7 @@ namespace Fengling.Water
             _material.SetFloat("_Roughness", roughness);
             _material.SetFloat("_F0", f0);
             _material.SetFloat("_NormalStrength", normalStrength);
+            _material.SetFloat("_RefractionStrength", refractionStrength);
             _material.SetFloat("_NormalTiling1", normalTiling1);
             _material.SetFloat("_NormalTiling2", normalTiling2);
             _material.SetFloat("_SunIntensity", sunIntensity);
@@ -229,6 +242,7 @@ namespace Fengling.Water
 
             _material.SetFloat("_AmplitudeScale", 1f);
             _material.SetFloat("_NormalStrength", normalStrength);
+            _material.SetFloat("_RefractionStrength", refractionStrength);
             _material.SetFloat("_NormalTiling1", normalTiling1);
             _material.SetFloat("_NormalTiling2", normalTiling2);
             _material.SetColor("_ShallowColor", shallowColor);
@@ -237,6 +251,32 @@ namespace Fengling.Water
             _material.SetFloat("_FoamDistance", foamDistance);
             _material.SetFloat("_FoamStrength", foamStrength);
             _material.SetFloat("_UseFoam", useFoam ? 1f : 0f);
+
+            // 管线拷贝的深度/场景颜色：显式绑到材质，避免全局 sampler 在某些平台失效。
+            var sceneDepth = Shader.GetGlobalTexture("_FenglingSceneDepth");
+            if (sceneDepth != null)
+            {
+                _material.SetTexture("_FenglingSceneDepth", sceneDepth);
+                _material.SetFloat("_FenglingSceneDepthAvailable",
+                    Shader.GetGlobalFloat("_FenglingSceneDepthAvailable"));
+            }
+            else
+            {
+                _material.SetFloat("_FenglingSceneDepthAvailable", 0f);
+            }
+
+            var sceneColor = Shader.GetGlobalTexture("_FenglingSceneColor");
+            if (sceneColor != null)
+            {
+                _material.SetTexture("_FenglingSceneColor", sceneColor);
+                _material.SetFloat("_FenglingSceneColorAvailable",
+                    Shader.GetGlobalFloat("_FenglingSceneColorAvailable"));
+            }
+            else
+            {
+                _material.SetFloat("_FenglingSceneColorAvailable", 0f);
+            }
+
             _material.SetVector("_FlowDir", new Vector4(flowDirection.x, flowDirection.y, 0f, 0f));
             _material.SetFloat("_FlowSpeed", flowSpeed);
             _material.SetFloat("_Vertical", verticalFlow);
@@ -251,6 +291,25 @@ namespace Fengling.Water
             Shader.SetGlobalVectorArray("_FenglingWaveParams", WaveParams);
 
             UpdateUnderwater();
+        }
+
+        /// <summary>
+        /// 管线在透明 pass 之前调用：把当前帧的深度/场景颜色显式绑到材质。
+        /// 不能只在 Update 里读全局，否则读到的是上一帧已释放的 RT。
+        /// </summary>
+        public void BindSceneTextures(Texture depth, Texture color)
+        {
+            if (_material == null) return;
+            if (depth != null)
+            {
+                _material.SetTexture("_FenglingSceneDepth", depth);
+                _material.SetFloat("_FenglingSceneDepthAvailable", 1f);
+            }
+            if (color != null)
+            {
+                _material.SetTexture("_FenglingSceneColor", color);
+                _material.SetFloat("_FenglingSceneColorAvailable", 1f);
+            }
         }
 
         /// <summary>

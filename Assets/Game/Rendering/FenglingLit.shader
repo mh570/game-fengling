@@ -167,6 +167,47 @@ Shader "Fengling/Lit"
             }
             ENDHLSL
         }
+
+        Pass
+        {
+            Name "DepthOnly"
+            Tags { "LightMode" = "DepthOnly" }
+            Cull Back
+            ZWrite On
+            ZTest LEqual
+            ColorMask RGBA
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+            };
+
+            struct v2f
+            {
+                float4 pos : SV_POSITION;
+                float depth : TEXCOORD0;
+            };
+
+            v2f vert(appdata v)
+            {
+                v2f o;
+                float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+                o.pos = UnityWorldToClipPos(worldPos);
+                o.depth = -mul(UNITY_MATRIX_V, float4(worldPos, 1.0)).z;
+                return o;
+            }
+
+            float4 frag(v2f i) : SV_Target
+            {
+                return float4(i.depth, 0.0, 0.0, 1.0);
+            }
+            ENDHLSL
+        }
     }
 
     Fallback Off

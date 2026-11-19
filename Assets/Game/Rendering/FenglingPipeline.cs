@@ -148,15 +148,46 @@ namespace Fengling.Rendering
             if (camera.clearFlags == CameraClearFlags.Skybox)
                 context.DrawSkybox(camera);
 
-            // 把不透明 pass 的深度交给水面：岸线/泡沫/浅水 alpha 用真实深度，
-            // 不再依赖烘培高度图（高度图和 mesh 插值在岸边会差 0.1m 左右）。
-            var depthCmd = CommandBufferPool.Get("Fengling.DepthTexture");
-            depthCmd.SetGlobalTexture("_CameraDepthTexture", depthTarget);
-            // 自定义 SRP 下 depth RT 的跨平台采样还没实测通过；先关闭，
-            // 水面暂时继续用烘焙高度图。等平面反射阶段统一验证深度纹理。
-            depthCmd.SetGlobalFloat("_FenglingCameraDepthAvailable", 0f);
+            // ---- 场景颜色 / 线性深度拷贝（全分辨率）
+            // 水面在透明队列里，必须先拷贝不透明+天空的颜色，才能做折射。
+            var sceneColorRT = RenderTexture.GetTemporary(
+                width, height, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
+            sceneColorRT.name = "FenglingSceneColor";
+            var linearDepthRT = RenderTexture.GetTemporary(
+                width, height, 24, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
+            linearDepthRT.name = "FenglingLinearDepth";
+
+            var copyCmd = CommandBufferPool.Get("Fengling.SceneColor");
+            copyCmd.Blit(colorRT, sceneColorRT);
+            context.ExecuteCommandBuffer(copyCmd);
+            CommandBufferPool.Release(copyCmd);
+
+            var depthCmd = CommandBufferPool.Get("Fengling.LinearDepth");
+            depthCmd.SetRenderTarget(linearDepthRT);
+            depthCmd.ClearRenderTarget(true, true, new Color(1000f, 0f, 0f, 1f));
             context.ExecuteCommandBuffer(depthCmd);
             CommandBufferPool.Release(depthCmd);
+
+            var depthDrawing = new DrawingSettings(new ShaderTagId("DepthOnly"), new SortingSettings(camera))
+            {
+                perObjectData = PerObjectData.None,
+            };
+            var depthFilter = new FilteringSettings(RenderQueueRange.opaque);
+            context.DrawRenderers(culling, ref depthDrawing, ref depthFilter);
+            context.Submit();
+
+            var restoreCmd = CommandBufferPool.Get("Fengling.DepthRestore");
+            restoreCmd.SetRenderTarget(colorTarget, depthTarget);
+            restoreCmd.SetGlobalTexture("_FenglingSceneDepth", linearDepthRT);
+            restoreCmd.SetGlobalTexture("_FenglingSceneColor", sceneColorRT);
+            restoreCmd.SetGlobalFloat("_FenglingSceneDepthAvailable", 1f);
+            restoreCmd.SetGlobalFloat("_FenglingSceneColorAvailable", 1f);
+            context.ExecuteCommandBuffer(restoreCmd);
+            CommandBufferPool.Release(restoreCmd);
+
+            // 材质属性绑定必须在管线内、透明 pass 之前完成；
+            // 在 WaterSurfaceRenderer.Update 里读全局会拿到上一帧已释放的 RT。
+            FenglingSceneTextures.Publish(linearDepthRT, sceneColorRT);
 
             // ---- 透明
             var transparentSorting = new SortingSettings(camera) { criteria = SortingCriteria.CommonTransparent };
@@ -170,6 +201,8 @@ namespace Fengling.Rendering
             PostProcess(context, camera, colorRT, width, height);
             RenderTexture.ReleaseTemporary(colorRT);
             RenderTexture.ReleaseTemporary(depthRT);
+            RenderTexture.ReleaseTemporary(sceneColorRT);
+            RenderTexture.ReleaseTemporary(linearDepthRT);
         }
 
         private void PostProcess(ScriptableRenderContext context, Camera camera, RenderTexture colorRT,

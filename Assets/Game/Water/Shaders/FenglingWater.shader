@@ -41,6 +41,7 @@ Shader "Fengling/Water Surface"
         _HorizonFadeStart ("Horizon Fade Start (m)", Float) = 30
         _HorizonFadeRange ("Horizon Fade Range (m)", Float) = 120
         _ShoreColor ("Shore / Wet Sand Color", Color) = (0.55, 0.50, 0.38, 1)
+        _RefractionStrength ("Refraction Strength", Range(0, 0.1)) = 0.015
 
         [Header(Foam)]
         _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
@@ -135,6 +136,11 @@ Shader "Fengling/Water Surface"
 
             UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
             float _FenglingCameraDepthAvailable;
+            sampler2D _FenglingSceneDepth;
+            sampler2D _FenglingSceneColor;
+            float _FenglingSceneDepthAvailable;
+            float _FenglingSceneColorAvailable;
+            float _RefractionStrength;
 
             int _FenglingWaveCount;
             float4 _FenglingWaveDirs[MAX_WAVES];
@@ -319,14 +325,15 @@ Shader "Fengling/Water Surface"
                     N = normalize(float3(tN.x, 1.0, tN.y));
 
                 // ---- 深度（决定颜色和透明度）
-                // 优先用不透明 pass 的真实深度；没有深度纹理时才退回烘焙高度图。
+                // 优先用管线拷贝的全分辨率线性深度；失败时才退回烘焙高度图。
                 float terrainY = TerrainHeight(i.worldPos);
+                float2 screenUV = i.screenPos.xy / max(1e-4, i.screenPos.w);
                 float depth;
-                if (_FenglingCameraDepthAvailable > 0.5)
+                float sceneEye = tex2D(_FenglingSceneDepth, screenUV).r;
+                float surfaceEye = -mul(UNITY_MATRIX_V, float4(i.worldPos, 1.0)).z;
+                if (_FenglingSceneDepthAvailable > 0.5 && sceneEye > 0.0 && sceneEye < 900.0)
                 {
-                    float2 screenUV = i.screenPos.xy / i.screenPos.w;
-                    float sceneEye = LinearEyeDepth(tex2D(_CameraDepthTexture, screenUV).r);
-                    depth = max(0.0, sceneEye - i.screenPos.w);
+                    depth = max(0.0, sceneEye - surfaceEye);
                 }
                 else
                 {
@@ -361,6 +368,15 @@ Shader "Fengling/Water Surface"
                 // 浅水处不要满菲涅尔反射：否则掠射角会把薄薄一层水染成深色带。
                 float shoreFactor = saturate(depth / 0.75);
                 float3 color = lerp(waterColor, envColor, fresnel * shoreFactor);
+
+                // 折射：采样透明队列之前的场景颜色（地形/石头）。
+                if (_FenglingSceneColorAvailable > 0.5)
+                {
+                    float2 refrUV = screenUV + N.xz * (_RefractionStrength / max(0.5, depth));
+                    float3 sceneRefr = tex2D(_FenglingSceneColor, saturate(refrUV)).rgb;
+                    float refractMask = saturate(1.0 - depth / 2.5) * 0.25;
+                    color = lerp(color, sceneRefr, refractMask);
+                }
 
 
                 // ---- 太阳高光（GGX）

@@ -2,7 +2,8 @@
     "name": "Fengling.Water",
     "rootNamespace": "Fengling.Water",
     "references": [
-        "Fengling.Water.Abstractions"
+        "Fengling.Water.Abstractions",
+        "Fengling.Rendering"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
