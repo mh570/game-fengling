@@ -333,6 +333,14 @@ Shader "Fengling/Water Surface"
                     depth = TerrainDepth(i.worldPos);
                 }
 
+                // 水线裁切：太薄的贴边水层最容易产生暗线/锯齿，直接让地形露出来。
+                if (depth < 2.0)
+                    discard;
+
+                // 裁切边缘补一条泡沫，避免出现一刀切的硬水线。
+                float edgeFoam = smoothstep(2.0, 2.15, depth) * (1.0 - smoothstep(2.35, 2.7, depth));
+                edgeFoam *= 0.45 + 0.55 * valueNoise(i.worldPos.xz * 3.0 + _WaterTime * 0.1);
+
                 // 写实：Beer-Lambert 连续吸收
                 float transmittance = exp(-depth / max(0.01, _AbsorptionDistance));
                 float3 realColor = lerp(_DeepColor.rgb, _ShallowColor.rgb, transmittance);
@@ -398,7 +406,7 @@ Shader "Fengling/Water Surface"
                 float shoreMask = saturate(1.0 - depth / 4.0);
                 color = lerp(color, _ShoreColor.rgb, shoreMask * 0.9);
 
-                color = lerp(color, _FoamColor.rgb, saturate(foam));
+                color = lerp(color, _FoamColor.rgb, saturate(max(foam, edgeFoam * 1.2)));
 
                 // ---- 透明度：浅处几乎全透（看得见沙底），深处不透明
                 float alpha = saturate(depth / max(0.01, _FadeDistance));
@@ -409,6 +417,7 @@ Shader "Fengling/Water Surface"
                 alpha *= saturate(depth / 0.5);
                 alpha = max(alpha, 0.04 * saturate(depth / 0.5));
                 alpha = max(alpha, shoreMask * 0.70);
+                alpha = max(alpha, edgeFoam * 0.85);
 
                 // 远处：颜色和 alpha 都淡入海平线色，避免看到水面网格的硬边缘。
                 float horizonFade = saturate((viewDist - _HorizonFadeStart) / max(1.0, _HorizonFadeRange));
