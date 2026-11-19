@@ -11,7 +11,7 @@ namespace Fengling.Rendering
     ///   - 不重写 shaderTag，打包时该管线的变体会被剥离
     /// </summary>
     [CreateAssetMenu(menuName = "Fengling/Render Pipeline", fileName = "FenglingPipeline")]
-    public sealed class FenglingPipelineAsset : RenderPipelineAsset
+    public sealed class FenglingPipelineAsset : RenderPipelineAsset<FenglingPipeline>
     {
         [SerializeField] private FenglingPipelineSettings settings = new FenglingPipelineSettings();
 
