@@ -220,10 +220,10 @@ namespace Fengling.EditorTools
             sm.heightRange = terrain.HeightMapRange;
             sm.normalMap1 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap1Path);
             sm.normalMap2 = AssetDatabase.LoadAssetAtPath<Texture2D>(NormalMap2Path);
-            sm.shallowColor = p.Shallow;
-            sm.deepColor = p.Deep;
-            sm.absorptionDistance = p.Absorption;
-            sm.opaqueAtDepth = p.OpaqueAtDepth;
+            sm.shallowColor = new Color(0.08f, 0.48f, 0.55f);
+            sm.deepColor = new Color(0.01f, 0.10f, 0.22f);
+            sm.absorptionDistance = 2.5f;
+            sm.opaqueAtDepth = 2.5f;
             sm.foamDistance = p.FoamDistance;
             sm.foamStrength = p.FoamStrength;
             sm.stylized = 0f;
@@ -273,7 +273,7 @@ namespace Fengling.EditorTools
             top.orthoSize = Mathf.Clamp(p.Size.x * 0.12f, 18f, 28f);
             top.focus = new Vector3(0f, p.WaterLevel, p.ShoreZ + 20f);
             top.followTarget = player.transform;
-            top.followOffset = new Vector3(0f, 0f, 12f);
+            top.followOffset = new Vector3(0f, 0f, -8f);
             top.enabled = true;
             var sw = cam.gameObject.AddComponent<Player.CameraModeSwitch>();
             sw.firstPerson = fps;
