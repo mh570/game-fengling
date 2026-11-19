@@ -414,7 +414,10 @@ Shader "Fengling/Water Surface"
                 // 平面反射的天空清屏色偏暗，屏幕顶部会露出暗边；
                 // 用一条很窄的 horizon 融合盖住，不影响近处倒影。
                 float topFade = smoothstep(0.94, 1.0, screenUV.y);
-                color = lerp(color, _HorizonColor.rgb, topFade * 0.7);
+                float3 topColor = _HorizonColor.rgb;
+                if (_FenglingSceneColorAvailable > 0.5)
+                    topColor = tex2D(_FenglingSceneColor, screenUV).rgb;
+                color = lerp(color, topColor, topFade);
 
                 // ---- 岸边泡沫：深度差 + 噪声扭曲坐标（让边缘碎掉）
                 float2 warp = float2(
@@ -458,7 +461,7 @@ Shader "Fengling/Water Surface"
                 alpha *= saturate(depth / 0.5);
                 alpha = max(alpha, 0.04 * saturate(depth / 0.5));
                 alpha = max(alpha, shoreMask * 0.45);
-                alpha = max(alpha, topFade * 0.7);
+                alpha = max(alpha, topFade);
 
                 // 远处：用水平距离，而不是相机到水面的 3D 距离。
                 // 俯视相机离水面很高，用 3D 距离会把整片水都判成“远景”而淡成透明。
