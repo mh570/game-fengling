@@ -147,6 +147,14 @@ namespace Fengling.Rendering
                 _shadows.Disable();
             }
 
+            // Shadow pass 会切换 RT/矩阵；显式重新绑定主相机目标和属性，
+            // 避免后续不透明/透明继续画进 shadow map。
+            context.SetupCameraProperties(camera);
+            var rebind = CommandBufferPool.Get("Fengling.MainTargetRebind");
+            rebind.SetRenderTarget(colorTarget, depthTarget);
+            context.ExecuteCommandBuffer(rebind);
+            CommandBufferPool.Release(rebind);
+
             // ---- 不透明
             var opaqueSettings = new DrawingSettings(OpaqueTags[0], new SortingSettings(camera))
             {
