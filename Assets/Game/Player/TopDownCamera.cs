@@ -32,6 +32,11 @@ namespace Fengling.Player
         [Tooltip("相机聚焦的世界坐标点（地面）")]
         public Vector3 focus = new Vector3(0f, 0f, 30f);
 
+        [Header("跟随")]
+        [Tooltip("设置后相机焦点跟随该 Transform；为空则用 focus 手动平移")]
+        public Transform followTarget;
+        public Vector3 followOffset = Vector3.zero;
+
         [Header("边界（可选）")]
         public bool clampFocus = true;
         public Vector2 focusLimit = new Vector2(100f, 100f);
@@ -87,6 +92,10 @@ namespace Fengling.Player
             float scroll = Input.mouseScrollDelta.y;
             if (Mathf.Abs(scroll) > 0.01f)
                 orthoSize = Mathf.Clamp(orthoSize * (1f - scroll * 0.1f), minOrthoSize, maxOrthoSize);
+
+            // RPG 跟随：焦点跟玩家，不再被手动平移覆盖
+            if (followTarget != null)
+                focus = followTarget.position + followOffset;
 
             if (clampFocus)
             {

@@ -419,8 +419,11 @@ Shader "Fengling/Water Surface"
                 alpha = max(alpha, shoreMask * 0.70);
                 alpha = max(alpha, edgeFoam * 0.85);
 
-                // 远处：颜色和 alpha 都淡入海平线色，避免看到水面网格的硬边缘。
-                float horizonFade = saturate((viewDist - _HorizonFadeStart) / max(1.0, _HorizonFadeRange));
+                // 远处：用水平距离，而不是相机到水面的 3D 距离。
+                // 俯视相机离水面很高，用 3D 距离会把整片水都判成“远景”而淡成透明。
+                float2 horizonDelta = i.worldPos.xz - _WorldSpaceCameraPos.xz;
+                float horizonDist = length(horizonDelta);
+                float horizonFade = saturate((horizonDist - _HorizonFadeStart) / max(1.0, _HorizonFadeRange));
                 color = lerp(color, _HorizonColor.rgb, horizonFade);
                 alpha *= (1.0 - horizonFade);
 

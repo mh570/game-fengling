@@ -54,6 +54,28 @@ namespace Fengling.EditorTools
             ground.GetComponent<Renderer>().sharedMaterial =
                 LitMaterialProvider.Make("P2MinimalGround", new Color(0.66f, 0.60f, 0.46f), 0.05f);
 
+            var island = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            island.name = "Island";
+            island.transform.position = new Vector3(0f, -0.2f, 0f);
+            island.transform.localScale = new Vector3(20f, 1.4f, 20f);
+            island.GetComponent<Renderer>().sharedMaterial =
+                LitMaterialProvider.Make("P2MinimalIsland", new Color(0.72f, 0.66f, 0.50f), 0.05f);
+
+            var player = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            player.name = "Player";
+            player.transform.position = new Vector3(0f, 1.5f, 0f);
+            player.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
+            var cap = player.GetComponent<CapsuleCollider>();
+            if (cap != null) Object.DestroyImmediate(cap);
+            var cc = player.AddComponent<CharacterController>();
+            cc.height = 2f;
+            cc.radius = 0.45f;
+            player.AddComponent<Player.PlayerMotor>();
+            player.GetComponent<Renderer>().sharedMaterial =
+                LitMaterialProvider.Make("PlayerBody", new Color(0.72f, 0.32f, 0.24f), 0.2f);
+            top.followTarget = player.transform;
+            top.followOffset = Vector3.zero;
+
             var waterGo = new GameObject("Water");
             var wm = waterGo.AddComponent<Water.WaterModule>();
             wm.Settings.kind = Water.WaterKind.Flat;
@@ -116,15 +138,14 @@ namespace Fengling.EditorTools
 
             var cam = Camera.main;
             if (cam == null) { EditorApplication.Exit(1); return; }
-            foreach (var mb in cam.GetComponents<MonoBehaviour>())
-                if (mb != null && mb.GetType().Name.Contains("Camera")) mb.enabled = false;
-
             var top = cam.GetComponent<Player.TopDownCamera>();
-            if (top != null) top.enabled = false;
-            cam.orthographic = true;
-            cam.orthographicSize = 25f;
-            cam.transform.position = new Vector3(0f, 50f, -20f);
-            cam.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
+            if (top != null)
+            {
+                top.enabled = true;
+                top.pitch = 55f;
+                top.yaw = 45f;
+                top.orthoSize = 25f;
+            }
             cam.nearClipPlane = 0.3f;
             cam.farClipPlane = 500f;
 
