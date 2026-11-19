@@ -231,18 +231,30 @@ namespace Fengling.EditorTools
             sm.flowSpeed = p.Name == "River" ? 0.8f : 0.05f;
             sm.verticalFlow = 0f;
 
+            // P4 topdown baseline
+            sm.autoTier = false;
+            sm.useFoam = true;
+            sm.useReflectionCube = false;
+            sm.normalTiling1 = 2f;
+            sm.normalTiling2 = 5f;
+            sm.normalStrength = 0.45f;
+            sm.roughness = 0.5f;
+            sm.sunIntensity = 0.2f;
+            sm.f0 = 0f;
+
             if (p.VerticalWater) BuildWaterfallSheet(surface.transform, p);
 
-            // ---- camera (first person)
-            var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            // ---- camera (topdown RPG default; C 切第一人称)
+            var player = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             player.name = "Player";
             player.transform.position = new Vector3(0f, p.WaterLevel + 2f, p.ShoreZ + 10f);
+            player.transform.localScale = new Vector3(0.9f, 1f, 0.9f);
             var playerMat = MakeMaterial("PlayerBody", new Color(0.72f, 0.32f, 0.24f), 0.2f);
             player.GetComponent<Renderer>().sharedMaterial = playerMat;
             var cap = player.GetComponent<CapsuleCollider>();
             if (cap != null) Object.DestroyImmediate(cap);
             var cc = player.AddComponent<CharacterController>();
-            cc.height = 2f; cc.radius = 0.5f;
+            cc.height = 2f; cc.radius = 0.45f;
             player.AddComponent<Player.PlayerMotor>();
 
             var cam = Camera.main;
@@ -254,13 +266,19 @@ namespace Fengling.EditorTools
             }
             var fps = cam.gameObject.AddComponent<Player.FirstPersonCamera>();
             fps.target = player.transform;
+            fps.enabled = false;
             var top = cam.gameObject.AddComponent<Player.TopDownCamera>();
-            top.orthoSize = p.Size.x * 0.35f;
+            top.pitch = 55f;
+            top.yaw = 45f;
+            top.orthoSize = Mathf.Clamp(p.Size.x * 0.12f, 18f, 28f);
             top.focus = new Vector3(0f, p.WaterLevel, p.ShoreZ + 20f);
-            top.enabled = false;
+            top.followTarget = player.transform;
+            top.followOffset = new Vector3(0f, 0f, 12f);
+            top.enabled = true;
             var sw = cam.gameObject.AddComponent<Player.CameraModeSwitch>();
             sw.firstPerson = fps;
             sw.topDown = top;
+            sw.startInFirstPerson = false;
 
             // ---- sun + volume
             var sunGo = GameObject.Find("Directional Light");
