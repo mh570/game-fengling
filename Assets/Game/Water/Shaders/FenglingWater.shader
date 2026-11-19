@@ -38,8 +38,9 @@ Shader "Fengling/Water Surface"
         _FadeDistance ("Opaque At Depth (m)", Float) = 6
         _WaterLevel ("Water Level Y", Float) = 0
         _HorizonColor ("Horizon Color", Color) = (0.65, 0.78, 0.90, 1)
-        _HorizonFadeStart ("Horizon Fade Start (m)", Float) = 120
-        _HorizonFadeRange ("Horizon Fade Range (m)", Float) = 320
+        _HorizonFadeStart ("Horizon Fade Start (m)", Float) = 30
+        _HorizonFadeRange ("Horizon Fade Range (m)", Float) = 120
+        _ShoreColor ("Shore / Wet Sand Color", Color) = (0.66, 0.60, 0.46, 1)
 
         [Header(Foam)]
         _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
@@ -121,6 +122,7 @@ Shader "Fengling/Water Surface"
             float4 _HorizonColor;
             float _HorizonFadeStart;
             float _HorizonFadeRange;
+            float4 _ShoreColor;
 
             float4 _FoamColor;
             float _FoamDistance;
@@ -130,6 +132,9 @@ Shader "Fengling/Water Surface"
             sampler2D _HeightMap;
             float4 _HeightMapBounds;
             float4 _HeightRange;
+
+            UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
+            float _FenglingCameraDepthAvailable;
 
             int _FenglingWaveCount;
             float4 _FenglingWaveDirs[MAX_WAVES];
@@ -157,6 +162,7 @@ Shader "Fengling/Water Surface"
                 float4 pos      : SV_POSITION;
                 float3 worldPos : TEXCOORD0;
                 float2 uv       : TEXCOORD1;
+                float4 screenPos : TEXCOORD2;
             };
 
             // ---------- 噪声 ----------
@@ -234,6 +240,7 @@ Shader "Fengling/Water Surface"
                 o.worldPos = worldPos;
                 o.uv = v.uv;
                 o.pos = mul(UNITY_MATRIX_VP, float4(worldPos, 1.0));
+                o.screenPos = ComputeScreenPos(o.pos);
                 return o;
             }
 
@@ -310,12 +317,21 @@ Shader "Fengling/Water Surface"
                     N = normalize(float3(tN.x, 1.0, tN.y));
 
                 // ---- 深度（决定颜色和透明度）
-                // 水面略高于地形时才是水；地形已经露出水面的地方直接 discard，
-                // 避免水面/沙滩在掠射角下 z-fighting 出黑边。
+                // 优先用不透明 pass 的真实深度；没有深度纹理时才退回烘焙高度图。
                 float terrainY = TerrainHeight(i.worldPos);
-                if (terrainY > i.worldPos.y + 0.02)
-                    discard;
-                float depth = TerrainDepth(i.worldPos);
+                float depth;
+                if (_FenglingCameraDepthAvailable > 0.5)
+                {
+                    float2 screenUV = i.screenPos.xy / i.screenPos.w;
+                    float sceneEye = LinearEyeDepth(tex2D(_CameraDepthTexture, screenUV).r);
+                    depth = max(0.0, sceneEye - i.screenPos.w);
+                }
+                else
+                {
+                    if (terrainY > i.worldPos.y + 0.02)
+                        discard;
+                    depth = TerrainDepth(i.worldPos);
+                }
 
                 // 写实：Beer-Lambert 连续吸收
                 float transmittance = exp(-depth / max(0.01, _AbsorptionDistance));
@@ -337,7 +353,9 @@ Shader "Fengling/Water Surface"
                 // P0 先用天空 SH 兜底，等平面反射做好后再替换。
                 float3 envColor = ShadeSH9(float4(reflectDir, 1.0));
 
-                float3 color = lerp(waterColor, envColor, fresnel);
+                // 浅水处不要满菲涅尔反射：否则掠射角会把薄薄一层水染成深色带。
+                float shoreFactor = saturate(depth / 0.75);
+                float3 color = lerp(waterColor, envColor, fresnel * shoreFactor);
 
                 // ---- 太阳高光（GGX）
                 float3 L = normalize(_SunDirection.xyz);
@@ -376,16 +394,21 @@ Shader "Fengling/Water Surface"
 
                 float foam = lerp(realFoam, stylFoam, _Stylized) * _FoamStrength * _UseFoam;
 
+                // 岸线湿沙带：浅水直接混到沙色，而不是让深水色在岸边拉出一条暗带。
+                float shoreMask = saturate(1.0 - depth / 4.0);
+                color = lerp(color, _ShoreColor.rgb, shoreMask * 0.9);
+
                 color = lerp(color, _FoamColor.rgb, saturate(foam));
 
                 // ---- 透明度：浅处几乎全透（看得见沙底），深处不透明
                 float alpha = saturate(depth / max(0.01, _FadeDistance));
-                alpha = max(alpha, fresnel * 0.9);
-                alpha = saturate(alpha + 0.06);
-                alpha = max(alpha, 0.20);   // 保底：水始终可见
+                alpha = max(alpha, fresnel * shoreFactor * 0.9);
+                alpha = saturate(alpha + 0.04);
 
                 // 岸线：水深趋近 0 时淡出，避免水/沙滩共面处出现黑边。
-                alpha *= saturate(depth / 0.25);
+                alpha *= saturate(depth / 0.5);
+                alpha = max(alpha, 0.04 * saturate(depth / 0.5));
+                alpha = max(alpha, shoreMask * 0.70);
 
                 // 远处：颜色和 alpha 都淡入海平线色，避免看到水面网格的硬边缘。
                 float horizonFade = saturate((viewDist - _HorizonFadeStart) / max(1.0, _HorizonFadeRange));

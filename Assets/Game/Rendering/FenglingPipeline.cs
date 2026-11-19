@@ -60,12 +60,17 @@ namespace Fengling.Rendering
             int height = Mathf.Max(1, camera.pixelHeight);
 
             var colorRT = RenderTexture.GetTemporary(
-                width, height, 24, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
+                width, height, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
             colorRT.name = "FenglingColor";
+            var depthRT = RenderTexture.GetTemporary(
+                width, height, 24, RenderTextureFormat.Depth, RenderTextureReadWrite.Linear);
+            depthRT.name = "FenglingDepth";
+
             var colorTarget = (RenderTargetIdentifier)colorRT;
+            var depthTarget = (RenderTargetIdentifier)depthRT;
 
             var cmd = CommandBufferPool.Get("Fengling.Setup");
-            cmd.SetRenderTarget(colorTarget);
+            cmd.SetRenderTarget(colorTarget, depthTarget);
 
             // SolidColor/Skybox 清颜色；Depth 只清深度；Nothing 都不清。
             bool clearColor = camera.clearFlags == CameraClearFlags.SolidColor ||
@@ -95,7 +100,8 @@ namespace Fengling.Rendering
             if (_settings.shadowsEnabled && sunForShadow != null)
             {
                 _shadows.Render(context, camera, culling, sunForShadow.transform.forward,
-                                _settings.shadowDistance, _settings.shadowResolution, colorTarget);
+                                _settings.shadowDistance, _settings.shadowResolution,
+                                colorTarget, depthTarget);
             }
             else
             {
@@ -118,6 +124,16 @@ namespace Fengling.Rendering
             if (camera.clearFlags == CameraClearFlags.Skybox)
                 context.DrawSkybox(camera);
 
+            // 把不透明 pass 的深度交给水面：岸线/泡沫/浅水 alpha 用真实深度，
+            // 不再依赖烘培高度图（高度图和 mesh 插值在岸边会差 0.1m 左右）。
+            var depthCmd = CommandBufferPool.Get("Fengling.DepthTexture");
+            depthCmd.SetGlobalTexture("_CameraDepthTexture", depthTarget);
+            // 自定义 SRP 下 depth RT 的跨平台采样还没实测通过；先关闭，
+            // 水面暂时继续用烘焙高度图。等平面反射阶段统一验证深度纹理。
+            depthCmd.SetGlobalFloat("_FenglingCameraDepthAvailable", 0f);
+            context.ExecuteCommandBuffer(depthCmd);
+            CommandBufferPool.Release(depthCmd);
+
             // ---- 透明
             var transparentSorting = new SortingSettings(camera) { criteria = SortingCriteria.CommonTransparent };
             var transparentSettings = new DrawingSettings(TransparentTags[0], transparentSorting)
@@ -129,6 +145,7 @@ namespace Fengling.Rendering
 
             PostProcess(context, camera, colorRT, width, height);
             RenderTexture.ReleaseTemporary(colorRT);
+            RenderTexture.ReleaseTemporary(depthRT);
         }
 
         private void PostProcess(ScriptableRenderContext context, Camera camera, RenderTexture colorRT,

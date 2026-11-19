@@ -42,7 +42,7 @@ namespace Fengling.Rendering
 
         public void Render(ScriptableRenderContext context, Camera camera, CullingResults culling,
                            Vector3 lightDirection, float distance, int resolution,
-                           RenderTargetIdentifier restoreTarget)
+                           RenderTargetIdentifier restoreTarget, RenderTargetIdentifier restoreDepthTarget)
         {
             Resolution = Mathf.Clamp(resolution, 256, 4096);
             EnsureTexture(Resolution);
@@ -71,7 +71,7 @@ namespace Fengling.Rendering
             // 恢复相机状态：矩阵 + 渲染目标
             // 少了 SetRenderTarget，后面的不透明/透明会全部画进阴影图里，屏幕上只剩清屏色
             var restore = CommandBufferPool.Get("Fengling.ShadowRestore");
-            restore.SetRenderTarget(restoreTarget);
+            restore.SetRenderTarget(restoreTarget, restoreDepthTarget);
             context.ExecuteCommandBuffer(restore);
             CommandBufferPool.Release(restore);
             context.SetupCameraProperties(camera);

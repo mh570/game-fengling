@@ -49,6 +49,12 @@ namespace Fengling.Water
         [Range(0f, 0.2f)] public float f0 = 0.02f;
         [Range(0f, 2f)] public float normalStrength = 1f;
 
+        [Header("远处 / 海平线")]
+        public Color horizonColor = new Color(0.65f, 0.78f, 0.90f);
+        [Range(10f, 500f)] public float horizonFadeStart = 30f;
+        [Range(50f, 1000f)] public float horizonFadeRange = 120f;
+        public Color shoreColor = new Color(0.66f, 0.60f, 0.46f);
+
         [Tooltip("预留：空间浪高扰动。当前未使用，避免 CPU 浮力采样与 GPU 波形不一致")]
         [Range(0f, 1f)] public float waveIrregularity = 0.35f;
         [Range(0f, 3f)] public float sunIntensity = 2f;
@@ -193,6 +199,10 @@ namespace Fengling.Water
             _material.SetFloat("_FoamDistance", foamDistance);
             _material.SetFloat("_FoamStrength", foamStrength);
             _material.SetFloat("_Stylized", 0f);   // 只做写实
+            _material.SetColor("_HorizonColor", horizonColor);
+            _material.SetFloat("_HorizonFadeStart", horizonFadeStart);
+            _material.SetFloat("_HorizonFadeRange", horizonFadeRange);
+            _material.SetColor("_ShoreColor", shoreColor);
 
             _material.SetFloat("_UseFoam", useFoam ? 1f : 0f);
             _material.SetFloat("_UseReflectionCube", useReflectionCube ? 1f : 0f);
