@@ -188,3 +188,31 @@ HDRP 版本的六个场景会失去渲染能力（材质全部是 HDRP/Lit）。
 | D 泡沫 | 未开始 |
 | E 后处理 | 未开始 |
 | F 水下 | 未开始 |
+
+---
+
+## 7. 阶段 A 的三个必答题（实测踩过）
+
+自建 SRP 时，`RenderPipelineAsset` 必须做对这三件事，否则会出现"完全看不出原因的洋红/黑屏"。
+
+| 必答项 | 不做的后果 | 正确写法 |
+|---|---|---|
+| **继承泛型基类** | 管线类型没注册，材质与管线匹配失败，**所有物体洋红** | `class X : RenderPipelineAsset<MyPipeline>` |
+| **重写 defaultMaterial / defaultShader** | 材质缺失的渲染器拿不到默认材质，出洋红 | 返回自己 Lit shader 的材质实例 |
+| **重写 renderPipelineShaderTag** | 打包时该管线的 shader 变体被剥离 | 返回自己主 pass 的 tag |
+
+Unity 对应的警告文字（遇到时直接对照）：
+
+```
+You must either inherit from RenderPipelineAsset<TRenderPipeline> or override pipelineType property.
+The property renderPipelineShaderTag has not been overridden. ...variants will be stripped.
+```
+
+### 踩坑记录
+
+这三条是"静默失败"：Console 只有黄色警告，没有红色错误，画面表现为全洋红。
+排查时容易一路怀疑材质、GUID、shader 编译，而根因在资产类声明上。
+
+**建议加入阶段 A 验收清单**：
+- [ ] 三个属性全部重写
+- [ ] 新建一个空场景，放一个 Cube，材质用 Fengling/Lit，确认**不是洋红**
