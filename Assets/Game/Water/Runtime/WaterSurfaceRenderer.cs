@@ -50,6 +50,7 @@ namespace Fengling.Water
         [Range(0f, 0.2f)] public float f0 = 0.02f;
         [Range(0f, 2f)] public float normalStrength = 1f;
         [Range(0f, 0.1f)] public float refractionStrength = 0.015f;
+        [Range(0f, 1f)] public float reflectionStrength = 0.18f;
         [Header("Normal Tiling")]
         [Tooltip("每 10m 的法线重复次数；正交俯视下太高会产生横向条纹")]
         [Range(0.5f, 24f)] public float normalTiling1 = 8f;
@@ -214,6 +215,7 @@ namespace Fengling.Water
             _material.SetFloat("_F0", f0);
             _material.SetFloat("_NormalStrength", normalStrength);
             _material.SetFloat("_RefractionStrength", refractionStrength);
+            _material.SetFloat("_ReflectionStrength", reflectionStrength);
             _material.SetFloat("_NormalTiling1", normalTiling1);
             _material.SetFloat("_NormalTiling2", normalTiling2);
             _material.SetFloat("_SunIntensity", sunIntensity);
@@ -245,6 +247,7 @@ namespace Fengling.Water
             _material.SetFloat("_AmplitudeScale", 1f);
             _material.SetFloat("_NormalStrength", normalStrength);
             _material.SetFloat("_RefractionStrength", refractionStrength);
+            _material.SetFloat("_ReflectionStrength", reflectionStrength);
             _material.SetFloat("_NormalTiling1", normalTiling1);
             _material.SetFloat("_NormalTiling2", normalTiling2);
             _material.SetColor("_ShallowColor", shallowColor);

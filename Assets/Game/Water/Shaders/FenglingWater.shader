@@ -42,6 +42,7 @@ Shader "Fengling/Water Surface"
         _HorizonFadeRange ("Horizon Fade Range (m)", Float) = 120
         _ShoreColor ("Shore / Wet Sand Color", Color) = (0.55, 0.50, 0.38, 1)
         _RefractionStrength ("Refraction Strength", Range(0, 0.1)) = 0.015
+        _ReflectionStrength ("Reflection Strength", Range(0, 1)) = 0.18
 
         [Header(Foam)]
         _FoamColor ("Foam Color", Color) = (1, 1, 1, 1)
@@ -144,6 +145,7 @@ Shader "Fengling/Water Surface"
             float4x4 _FenglingReflectionVP;
             float _FenglingReflectionEnabled;
             float _RefractionStrength;
+            float _ReflectionStrength;
 
             int _FenglingWaveCount;
             float4 _FenglingWaveDirs[MAX_WAVES];
@@ -391,7 +393,7 @@ Shader "Fengling/Water Surface"
                     {
                         float3 refl = tex2D(_FenglingReflectionTex, ruv).rgb;
                         // 俯视下反射只做“天空/大形状”的低强度染色，避免云朵变成白斑。
-                        color = lerp(color, refl * 0.82, 0.18);
+                        color = lerp(color, refl * 0.82, _ReflectionStrength);
                     }
                 }
 
