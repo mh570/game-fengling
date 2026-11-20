@@ -61,6 +61,17 @@ namespace Fengling.EditorTools
             cam.nearClipPlane = 0.3f;
             cam.farClipPlane = 1000f;
 
+            // Phase 2：时间核心 + 太阳/月亮/天空。
+            var timeGo = GameObject.Find("TimeOfDay");
+            if (timeGo == null) timeGo = new GameObject("TimeOfDay");
+            var tod = timeGo.GetComponent<Fengling.Time.TimeOfDaySystem>();
+            if (tod == null) tod = timeGo.AddComponent<Fengling.Time.TimeOfDaySystem>();
+            tod.sun = RenderSettings.sun;
+            tod.skyMaterial = RenderSettings.skybox;
+            tod.timeOfDay = 8f;
+            tod.gameMinutesPerSecond = 1f;
+            tod.showHud = true;
+
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.Refresh();

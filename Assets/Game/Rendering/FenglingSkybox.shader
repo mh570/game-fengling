@@ -16,6 +16,11 @@ Shader "Fengling/Skybox"
         _SunDirection ("Sun Direction", Vector) = (0.3, 0.8, 0.5, 0)
         _SunColor ("Sun Color", Color) = (1, 0.92, 0.78, 1)
         _SunSize ("Sun Glow", Range(1, 500)) = 90
+        _MoonDirection ("Moon Direction", Vector) = (-0.3, -0.8, -0.5, 0)
+        _MoonColor ("Moon Color", Color) = (0.72, 0.82, 1, 1)
+        _MoonSize ("Moon Glow", Range(1, 500)) = 120
+        _NightFactor ("Night Factor", Range(0, 1)) = 0
+        _StarIntensity ("Star Intensity", Range(0, 1)) = 0
         _Exposure ("Exposure", Float) = 1
     }
 
@@ -42,6 +47,11 @@ Shader "Fengling/Skybox"
             float4 _SunDirection;
             float4 _SunColor;
             float _SunSize;
+            float4 _MoonDirection;
+            float4 _MoonColor;
+            float _MoonSize;
+            float _NightFactor;
+            float _StarIntensity;
             float _Exposure;
 
             struct appdata
@@ -125,6 +135,21 @@ Shader "Fengling/Skybox"
                 float sunDot = saturate(dot(dir, normalize(_SunDirection.xyz)));
                 float glow = pow(sunDot, _SunSize) * 3.0 + pow(sunDot, 8.0) * 0.2;
                 sky += _SunColor.rgb * glow;
+
+                // 月亮光晕：只在夜间出现
+                float moonDot = saturate(dot(dir, normalize(_MoonDirection.xyz)));
+                float moonGlow = pow(moonDot, _MoonSize) * 2.2 + pow(moonDot, 20.0) * 0.25;
+                sky += _MoonColor.rgb * moonGlow * _NightFactor;
+
+                // 星空：方向球面网格 + 稀疏 hash
+                if (_StarIntensity > 0.001 && dir.y > 0.02)
+                {
+                    float2 sphere = float2(atan2(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0)));
+                    float2 cell = floor(sphere * 140.0);
+                    float h = hash21(cell);
+                    float star = step(0.9975, h) * pow(saturate(dir.y), 1.5);
+                    sky += star * _StarIntensity * float3(0.8, 0.9, 1.0);
+                }
 
                 return float4(sky * _Exposure, 1.0);
             }

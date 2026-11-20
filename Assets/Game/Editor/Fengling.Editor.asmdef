@@ -7,6 +7,7 @@
         "Fengling.Player",
         "Fengling.Environment",
         "Fengling.Rendering",
+        "Fengling.Time",
         "Unity.RenderPipelines.HighDefinition.Runtime",
         "Unity.RenderPipelines.Core.Runtime"
     ],

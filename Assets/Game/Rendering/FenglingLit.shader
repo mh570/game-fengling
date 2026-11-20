@@ -39,6 +39,8 @@ Shader "Fengling/Lit"
             float _Metallic;
             float _AmbientBoost;
             float _AmbientFloor;
+            float4 _FenglingAmbientColor;
+            float _FenglingAmbientScale;
 
             // 由 FenglingPipeline 每帧写入
             float4 _FenglingSunDir;
@@ -95,7 +97,10 @@ Shader "Fengling/Lit"
                 diffuse += albedo * _FenglingFillColor.rgb * fillNdl;
 
                 // 环境光（球谐，来自天空盒）。加一个很小的保底，避免逆光面纯黑。
-                float3 ambient = ShadeSH9(float4(N, 1.0)) * albedo * _AmbientBoost;
+                // 自建 SRP 的 Skybox SH 不会随时间自动刷新；时间系统用全局 scale/color 驱动。
+                float3 ambientSH = ShadeSH9(float4(N, 1.0));
+                float3 ambient = ambientSH * _FenglingAmbientScale * albedo * _AmbientBoost
+                               + _FenglingAmbientColor.rgb * albedo;
                 ambient = max(ambient, albedo * _AmbientFloor);
 
                 // Blinn-Phong 高光
