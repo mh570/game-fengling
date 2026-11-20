@@ -209,6 +209,10 @@ namespace Fengling.Time
                     new Color(0.62f, 0.66f, 0.72f), dayFactor));
                 _skyInstance.SetFloat("_CloudCoverage", Mathf.Lerp(0.12f, 0.95f, cloudCover));
                 _skyInstance.SetFloat("_CloudOpacity", weather != null ? weather.CloudOpacity : 0f);
+                _skyInstance.SetFloat("_CloudFarCoverage", Mathf.Lerp(0.62f, 0.34f, cloudCover));
+                _skyInstance.SetFloat("_CloudFarOpacity", Mathf.Lerp(0.22f, 0.55f, cloudCover));
+                _skyInstance.SetFloat("_CloudNearCoverage", Mathf.Lerp(0.70f, 0.42f, cloudCover));
+                _skyInstance.SetFloat("_CloudNearOpacity", Mathf.Lerp(0.20f, 0.75f, cloudCover));
             }
 
             if (driveAmbient)
