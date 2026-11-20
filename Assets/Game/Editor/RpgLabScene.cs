@@ -95,6 +95,7 @@ namespace Fengling.EditorTools
             tod.skyMaterial = RenderSettings.skybox;
             tod.timeOfDay = 8f;
             tod.gameMinutesPerSecond = 1f;
+            tod.moonMaxIntensity = 3f;
             tod.showHud = true;
 
             EditorSceneManager.MarkSceneDirty(scene);

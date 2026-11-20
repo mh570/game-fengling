@@ -23,7 +23,7 @@ namespace Fengling.Time
         public Light moon;
         [Range(-60f, 60f)] public float latitude = 35f;
         public float sunMaxIntensity = 8f;
-        public float moonMaxIntensity = 0.8f;
+        public float moonMaxIntensity = 3f;
 
         [Header("天空")]
         public Material skyMaterial;
@@ -143,6 +143,10 @@ namespace Fengling.Time
                 moon.transform.rotation = Quaternion.LookRotation(-moonDir, Vector3.up);
                 moon.intensity = moonMaxIntensity * moonFactor;
                 moon.color = new Color(0.52f, 0.66f, 1f);
+
+                // 月亮光照参数直接写全局，避免阴影类查找 Moon Light 失败时月亮完全不亮。
+                Shader.SetGlobalVector("_FenglingMoonDir", new Vector4(moonDir.x, moonDir.y, moonDir.z, 0f));
+                Shader.SetGlobalColor("_FenglingMoonColor", moon.color * (moon.intensity * 0.12f));
             }
 
             // 低太阳时淡化阴影，避免一条拖到屏幕外的长矛。
@@ -187,7 +191,7 @@ namespace Fengling.Time
                 // FenglingLit 的 SH 兜底：白天保留 SH，夜晚/黎明用全局色保底。
                 Shader.SetGlobalFloat("_FenglingAmbientScale", Mathf.Lerp(0.08f, 1f, ambientT));
                 Shader.SetGlobalColor("_FenglingAmbientColor",
-                    Color.Lerp(new Color(0.025f, 0.03f, 0.05f),
+                    Color.Lerp(new Color(0.07f, 0.08f, 0.12f),
                         new Color(0.18f, 0.19f, 0.18f), ambientT));
             }
         }

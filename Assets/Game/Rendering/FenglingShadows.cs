@@ -17,6 +17,11 @@ namespace Fengling.Rendering
         private readonly Matrix4x4[] _vps = new Matrix4x4[CascadeCount];
         private readonly Vector4[] _spheres = new Vector4[CascadeCount];
 
+        private RenderTexture _moonMap;
+        private Matrix4x4 _moonView;
+        private Matrix4x4 _moonProj;
+        private Light _moon;
+
         public int Resolution = 1024;
 
         private void EnsureMap(int index, int size)
@@ -34,6 +39,24 @@ namespace Fengling.Rendering
                 wrapMode = TextureWrapMode.Clamp,
             };
             _maps[index].Create();
+        }
+
+        private void EnsureMoonMap(int size)
+        {
+            size = Mathf.Max(256, size / 2);
+            if (_moonMap != null && _moonMap.width == size) return;
+            if (_moonMap != null)
+            {
+                _moonMap.Release();
+                Object.DestroyImmediate(_moonMap);
+            }
+            _moonMap = new RenderTexture(size, size, 24, RenderTextureFormat.RFloat)
+            {
+                name = "FenglingMoonShadow",
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp,
+            };
+            _moonMap.Create();
         }
 
         public void Render(ScriptableRenderContext context, Camera camera, CullingResults culling,
@@ -84,6 +107,56 @@ namespace Fengling.Rendering
                 };
                 var filtering = new FilteringSettings(RenderQueueRange.opaque);
                 context.DrawRenderers(culling, ref drawing, ref filtering);
+            }
+
+            // 月亮单独一张低分辨率阴影图（单级，不参与太阳级联）。
+            if (_moon == null)
+            {
+                foreach (var l in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+                {
+                    if (l != null && l.name == "Moon Light")
+                    {
+                        _moon = l;
+                        break;
+                    }
+                }
+            }
+            if (_moon != null && _moon.intensity > 0.01f)
+            {
+                EnsureMoonMap(Resolution);
+                var moonRays = _moon.transform.forward;
+                var lightRot = Quaternion.LookRotation(moonRays.normalized, Vector3.up);
+                var center = camera.transform.position;
+                var lightPos = center - moonRays.normalized * 20f;
+                _moonView = Matrix4x4.TRS(lightPos, lightRot, Vector3.one).inverse;
+                _moonProj = Matrix4x4.Ortho(-20f, 20f, -20f, 20f, 0.01f, 80f);
+
+                var moonCmd = CommandBufferPool.Get("Fengling.MoonShadow");
+                moonCmd.SetRenderTarget(_moonMap);
+                moonCmd.ClearRenderTarget(true, true, new Color(1000f, 0f, 0f, 1f));
+                moonCmd.SetViewProjectionMatrices(_moonView, _moonProj);
+                context.ExecuteCommandBuffer(moonCmd);
+                CommandBufferPool.Release(moonCmd);
+
+                var moonDrawing = new DrawingSettings(new ShaderTagId("DepthOnly"), new SortingSettings(camera))
+                {
+                    perObjectData = PerObjectData.None,
+                };
+                var moonFiltering = new FilteringSettings(RenderQueueRange.opaque);
+                context.DrawRenderers(culling, ref moonDrawing, ref moonFiltering);
+
+                Shader.SetGlobalTexture("_FenglingMoonShadowMap", _moonMap);
+                Shader.SetGlobalMatrix("_FenglingMoonShadowView", _moonView);
+                Shader.SetGlobalMatrix("_FenglingMoonShadowProj", _moonProj);
+                Shader.SetGlobalFloat("_FenglingMoonShadowTexel", 1f / _moonMap.width);
+                Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 1f);
+                Shader.SetGlobalVector("_FenglingMoonDir", -moonRays);
+                Shader.SetGlobalColor("_FenglingMoonColor", _moon.color * (_moon.intensity * 0.12f));
+            }
+            else
+            {
+                Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 0f);
+                Shader.SetGlobalColor("_FenglingMoonColor", Color.black);
             }
 
             var restore = CommandBufferPool.Get("Fengling.ShadowRestore");

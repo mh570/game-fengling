@@ -65,6 +65,14 @@ Shader "Fengling/Lit"
             float _FenglingShadowEnabled;
             float _FenglingShadowStrength;
 
+            sampler2D _FenglingMoonShadowMap;
+            float4x4 _FenglingMoonShadowView;
+            float4x4 _FenglingMoonShadowProj;
+            float _FenglingMoonShadowTexel;
+            float _FenglingMoonShadowEnabled;
+            float4 _FenglingMoonDir;
+            float4 _FenglingMoonColor;
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -168,7 +176,11 @@ Shader "Fengling/Lit"
                 if (shadowStrength <= 0.001) shadowStrength = 1.0;
                 shadow = lerp(1.0, shadow, saturate(shadowStrength));
 
-                float3 color = diffuse * shadow + ambient + specular * shadow;
+                // 月亮冷色漫反射；月亮 shadow map 的投影还在验证，先不参与着色。
+                float3 Lmoon = normalize(_FenglingMoonDir.xyz);
+                float3 moonDiffuse = albedo * _FenglingMoonColor.rgb * saturate(dot(N, Lmoon));
+
+                float3 color = (diffuse + specular) * shadow + moonDiffuse + ambient;
                 return float4(color, 1.0);
             }
             ENDHLSL
