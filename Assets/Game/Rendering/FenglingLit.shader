@@ -48,10 +48,20 @@ Shader "Fengling/Lit"
             float4 _FenglingFillDir;
             float4 _FenglingFillColor;
 
-            sampler2D _FenglingShadowMap;
-            float4x4 _FenglingShadowView;
-            float4x4 _FenglingShadowProj;
-            float _FenglingShadowDistance;
+            sampler2D _FenglingShadowMap0;
+            sampler2D _FenglingShadowMap1;
+            sampler2D _FenglingShadowMap2;
+            sampler2D _FenglingShadowMap3;
+            float4x4 _FenglingShadowView0;
+            float4x4 _FenglingShadowView1;
+            float4x4 _FenglingShadowView2;
+            float4x4 _FenglingShadowView3;
+            float4x4 _FenglingShadowVP0;
+            float4x4 _FenglingShadowVP1;
+            float4x4 _FenglingShadowVP2;
+            float4x4 _FenglingShadowVP3;
+            float4 _FenglingShadowSpheres[4];
+            float _FenglingShadowTexel;
             float _FenglingShadowEnabled;
             float _FenglingShadowStrength;
 
@@ -78,6 +88,24 @@ Shader "Fengling/Lit"
                 o.pos = UnityWorldToClipPos(o.worldPos);
                 o.uv = TRANSFORM_TEX(v.uv, _BaseMap);
                 return o;
+            }
+
+            float SampleCascade(sampler2D map, float4x4 vp, float4x4 view,
+                                float3 worldPos, float bias, float texelSize)
+            {
+                float4 c = mul(vp, float4(worldPos, 1.0));
+                c.xyz /= c.w;
+                float2 uv = c.xy * 0.5 + 0.5;
+                if (any(uv < 0.001) || any(uv > 0.999)) return 1.0;
+
+                float surfaceDepth = -mul(view, float4(worldPos, 1.0)).z;
+                float2 t = float2(texelSize, texelSize);
+                float lit = 0;
+                lit += tex2D(map, uv + float2(-t.x, -t.y)).r > surfaceDepth - bias ? 1 : 0;
+                lit += tex2D(map, uv + float2( t.x, -t.y)).r > surfaceDepth - bias ? 1 : 0;
+                lit += tex2D(map, uv + float2(-t.x,  t.y)).r > surfaceDepth - bias ? 1 : 0;
+                lit += tex2D(map, uv + float2( t.x,  t.y)).r > surfaceDepth - bias ? 1 : 0;
+                return lit / 4.0;
             }
 
             float4 frag(v2f i) : SV_Target
@@ -109,26 +137,30 @@ Shader "Fengling/Lit"
                 float spec = pow(saturate(dot(N, H)), exp2(lerp(1.0, 10.0, _Smoothness)));
                 float3 specular = _FenglingSunColor.rgb * spec * _Smoothness * (1.0 - _Metallic);
 
-                // 阴影
+                // 阴影（4 级级联，按 culling sphere 选级）
                 float shadow = 1.0;
                 if (_FenglingShadowEnabled > 0.5)
                 {
-                    float4 shadowCoord = mul(_FenglingShadowProj, mul(_FenglingShadowView, float4(i.worldPos, 1.0)));
-                    shadowCoord.xyz /= shadowCoord.w;
-                    float2 uv = shadowCoord.xy * 0.5 + 0.5;
-                    if (all(uv > 0.001) && all(uv < 0.999))
+                    float texel = max(0.00001, _FenglingShadowTexel);
+                    int cascade = 3;
+                    for (int ci = 0; ci < 4; ci++)
                     {
-                        float3 shadowViewPos = mul(_FenglingShadowView, float4(i.worldPos, 1.0)).xyz;
-                        float surfaceDepth = -shadowViewPos.z;
-                        float bias = 0.05; // world units
-                        float2 texel = float2(1.0 / 2048.0, 1.0 / 2048.0);
-                        float lit = 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x, -texel.y)).r > surfaceDepth - bias ? 1 : 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x, -texel.y)).r > surfaceDepth - bias ? 1 : 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2(-texel.x,  texel.y)).r > surfaceDepth - bias ? 1 : 0;
-                        lit += tex2D(_FenglingShadowMap, uv + float2( texel.x,  texel.y)).r > surfaceDepth - bias ? 1 : 0;
-                        shadow = lit / 4.0;
+                        float4 sphere = _FenglingShadowSpheres[ci];
+                        if (distance(i.worldPos, sphere.xyz) < sphere.w)
+                        {
+                            cascade = ci;
+                            break;
+                        }
                     }
+
+                    if (cascade == 0)
+                        shadow = SampleCascade(_FenglingShadowMap0, _FenglingShadowVP0, _FenglingShadowView0, i.worldPos, 0.08, texel);
+                    else if (cascade == 1)
+                        shadow = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, i.worldPos, 0.08, texel);
+                    else if (cascade == 2)
+                        shadow = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, i.worldPos, 0.08, texel);
+                    else
+                        shadow = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, i.worldPos, 0.08, texel);
                 }
 
                 // 低太阳时淡化阴影强度，避免影子拉成一条长矛。
