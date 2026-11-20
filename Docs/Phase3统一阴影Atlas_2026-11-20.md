@@ -65,6 +65,30 @@
 - 独立 culling / moon culling sphere
 - 验证 0:00 角色月影
 
+**Stage 2 结果（未通过）**
+
+已实现：
+
+- moon tile 512 @ (512, 2048)
+- moon 用同一 `ComputeDirectionalShadowMatricesAndCullingPrimitives`
+- `ShadowDrawingSettings` + `CreateShadowRendererList`
+- `RendererList.isValid = true`
+- moon light：`shadows=Soft`、`shadowStrength=1`、index 有效
+- 试过 `context.DrawShadows` 旧路径
+
+结果：
+
+- 读回 moon tile 仍是纯色空图
+- 0:00 没有角色月影
+- 太阳 atlas tile 正常，说明 atlas/viewport 本身没错
+- 因此第二方向光 caster 在当前 SRP 下没有真正进入 atlas
+
+结论：
+
+- 统一 atlas 的太阳部分保留
+- 月亮 slice 回滚，不留在主线
+- 真实月影需要进一步研究 HDRP 的 directional light shadow culling / ShadowDrawingSettings 初始化，不能只复用太阳路径
+
 ### Stage 3：质量回归
 
 - 5×5 PCF / normal bias / 级联混合 / 缓存
