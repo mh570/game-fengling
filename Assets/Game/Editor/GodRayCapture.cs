@@ -47,29 +47,31 @@ namespace Fengling.EditorTools
             if (tod == null || weather == null || cam == null) { EditorApplication.Exit(1); return; }
 
             tod.paused = true;
-            tod.SetTime(8.2f);
-            weather.cloudCover = 0.25f;
-            weather.haze = 0.35f;
-            weather.fog = 0.55f;
+            weather.cloudCover = 0.2f;
+            weather.haze = 0.55f;
+            weather.fog = 0.85f;
+            tod.SetTime(16.0f);
 
             var rts = cam.GetComponent<Player.RtsCameraController>();
             if (rts != null) rts.enabled = false;
 
-            // 一点低机位，朝太阳方向看。
+            // 低机位朝太阳看；柱体沿相机视线摆在太阳方向上。
             Vector3 sunDir = -tod.sun.transform.forward;
-            Vector3 flatSun = new Vector3(sunDir.x, 0f, sunDir.z).normalized;
-            cam.transform.position = new Vector3(0f, 5f, -10f);
-            cam.transform.rotation = Quaternion.LookRotation(flatSun, Vector3.up);
+            Vector3 viewDir = new Vector3(sunDir.x, 0f, sunDir.z).normalized;
+            cam.transform.position = new Vector3(0f, 5f, 0f);
+            cam.transform.rotation = Quaternion.LookRotation(viewDir, Vector3.up);
 
-            // 在相机与太阳之间摆一排高柱，制造遮挡缝隙。
-            var mat = new Material(Shader.Find("Fengling/Lit")) { color = new Color(0.35f, 0.30f, 0.24f) };
-            for (int i = 0; i < 12; i++)
+            var mat = new Material(Shader.Find("Fengling/Lit")) { color = new Color(0.22f, 0.18f, 0.14f) };
+            for (int i = 0; i < 9; i++)
             {
                 var pillar = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 pillar.name = "GodRayPillar_" + i;
-                float x = (i - 5.5f) * 2.2f;
-                pillar.transform.position = new Vector3(x, 4f, 8f + Mathf.Abs(i - 5.5f) * 2.5f);
-                pillar.transform.localScale = new Vector3(1.1f, 8f, 1.1f);
+                float lateral = (i - 4f) * 2.4f;
+                float distance = 9f + (i % 3) * 4f;
+                Vector3 pos = cam.transform.position + viewDir * distance + cam.transform.right * lateral;
+                pos.y = 6f;
+                pillar.transform.position = pos;
+                pillar.transform.localScale = new Vector3(1.2f, 12f, 1.2f);
                 pillar.GetComponent<Renderer>().sharedMaterial = mat;
             }
 
