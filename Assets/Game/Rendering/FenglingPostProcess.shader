@@ -33,6 +33,78 @@ Shader "Fengling/PostProcess"
             float _FenglingContrast;
             float _FenglingSaturation;
 
+            sampler2D _FenglingSceneDepth;
+            float4x4 _FenglingInvProj;
+            float4x4 _FenglingCameraToWorld;
+            float4 _FenglingCameraPos;
+            float4 _FenglingSunDir;
+            float4 _FenglingSunColor;
+            float _FenglingVolumetricDensity;
+
+            sampler2D _FenglingShadowAtlas;
+            float4x4 _FenglingShadowView0;
+            float4x4 _FenglingShadowVP0;
+            float4 _FenglingShadowTile0;
+
+            float Hash12(float2 p)
+            {
+                p = frac(p * float2(123.34, 456.21));
+                p += dot(p, p + 45.32);
+                return frac(p.x * p.y);
+            }
+
+            float SampleSunShadow(float3 worldPos)
+            {
+                float4 sc = mul(_FenglingShadowVP0, float4(worldPos, 1.0));
+                sc.xyz /= sc.w;
+                float2 uv = sc.xy * 0.5 + 0.5;
+                if (any(uv < 0.001) || any(uv > 0.999)) return 1.0;
+                uv = uv * _FenglingShadowTile0.xy + _FenglingShadowTile0.zw;
+                float surface = -mul(_FenglingShadowView0, float4(worldPos, 1.0)).z;
+                float stored = tex2D(_FenglingShadowAtlas, uv).r;
+                return stored > surface - 0.15 ? 1.0 : 0.0;
+            }
+
+            float3 VolumetricLight(float2 uv)
+            {
+                if (_FenglingVolumetricDensity <= 0.0001) return 0;
+
+                float depth = tex2D(_FenglingSceneDepth, uv).r;
+                if (depth <= 0.0 || depth > 5000.0) depth = 90.0;
+                depth = min(depth, 90.0);
+
+                float2 ndc = uv * 2.0 - 1.0;
+                float4 clip = float4(ndc, 0.5, 1.0);
+                float4 view = mul(_FenglingInvProj, clip);
+                view.xyz /= view.w;
+                float3 dir = normalize(mul((float3x3)_FenglingCameraToWorld, normalize(view.xyz)));
+
+                float3 sunDir = normalize(_FenglingSunDir.xyz);
+                if (sunDir.y <= 0.0) return 0;
+
+                const int STEPS = 18;
+                float stepLen = depth / STEPS;
+                float jitter = Hash12(uv * 713.0 + _Time.y * 0.37);
+                float transmittance = 1.0;
+                float3 acc = 0;
+
+                for (int i = 0; i < STEPS; i++)
+                {
+                    float t = (i + jitter) * stepLen;
+                    float3 p = _FenglingCameraPos.xyz + dir * t;
+                    float heightDensity = 0.55 + 0.45 * exp(-max(0.0, p.y) * 0.035);
+                    float density = _FenglingVolumetricDensity * heightDensity;
+                    float shadow = SampleSunShadow(p);
+                    float cosTheta = saturate(dot(dir, sunDir));
+                    float phase = 0.35 + 0.65 * pow(cosTheta, 6.0);
+                    float3 inscatter = _FenglingSunColor.rgb * (density * stepLen * shadow * phase);
+                    acc += transmittance * inscatter;
+                    transmittance *= exp(-density * stepLen);
+                }
+
+                return acc * 0.35;
+            }
+
             struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
             struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; };
 
@@ -54,6 +126,7 @@ Shader "Fengling/PostProcess"
                 float3 scene = tex2D(_MainTex, i.uv).rgb;
                 float3 bloom = tex2D(_BloomTex, i.uv).rgb;
 
+                scene += VolumetricLight(i.uv);
                 scene += bloom * _FenglingBloomIntensity;
                 scene *= exp2(_FenglingExposure);
                 scene = ACESFilm(scene);

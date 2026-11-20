@@ -362,6 +362,9 @@ namespace Fengling.Rendering
                 bloomWidth, bloomHeight, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
 
             var cmd = CommandBufferPool.Get("Fengling.PostProcess");
+            cmd.SetGlobalMatrix("_FenglingInvProj", camera.projectionMatrix.inverse);
+            cmd.SetGlobalMatrix("_FenglingCameraToWorld", camera.cameraToWorldMatrix);
+            cmd.SetGlobalVector("_FenglingCameraPos", camera.transform.position);
             cmd.SetGlobalFloat("_FenglingExposure", _settings.exposure);
             cmd.SetGlobalFloat("_FenglingBloomIntensity", _settings.bloomIntensity);
             cmd.SetGlobalFloat("_FenglingBloomThreshold", _settings.bloomThreshold);
