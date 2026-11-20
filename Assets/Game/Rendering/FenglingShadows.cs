@@ -146,13 +146,28 @@ namespace Fengling.Rendering
             }
             if (_moon != null && _moon.intensity > 0.01f)
             {
+                int moonIndex = -1;
+                var moonVisible = culling.visibleLights;
+                for (int i = 0; i < moonVisible.Length; i++)
+                {
+                    if (moonVisible[i].lightType == LightType.Directional && moonVisible[i].light == _moon)
+                    {
+                        moonIndex = i;
+                        break;
+                    }
+                }
+                if (moonIndex < 0)
+                {
+                    Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 0f);
+                    Shader.SetGlobalColor("_FenglingMoonColor", _moon.color * (_moon.intensity * 0.12f));
+                    goto afterMoon;
+                }
+
                 EnsureMoonMap(Resolution);
-                var moonRays = _moon.transform.forward;
-                var lightRot = Quaternion.LookRotation(moonRays.normalized, Vector3.up);
-                var center = camera.transform.position;
-                var lightPos = center - moonRays.normalized * 20f;
-                _moonView = Matrix4x4.TRS(lightPos, lightRot, Vector3.one).inverse;
-                _moonProj = Matrix4x4.Ortho(-20f, 20f, -20f, 20f, 0.01f, 80f);
+                int moonSize = _moonMap.width;
+                culling.ComputeDirectionalShadowMatricesAndCullingPrimitives(
+                    moonIndex, 0, 1, Vector3.zero, moonSize, 0f,
+                    out _moonView, out _moonProj, out ShadowSplitData moonSplit);
 
                 var moonCmd = CommandBufferPool.Get("Fengling.MoonShadow");
                 moonCmd.SetRenderTarget(_moonMap);
@@ -161,19 +176,22 @@ namespace Fengling.Rendering
                 context.ExecuteCommandBuffer(moonCmd);
                 CommandBufferPool.Release(moonCmd);
 
-                var moonDrawing = new DrawingSettings(new ShaderTagId("DepthOnly"), new SortingSettings(camera))
+                var moonSettings = new ShadowDrawingSettings(culling, moonIndex)
                 {
-                    perObjectData = PerObjectData.None,
+                    splitData = moonSplit,
                 };
-                var moonFiltering = new FilteringSettings(RenderQueueRange.opaque);
-                context.DrawRenderers(culling, ref moonDrawing, ref moonFiltering);
+                var moonList = context.CreateShadowRendererList(ref moonSettings);
+                var moonDraw = CommandBufferPool.Get("Fengling.MoonShadowDraw");
+                moonDraw.DrawRendererList(moonList);
+                context.ExecuteCommandBuffer(moonDraw);
+                CommandBufferPool.Release(moonDraw);
 
                 Shader.SetGlobalTexture("_FenglingMoonShadowMap", _moonMap);
                 Shader.SetGlobalMatrix("_FenglingMoonShadowView", _moonView);
                 Shader.SetGlobalMatrix("_FenglingMoonShadowProj", _moonProj);
-                Shader.SetGlobalFloat("_FenglingMoonShadowTexel", 1f / _moonMap.width);
+                Shader.SetGlobalFloat("_FenglingMoonShadowTexel", 1f / moonSize);
                 Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 1f);
-                Shader.SetGlobalVector("_FenglingMoonDir", -moonRays);
+                Shader.SetGlobalVector("_FenglingMoonDir", -_moon.transform.forward);
                 Shader.SetGlobalColor("_FenglingMoonColor", _moon.color * (_moon.intensity * 0.12f));
             }
             else
@@ -181,7 +199,7 @@ namespace Fengling.Rendering
                 Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 0f);
                 Shader.SetGlobalColor("_FenglingMoonColor", Color.black);
             }
-
+            afterMoon:
             var restore = CommandBufferPool.Get("Fengling.ShadowRestore");
             restore.SetRenderTarget(restoreTarget, restoreDepthTarget);
             context.ExecuteCommandBuffer(restore);

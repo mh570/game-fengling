@@ -204,7 +204,7 @@ namespace Fengling.Time
             moon.type = LightType.Directional;
             moon.color = new Color(0.52f, 0.66f, 1f);
             moon.intensity = 0f;
-            moon.shadows = LightShadows.None;
+            moon.shadows = LightShadows.Soft;
         }
 
         private void OnGUI()
