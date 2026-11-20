@@ -29,6 +29,7 @@ namespace Fengling.EditorTools
                 var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 go.name = "Rock_" + i;
                 go.transform.SetParent(root, false);
+                go.GetComponent<MeshFilter>().sharedMesh = RockMeshFactory.GetOrCreate();
 
                 float x = -spread + (float)rockRng.NextDouble() * spread * 2f;
                 float z = terrain.shoreZ + sceneWidth * 0.12f + (float)rockRng.NextDouble() * sceneWidth * 0.3f;
@@ -36,7 +37,7 @@ namespace Fengling.EditorTools
                 float s = 0.8f + (float)rockRng.NextDouble() * 1.6f;
 
                 go.transform.position = new Vector3(x, groundY + s * 0.25f, z);
-                go.transform.localScale = new Vector3(s, s * 0.7f, s);
+                go.transform.localScale = new Vector3(s * 1.2f, s * 0.55f, s * 0.9f);
                 go.transform.rotation = Quaternion.Euler(0f, (float)rockRng.NextDouble() * 360f, 0f);
                 go.GetComponent<Renderer>().sharedMaterial = rockMat;
             }
