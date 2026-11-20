@@ -16,11 +16,19 @@ namespace Fengling.Rendering
         private readonly Matrix4x4[] _views = new Matrix4x4[CascadeCount];
         private readonly Matrix4x4[] _vps = new Matrix4x4[CascadeCount];
         private readonly Vector4[] _spheres = new Vector4[CascadeCount];
+        private readonly float[] _splits = new float[CascadeCount];
 
         private RenderTexture _moonMap;
         private Matrix4x4 _moonView;
         private Matrix4x4 _moonProj;
         private Light _moon;
+
+        private bool _hasRendered;
+        private Vector3 _lastLightDir;
+        private Vector3 _lastCameraPos;
+        private Vector3 _lastCameraForward;
+        private float _lastDistance;
+        private int _lastResolution;
 
         public int Resolution = 1024;
 
@@ -66,6 +74,17 @@ namespace Fengling.Rendering
             Resolution = Mathf.Clamp(resolution, 256, 2048);
             for (int i = 0; i < CascadeCount; i++) EnsureMap(i, Resolution);
 
+            // 按需更新：太阳方向/相机位姿/阴影距离基本不变时复用缓存。
+            if (_hasRendered &&
+                Mathf.Abs(_lastDistance - distance) < 0.01f &&
+                _lastResolution == Resolution &&
+                Vector3.Angle(_lastLightDir, lightDirection) < 0.15f &&
+                (_lastCameraPos - camera.transform.position).sqrMagnitude < 0.25f &&
+                Vector3.Angle(_lastCameraForward, camera.transform.forward) < 0.5f)
+            {
+                return;
+            }
+
             int lightIndex = -1;
             var visible = culling.visibleLights;
             var sun = RenderSettings.sun;
@@ -93,6 +112,7 @@ namespace Fengling.Rendering
                 _views[i] = view;
                 _vps[i] = proj * view;
                 _spheres[i] = splitData.cullingSphere;
+                _splits[i] = distance * (i + 1f) / CascadeCount;
 
                 var setup = CommandBufferPool.Get("Fengling.ShadowCascade" + i);
                 setup.SetRenderTarget(_maps[i]);
@@ -172,12 +192,22 @@ namespace Fengling.Rendering
                 Shader.SetGlobalMatrix("_FenglingShadowVP" + i, _vps[i]);
             }
             Shader.SetGlobalVectorArray("_FenglingShadowSpheres", _spheres);
+            Shader.SetGlobalVector("_FenglingShadowSplits",
+                new Vector4(_splits[0], _splits[1], _splits[2], _splits[3]));
             Shader.SetGlobalFloat("_FenglingShadowTexel", 1f / Resolution);
             Shader.SetGlobalFloat("_FenglingShadowEnabled", 1f);
+
+            _hasRendered = true;
+            _lastLightDir = lightDirection;
+            _lastCameraPos = camera.transform.position;
+            _lastCameraForward = camera.transform.forward;
+            _lastDistance = distance;
+            _lastResolution = Resolution;
         }
 
         public void Disable()
         {
+            _hasRendered = false;
             Shader.SetGlobalFloat("_FenglingShadowEnabled", 0f);
         }
     }

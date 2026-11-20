@@ -61,6 +61,7 @@ Shader "Fengling/Lit"
             float4x4 _FenglingShadowVP2;
             float4x4 _FenglingShadowVP3;
             float4 _FenglingShadowSpheres[4];
+            float4 _FenglingShadowSplits;
             float _FenglingShadowTexel;
             float _FenglingShadowEnabled;
             float _FenglingShadowStrength;
@@ -150,6 +151,7 @@ Shader "Fengling/Lit"
                 if (_FenglingShadowEnabled > 0.5)
                 {
                     float texel = max(0.00001, _FenglingShadowTexel);
+                    float camDepth = -mul(UNITY_MATRIX_V, float4(i.worldPos, 1.0)).z;
                     int cascade = 3;
                     for (int ci = 0; ci < 4; ci++)
                     {
@@ -161,14 +163,36 @@ Shader "Fengling/Lit"
                         }
                     }
 
+                    float shadowNext = 1.0;
                     if (cascade == 0)
+                    {
                         shadow = SampleCascade(_FenglingShadowMap0, _FenglingShadowVP0, _FenglingShadowView0, i.worldPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, i.worldPos, 0.08, texel);
+                    }
                     else if (cascade == 1)
+                    {
                         shadow = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, i.worldPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, i.worldPos, 0.08, texel);
+                    }
                     else if (cascade == 2)
+                    {
                         shadow = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, i.worldPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, i.worldPos, 0.08, texel);
+                    }
                     else
+                    {
                         shadow = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, i.worldPos, 0.08, texel);
+                    }
+
+                    // 级联交界混合 + 最远距离淡出，避免一条硬切边。
+                    float split = cascade == 0 ? _FenglingShadowSplits.x :
+                                  cascade == 1 ? _FenglingShadowSplits.y :
+                                  cascade == 2 ? _FenglingShadowSplits.z : _FenglingShadowSplits.w;
+                    float blend = saturate((camDepth - split * 0.9) / max(0.001, split * 0.1));
+                    shadow = lerp(shadow, shadowNext, blend * 0.5);
+                    float farFade = saturate((camDepth - _FenglingShadowSplits.w * 0.9) /
+                                             max(0.001, _FenglingShadowSplits.w * 0.1));
+                    shadow = lerp(shadow, 1.0, farFade);
                 }
 
                 // 低太阳时淡化阴影强度，避免影子拉成一条长矛。
