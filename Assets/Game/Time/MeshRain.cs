@@ -10,8 +10,8 @@ namespace Fengling.Time
     public sealed class MeshRain : MonoBehaviour
     {
         public WeatherSystem weather;
-        public int count = 700;
-        public float area = 42f;
+        public int count = 4000;
+        public float area = 60f;
 
         private Mesh _mesh;
         private MeshRenderer _renderer;
@@ -71,7 +71,7 @@ namespace Fengling.Time
             _mesh.uv = uvs;
             _mesh.colors = colors;
             _mesh.triangles = tris;
-            _mesh.bounds = new Bounds(Vector3.zero, new Vector3(area, 20f, area));
+            _mesh.bounds = new Bounds(Vector3.zero, new Vector3(area, 40f, area));
         }
 
         private void Update()
@@ -79,7 +79,8 @@ namespace Fengling.Time
             if (_camera == null) _camera = Camera.main;
             if (_camera == null) return;
             var p = _camera.transform.position;
-            transform.position = new Vector3(p.x, p.y - 5f, p.z);
+            var f = _camera.transform.forward;
+            transform.position = new Vector3(p.x + f.x * 15f, p.y - 10f, p.z + f.z * 15f);
             Refresh();
         }
 
