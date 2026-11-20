@@ -180,6 +180,10 @@ namespace Fengling.Time
                 // 月亮光照参数直接写全局，避免阴影类查找 Moon Light 失败时月亮完全不亮。
                 Shader.SetGlobalVector("_FenglingMoonDir", new Vector4(moonDir.x, moonDir.y, moonDir.z, 0f));
                 Shader.SetGlobalColor("_FenglingMoonColor", moon.color * (moon.intensity * 0.12f));
+                float moonShadowStrength = Mathf.SmoothStep(0f, 1f,
+                    Mathf.InverseLerp(0.03f, 0.22f, moonDir.y)) *
+                    MoonIlluminatedFraction * moonVisibility;
+                Shader.SetGlobalFloat("_FenglingMoonShadowStrength", moonShadowStrength);
             }
 
             // 低太阳时淡化阴影，避免一条拖到屏幕外的长矛。

@@ -79,6 +79,7 @@ Shader "Fengling/Lit"
             float4x4 _FenglingMoonShadowProj;
             float _FenglingMoonShadowTexel;
             float _FenglingMoonShadowEnabled;
+            float _FenglingMoonShadowStrength;
             float4 _FenglingMoonShadowSphere;
             float4 _FenglingMoonDir;
             float4 _FenglingMoonColor;
@@ -254,6 +255,7 @@ Shader "Fengling/Lit"
                                                float4(1.0, 1.0, 0.0, 0.0),
                                                i.worldPos, 0.25, max(0.00001, _FenglingMoonShadowTexel));
                 }
+                moonShadow = lerp(1.0, moonShadow, saturate(_FenglingMoonShadowStrength));
                 float3 moonDiffuse = albedo * _FenglingMoonColor.rgb *
                                      saturate(dot(N, Lmoon)) * moonShadow;
 
