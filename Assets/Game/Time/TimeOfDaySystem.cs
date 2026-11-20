@@ -139,6 +139,8 @@ namespace Fengling.Time
             fogColor = Color.Lerp(fogColor, new Color(0.42f, 0.47f, 0.52f), atmosphere * 0.55f);
             Shader.SetGlobalColor("_FenglingFogColor", fogColor);
             Shader.SetGlobalFloat("_FenglingFogDensity", weather != null ? weather.FogDensity : 0f);
+            Shader.SetGlobalFloat("_FenglingWaterCloud", cloudCover);
+            Shader.SetGlobalFloat("_FenglingWaterAtmosphere", atmosphere);
             // 月亮：朔望月 -> 相位角 -> 照亮比例；月亮位置由太阳黄经 + 相位角推进。
             MoonPhaseAngle = (float)(elongation * Mathf.Deg2Rad);
             MoonIlluminatedFraction = (float)AstronomyMath.MoonIlluminatedFraction(MoonPhaseAngle);

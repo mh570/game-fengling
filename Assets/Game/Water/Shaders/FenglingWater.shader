@@ -114,6 +114,8 @@ Shader "Fengling/Water Surface"
             float _SunIntensity;
             float4 _FenglingFogColor;
             float _FenglingFogDensity;
+            float _FenglingWaterCloud;
+            float _FenglingWaterAtmosphere;
             float _Roughness;
             float _RoughnessFar;
             float _F0;
@@ -395,7 +397,7 @@ Shader "Fengling/Water Surface"
                     {
                         float3 refl = tex2D(_FenglingReflectionTex, ruv).rgb;
                         // 俯视下反射只做“天空/大形状”的低强度染色，避免云朵变成白斑。
-                        color = lerp(color, refl * 0.82, _ReflectionStrength);
+                        color = lerp(color, refl * 0.82, _ReflectionStrength * lerp(1.0, 0.35, saturate(_FenglingWaterCloud)));
                     }
                 }
 
@@ -413,7 +415,7 @@ Shader "Fengling/Water Surface"
                 // 正交俯视下太阳高光会被波浪法线放大成大片白斑；先压到很弱。
                 if (unity_OrthoParams.w > 0.5)
                     spec *= 0.03;
-                color += _SunColor.rgb * spec * _SunIntensity * (1.0 - _Stylized);
+                color += _SunColor.rgb * spec * _SunIntensity * (1.0 - _Stylized) * lerp(1.0, 0.25, saturate(_FenglingWaterCloud));
 
                 // 平面反射的天空清屏色偏暗，屏幕顶部会露出暗边；
                 // 用一条很窄的 horizon 融合盖住，不影响近处倒影。
@@ -491,6 +493,7 @@ Shader "Fengling/Water Surface"
                 float fogDist = distance(_WorldSpaceCameraPos, i.worldPos);
                 float fogFactor = 1.0 - exp(-max(0.0, _FenglingFogDensity) * fogDist);
                 color = lerp(color, _FenglingFogColor.rgb, saturate(fogFactor));
+                color = lerp(color, _FenglingFogColor.rgb, saturate(_FenglingWaterCloud) * 0.18);
 
                 return float4(color, alpha);
             }
