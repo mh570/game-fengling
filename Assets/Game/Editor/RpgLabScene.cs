@@ -10,6 +10,7 @@ namespace Fengling.EditorTools
     {
         private const string SourcePath = "Assets/Scenes/P2Minimal.unity";
         private const string ScenePath = "Assets/Scenes/RpgLab.unity";
+        private const string BlobMatPath = "Assets/Game/Rendering/Materials/BlobShadow.mat";
         private const string PendingKey = "RpgLab.Pending";
         private const string StartKey = "RpgLab.Start";
         private const string StageKey = "RpgLab.Stage";
@@ -43,9 +44,33 @@ namespace Fengling.EditorTools
                 return;
             }
 
+            // 贴地 contact shadow：清晨/黄昏真实阴影太弱时保证玩家不悬空。
+            var blobMat = AssetDatabase.LoadAssetAtPath<Material>(BlobMatPath);
+            if (blobMat == null)
+            {
+                blobMat = new Material(Shader.Find("Fengling/Blob Shadow"))
+                {
+                    name = "BlobShadow",
+                    color = new Color(0f, 0f, 0f, 0.38f),
+                };
+                AssetDatabase.CreateAsset(blobMat, BlobMatPath);
+            }
+            var blobGo = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            blobGo.name = "PlayerBlobShadow";
+            Object.DestroyImmediate(blobGo.GetComponent<MeshCollider>());
+            blobGo.transform.position = new Vector3(0f, terrain.SampleHeight(0f, 0f) + 0.03f, 0f);
+            blobGo.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            blobGo.transform.localScale = new Vector3(1.6f, 1.6f, 1f);
+            var blobRenderer = blobGo.GetComponent<MeshRenderer>();
+            blobRenderer.sharedMaterial = blobMat;
+            blobRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            blobRenderer.receiveShadows = false;
+            var blob = blobGo.AddComponent<Player.PlayerBlobShadow>();
+            blob.target = player.transform;
+            blob.terrain = terrain;
+
             var rts = cam.GetComponent<Player.RtsCameraController>();
-            if (rts == null) rts = cam.gameObject.AddComponent<Player.RtsCameraController>();
-            rts.focusTarget = player.transform;
+            if (rts == null) rts = cam.gameObject.AddComponent<Player.RtsCameraController>();            rts.focusTarget = player.transform;
             rts.startFocused = true;
             rts.terrain = terrain;
             rts.boundsHalf = new Vector2(terrain.size.x * 0.5f - 5f, terrain.size.y * 0.5f - 5f);

@@ -56,8 +56,8 @@ namespace Fengling.EditorTools
             var rts = cam.GetComponent<Player.RtsCameraController>();
             if (rts != null)
             {
-                rts.pitch = 35f;
-                rts.distance = 60f;
+                rts.pitch = 45f;
+                rts.distance = 24f;
                 rts.FocusOnPlayer();
             }
 
