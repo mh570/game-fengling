@@ -48,8 +48,8 @@ namespace Fengling.EditorTools
 
             tod.paused = true;
             weather.cloudCover = 0.2f;
-            weather.haze = 0.55f;
-            weather.fog = 0.85f;
+            weather.haze = 0.30f;
+            weather.fog = 0.45f;
             tod.SetTime(16.0f);
 
             var rts = cam.GetComponent<Player.RtsCameraController>();

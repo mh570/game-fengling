@@ -43,8 +43,18 @@ Shader "Fengling/PostProcess"
 
             sampler2D _FenglingShadowAtlas;
             float4x4 _FenglingShadowView0;
+            float4x4 _FenglingShadowView1;
+            float4x4 _FenglingShadowView2;
+            float4x4 _FenglingShadowView3;
             float4x4 _FenglingShadowVP0;
+            float4x4 _FenglingShadowVP1;
+            float4x4 _FenglingShadowVP2;
+            float4x4 _FenglingShadowVP3;
             float4 _FenglingShadowTile0;
+            float4 _FenglingShadowTile1;
+            float4 _FenglingShadowTile2;
+            float4 _FenglingShadowTile3;
+            float4 _FenglingShadowSplits;
 
             float Hash12(float2 p)
             {
@@ -53,16 +63,26 @@ Shader "Fengling/PostProcess"
                 return frac(p.x * p.y);
             }
 
-            float SampleSunShadow(float3 worldPos)
+            float SampleShadowCascade(float4x4 vp, float4x4 view, float4 tile, float3 worldPos)
             {
-                float4 sc = mul(_FenglingShadowVP0, float4(worldPos, 1.0));
+                float4 sc = mul(vp, float4(worldPos, 1.0));
                 sc.xyz /= sc.w;
                 float2 uv = sc.xy * 0.5 + 0.5;
                 if (any(uv < 0.001) || any(uv > 0.999)) return 1.0;
-                uv = uv * _FenglingShadowTile0.xy + _FenglingShadowTile0.zw;
-                float surface = -mul(_FenglingShadowView0, float4(worldPos, 1.0)).z;
+                uv = uv * tile.xy + tile.zw;
+                float surface = -mul(view, float4(worldPos, 1.0)).z;
                 float stored = tex2D(_FenglingShadowAtlas, uv).r;
                 return stored > surface - 0.15 ? 1.0 : 0.0;
+            }
+
+            float SampleSunShadow(float3 worldPos)
+            {
+                float dist = distance(_FenglingCameraPos.xyz, worldPos);
+                if (dist < _FenglingShadowSplits.x) return SampleShadowCascade(_FenglingShadowVP0, _FenglingShadowView0, _FenglingShadowTile0, worldPos);
+                if (dist < _FenglingShadowSplits.y) return SampleShadowCascade(_FenglingShadowVP1, _FenglingShadowView1, _FenglingShadowTile1, worldPos);
+                if (dist < _FenglingShadowSplits.z) return SampleShadowCascade(_FenglingShadowVP2, _FenglingShadowView2, _FenglingShadowTile2, worldPos);
+                if (dist < _FenglingShadowSplits.w) return SampleShadowCascade(_FenglingShadowVP3, _FenglingShadowView3, _FenglingShadowTile3, worldPos);
+                return 1.0;
             }
 
             float3 VolumetricLight(float2 uv)
@@ -102,7 +122,7 @@ Shader "Fengling/PostProcess"
                     transmittance *= exp(-density * stepLen);
                 }
 
-                return acc * 0.35;
+                return acc * 0.5;
             }
 
             struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
