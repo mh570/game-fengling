@@ -1382,7 +1382,7 @@ MonoBehaviour:
   opaqueAtDepth: 9
   roughness: 0.06
   f0: 0.02
-  normalStrength: 1.6
+  normalStrength: 1
   refractionStrength: 0.015
   reflectionStrength: 0.18
   normalTiling1: 8
@@ -1392,7 +1392,7 @@ MonoBehaviour:
   horizonFadeRange: 120
   shoreColor: {r: 0.66, g: 0.6, b: 0.46, a: 1}
   waveIrregularity: 0.35
-  sunIntensity: 2
+  sunIntensity: 1.2
   driveSunFromTime: 1
   sunIntensityScale: 0.35
   tintByTime: 1
@@ -1404,11 +1404,11 @@ MonoBehaviour:
   useFoam: 1
   useReflectionCube: 1
   flowDirection: {x: 1, y: 0}
-  flowSpeed: 1.6
+  flowSpeed: 1.1
   verticalFlow: 1
   foamColor: {r: 1, g: 1, b: 1, a: 1}
   foamDistance: 1
-  foamStrength: 2.4
+  foamStrength: 0.65
   foamWarp: 2.5
 --- !u!23 &433716364
 MeshRenderer:

@@ -43,6 +43,12 @@ namespace Fengling.Player
             float height = target.position.y - ground;
             float visible = Mathf.Clamp01(1f - Mathf.InverseLerp(maxHeight * 0.6f, maxHeight, height));
 
+            // 真实太阳/月影已经存在时，blob 只保留很弱的一层，避免黑球叠加。
+            float realShadow = Mathf.Max(
+                Shader.GetGlobalFloat("_FenglingShadowStrength"),
+                Shader.GetGlobalFloat("_FenglingMoonShadowStrength"));
+            visible *= Mathf.Clamp01(1f - realShadow * 1.1f);
+
             Vector3 p = target.position;
             p.y = ground + groundOffset;
             transform.position = p;
