@@ -116,6 +116,7 @@ Shader "Fengling/Water Surface"
             float _FenglingFogDensity;
             float _FenglingWaterCloud;
             float _FenglingWaterAtmosphere;
+            float _FenglingRain;
             float _Roughness;
             float _RoughnessFar;
             float _F0;
@@ -332,6 +333,20 @@ Shader "Fengling/Water Surface"
                 float3 N = normalize(Ngeo + float3(tN.x * nStrength, 0.0, tN.y * nStrength));
                 if (_Vertical > 0.5)
                     N = normalize(float3(tN.x, 1.0, tN.y));
+
+                // 雨滴涟漪：程序化小环，不依赖贴图。
+                float rain = saturate(_FenglingRain);
+                if (rain > 0.001)
+                {
+                    float2 rp = i.worldPos.xz * 1.5;
+                    float2 cell = floor(rp);
+                    float2 f = frac(rp) - 0.5;
+                    float seed = frac(sin(dot(cell, float2(12.9898, 78.233))) * 43758.5453);
+                    float life = frac(_WaterTime * 1.6 + seed);
+                    float r = length(f);
+                    float ring = sin((r - life) * 42.0) * smoothstep(0.5, 0.12, r);
+                    N = normalize(N + float3(ring * 0.06 * rain, 0.0, ring * 0.06 * rain));
+                }
 
                 // ---- 深度（决定颜色和透明度）
                 // 优先用管线拷贝的全分辨率线性深度；失败时才退回烘焙高度图。

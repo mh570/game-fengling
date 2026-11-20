@@ -18,9 +18,9 @@ namespace Fengling.Time
         [Range(0f, 1f)] public float rain = 0f;
         [Range(0f, 1f)] public float wind = 0.2f;
 
-        public float SunVisibility => Mathf.Lerp(1f, 0.22f, cloudCover) * (1f - Atmosphere * 0.35f);
-        public float MoonVisibility => Mathf.Lerp(1f, 0.1f, cloudCover) * (1f - Atmosphere * 0.45f);
-        public float ShadowVisibility => Mathf.Lerp(1f, 0.18f, cloudCover) * (1f - Atmosphere * 0.5f);
+        public float SunVisibility => Mathf.Lerp(1f, 0.22f, cloudCover) * (1f - Atmosphere * 0.35f) * (1f - rain * 0.35f);
+        public float MoonVisibility => Mathf.Lerp(1f, 0.1f, cloudCover) * (1f - Atmosphere * 0.45f) * (1f - rain * 0.4f);
+        public float ShadowVisibility => Mathf.Lerp(1f, 0.18f, cloudCover) * (1f - Atmosphere * 0.5f) * (1f - rain * 0.35f);
         public float CloudOpacity => Mathf.Clamp01(cloudCover * 0.9f + haze * 0.15f);
         public float Atmosphere => Mathf.Clamp01(haze * 0.6f + fog * 0.9f);
         public float FogDensity => fog * 0.025f + haze * 0.004f;
@@ -28,6 +28,7 @@ namespace Fengling.Time
         private void Awake()
         {
             Instance = this;
+            if (GetComponent<RainEffect>() == null) gameObject.AddComponent<RainEffect>();
         }
 
         private void OnDestroy()
