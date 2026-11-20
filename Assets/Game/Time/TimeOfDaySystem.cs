@@ -14,6 +14,10 @@ namespace Fengling.Time
         public int day = 1;
         [Range(0, 3)] public int season = 1; // 0春 1夏 2秋 3冬
         public int year = 1;
+        public int calendarYear = 2026;
+        [Range(1, 12)] public int calendarMonth = 11;
+        [Range(1, 31)] public int calendarDay = 20;
+        [Range(-180f, 180f)] public float longitude = 0f;
         public bool paused = false;
         [Tooltip("1 现实秒 = 多少游戏分钟；1 = 24 现实分钟一天")]
         [Range(0.01f, 60f)] public float gameMinutesPerSecond = 1f;
@@ -75,6 +79,18 @@ namespace Fengling.Time
                 {
                     timeOfDay -= 24f;
                     day++;
+                    calendarDay++;
+                    int daysInMonth = System.DateTime.DaysInMonth(calendarYear, calendarMonth);
+                    if (calendarDay > daysInMonth)
+                    {
+                        calendarDay = 1;
+                        calendarMonth++;
+                        if (calendarMonth > 12)
+                        {
+                            calendarMonth = 1;
+                            calendarYear++;
+                        }
+                    }
                     if (day > 30) { day = 1; season = (season + 1) % 4; }
                 }
             }
@@ -98,57 +114,23 @@ namespace Fengling.Time
 
         private void ApplyLighting()
         {
-            // 太阳赤纬：按季节/日期近似
-            float dayOfYear = season * 90f + day;
-            float declination = 23.44f * Mathf.Sin((dayOfYear - 81f) * Mathf.Deg2Rad * 360f / 365f);
-            float hourAngle = (timeOfDay - 12f) * 15f;
+            // 真实日期/时间 -> J2000 天数 -> 太阳/月亮黄经 -> 地平坐标。
+            var utc = new System.DateTime(calendarYear, calendarMonth, calendarDay, 0, 0, 0, System.DateTimeKind.Utc)
+                .AddHours(timeOfDay);
+            double days = AstronomyMath.DaysSinceJ2000(utc);
+            double sunLon = AstronomyMath.SunEclipticLongitude(days);
+            double moonLon = AstronomyMath.MoonEclipticLongitude(days);
+            double moonLat = AstronomyMath.MoonEclipticLatitude(days);
+            double elongation = ((moonLon - sunLon) % 360.0 + 360.0) % 360.0;
 
-            float lat = latitude * Mathf.Deg2Rad;
-            float dec = declination * Mathf.Deg2Rad;
-            float ha = hourAngle * Mathf.Deg2Rad;
-
-            float sinAlt = Mathf.Sin(lat) * Mathf.Sin(dec) +
-                           Mathf.Cos(lat) * Mathf.Cos(dec) * Mathf.Cos(ha);
-            sinAlt = Mathf.Clamp(sinAlt, -1f, 1f);
-            float altitude = Mathf.Asin(sinAlt);
-
-            float cosAz = (Mathf.Sin(dec) - Mathf.Sin(altitude) * Mathf.Sin(lat)) /
-                          (Mathf.Cos(altitude) * Mathf.Cos(lat) + 1e-5f);
-            float azimuth = Mathf.Acos(Mathf.Clamp(cosAz, -1f, 1f));
-            if (Mathf.Sin(ha) > 0f) azimuth = Mathf.PI * 2f - azimuth;
-
-            Vector3 sunDir = new Vector3(
-                Mathf.Cos(altitude) * Mathf.Sin(azimuth),
-                Mathf.Sin(altitude),
-                Mathf.Cos(altitude) * Mathf.Cos(azimuth)).normalized;
+            Vector3 sunDir = AstronomyMath.HorizonDirection(sunLon, 0.0, days, latitude, longitude);
+            Vector3 moonDir = AstronomyMath.HorizonDirection(moonLon, moonLat, days, latitude, longitude);
 
             float dayFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.08f, 0.18f, sunDir.y));
             // 月亮：朔望月 -> 相位角 -> 照亮比例；月亮位置由太阳黄经 + 相位角推进。
-            const float SynodicMonth = 29.53059f;
-            float daySerial = year * 365f + season * 90f + day;
-            float daysSinceNewMoon = daySerial + timeOfDay / 24f - 0.26f + moonPhaseOffsetDays;
-            MoonAgeDays = Mathf.Repeat(daysSinceNewMoon, SynodicMonth);
-            float phaseAngle = MoonAgeDays / SynodicMonth * Mathf.PI * 2f;
-            MoonPhaseAngle = phaseAngle;
-            MoonIlluminatedFraction = (1f - Mathf.Cos(phaseAngle)) * 0.5f;
-
-            float moonDeclination = declination + 5.14f * Mathf.Sin(phaseAngle);
-            float moonHourAngle = hourAngle + phaseAngle * Mathf.Rad2Deg;
-            float moonDecRad = moonDeclination * Mathf.Deg2Rad;
-            float moonHaRad = moonHourAngle * Mathf.Deg2Rad;
-            float sinMoonAlt = Mathf.Sin(lat) * Mathf.Sin(moonDecRad) +
-                               Mathf.Cos(lat) * Mathf.Cos(moonDecRad) * Mathf.Cos(moonHaRad);
-            sinMoonAlt = Mathf.Clamp(sinMoonAlt, -1f, 1f);
-            float moonAltitude = Mathf.Asin(sinMoonAlt);
-            float cosMoonAz = (Mathf.Sin(moonDecRad) - Mathf.Sin(moonAltitude) * Mathf.Sin(lat)) /
-                              (Mathf.Cos(moonAltitude) * Mathf.Cos(lat) + 1e-5f);
-            float moonAzimuth = Mathf.Acos(Mathf.Clamp(cosMoonAz, -1f, 1f));
-            if (Mathf.Sin(moonHaRad) > 0f) moonAzimuth = Mathf.PI * 2f - moonAzimuth;
-            Vector3 moonDir = new Vector3(
-                Mathf.Cos(moonAltitude) * Mathf.Sin(moonAzimuth),
-                Mathf.Sin(moonAltitude),
-                Mathf.Cos(moonAltitude) * Mathf.Cos(moonAzimuth)).normalized;
-
+            MoonPhaseAngle = (float)(elongation * Mathf.Deg2Rad);
+            MoonIlluminatedFraction = (float)AstronomyMath.MoonIlluminatedFraction(MoonPhaseAngle);
+            MoonAgeDays = (float)AstronomyMath.MoonAgeDays(sunLon, moonLon);
             float moonFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.08f, 0.18f, moonDir.y));
 
             // 天空太阳保持真实高度；光照/阴影方向限制最低仰角，避免黎明/黄昏影子无限长。
@@ -245,7 +227,7 @@ namespace Fengling.Time
         {
             if (!showHud) return;
             GUI.Box(new Rect(12f, 12f, 360f, 82f), "Time of Day");
-            GUI.Label(new Rect(24f, 36f, 300f, 22f), $"{Mathf.FloorToInt(timeOfDay):00}:{Mathf.FloorToInt((timeOfDay % 1f) * 60f):00}  Day {day}  S{season}  Moon {MoonIlluminatedFraction * 100f:0}%");
+            GUI.Label(new Rect(24f, 36f, 330f, 22f), $"{calendarYear}-{calendarMonth:00}-{calendarDay:00}  {Mathf.FloorToInt(timeOfDay):00}:{Mathf.FloorToInt((timeOfDay % 1f) * 60f):00}  Moon {MoonIlluminatedFraction * 100f:0}%");
 
             float newTime = GUI.HorizontalSlider(new Rect(24f, 58f, 250f, 18f), timeOfDay, 0f, 24f);
             if (Mathf.Abs(newTime - timeOfDay) > 0.001f)
