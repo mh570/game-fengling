@@ -29,6 +29,7 @@ namespace Fengling.Time
         public float moonPhaseOffsetDays = 0f;
         public float MoonIlluminatedFraction { get; private set; }
         public float MoonAgeDays { get; private set; }
+        public float MoonPhaseAngle { get; private set; }
 
         [Header("天空")]
         public Material skyMaterial;
@@ -128,6 +129,7 @@ namespace Fengling.Time
             float daysSinceNewMoon = daySerial + timeOfDay / 24f - 0.26f + moonPhaseOffsetDays;
             MoonAgeDays = Mathf.Repeat(daysSinceNewMoon, SynodicMonth);
             float phaseAngle = MoonAgeDays / SynodicMonth * Mathf.PI * 2f;
+            MoonPhaseAngle = phaseAngle;
             MoonIlluminatedFraction = (1f - Mathf.Cos(phaseAngle)) * 0.5f;
 
             float moonDeclination = declination + 5.14f * Mathf.Sin(phaseAngle);
@@ -187,6 +189,10 @@ namespace Fengling.Time
                 _skyInstance.SetVector(MoonDirectionId, new Vector4(moonDir.x, moonDir.y, moonDir.z, 0f));
                 _skyInstance.SetColor(SunColorId, sun != null ? sun.color : Color.white);
                 _skyInstance.SetColor(MoonColorId, new Color(0.72f, 0.82f, 1f));
+                _skyInstance.SetFloat("_MoonPhaseAngle", MoonPhaseAngle);
+                _skyInstance.SetFloat("_MoonSize", 800f);
+                _skyInstance.SetFloat("_MoonDiskSize", 0.02f);
+                _skyInstance.SetFloat("_MoonDiskBrightness", 0.9f);
                 _skyInstance.SetFloat(NightFactorId, 1f - dayFactor);
                 _skyInstance.SetFloat(StarIntensityId, Mathf.SmoothStep(0f, 1f, 1f - dayFactor));
 

@@ -19,6 +19,9 @@ Shader "Fengling/Skybox"
         _MoonDirection ("Moon Direction", Vector) = (-0.3, -0.8, -0.5, 0)
         _MoonColor ("Moon Color", Color) = (0.72, 0.82, 1, 1)
         _MoonSize ("Moon Glow", Range(1, 500)) = 120
+        _MoonPhaseAngle ("Moon Elongation", Float) = 3.14159
+        _MoonDiskSize ("Moon Disk Size", Range(0.002, 0.08)) = 0.012
+        _MoonDiskBrightness ("Moon Disk Brightness", Float) = 1.6
         _NightFactor ("Night Factor", Range(0, 1)) = 0
         _StarIntensity ("Star Intensity", Range(0, 1)) = 0
         _Exposure ("Exposure", Float) = 1
@@ -50,6 +53,9 @@ Shader "Fengling/Skybox"
             float4 _MoonDirection;
             float4 _MoonColor;
             float _MoonSize;
+            float _MoonPhaseAngle;
+            float _MoonDiskSize;
+            float _MoonDiskBrightness;
             float _NightFactor;
             float _StarIntensity;
             float _Exposure;
@@ -136,9 +142,36 @@ Shader "Fengling/Skybox"
                 float glow = pow(sunDot, _SunSize) * 3.0 + pow(sunDot, 8.0) * 0.2;
                 sky += _SunColor.rgb * glow;
 
+                // 月亮盘：亮面朝向太阳，按相位角切出月相。
+                float3 moonDir = normalize(_MoonDirection.xyz);
+                float moonCos = dot(dir, moonDir);
+                float disk = smoothstep(cos(_MoonDiskSize), cos(_MoonDiskSize * 0.92), moonCos);
+                if (disk > 0.001)
+                {
+                    float3 right = cross(float3(0, 1, 0), moonDir);
+                    if (dot(right, right) < 1e-4) right = cross(float3(1, 0, 0), moonDir);
+                    right = normalize(right);
+                    float3 up2 = cross(moonDir, right);
+                    float2 p = float2(dot(dir, right), dot(dir, up2)) / max(0.0001, _MoonDiskSize);
+
+                    float3 sunTangentVec = normalize(_SunDirection.xyz - moonDir * dot(_SunDirection.xyz, moonDir));
+                    float2 sunTangent = float2(dot(sunTangentVec, right), dot(sunTangentVec, up2));
+                    sunTangent = normalize(sunTangent + float2(1e-5, 1e-5));
+                    float x = dot(p, sunTangent);
+                    float cosElongation = cos(_MoonPhaseAngle);
+                    float lit = smoothstep(-0.035, 0.035, x - cosElongation);
+
+                    float3 diskColor = _MoonColor.rgb * _MoonDiskBrightness * (0.04 + lit * 1.0);
+                    float maria = 0.78 + 0.22 * fbm(p * 5.0 + 0.37);
+                    diskColor *= maria;
+                    // 地照：暗面保留一点冷光。
+                    diskColor += float3(0.03, 0.04, 0.06) * (1.0 - lit);
+                    sky = lerp(sky, diskColor, disk * saturate(_NightFactor * 1.2 + 0.25));
+                }
+
                 // 月亮光晕：只在夜间出现
-                float moonDot = saturate(dot(dir, normalize(_MoonDirection.xyz)));
-                float moonGlow = pow(moonDot, _MoonSize) * 2.2 + pow(moonDot, 20.0) * 0.25;
+                float moonDot = saturate(dot(dir, moonDir));
+                float moonGlow = pow(moonDot, _MoonSize) * 0.6 + pow(moonDot, 20.0) * 0.08;
                 sky += _MoonColor.rgb * moonGlow * _NightFactor;
 
                 // 星空：方向球面网格 + 稀疏 hash
