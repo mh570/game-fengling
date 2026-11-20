@@ -93,17 +93,21 @@ Shader "Fengling/PostProcess"
             {
                 if (_FenglingSunScreenPos.z < 0.5 || _FenglingGodRayIntensity <= 0.001) return 0;
                 float2 delta = (_FenglingSunScreenPos.xy - uv) / 32.0;
+                float2 perp = normalize(float2(-delta.y, delta.x) + float2(1e-5, 0.0)) * 0.0015;
                 float2 coord = uv;
                 float3 acc = 0;
                 float weight = 0;
                 for (int i = 0; i < 32; i++)
                 {
-                    coord += delta;
                     float3 c = tex2D(_MainTex, coord).rgb;
+                    c += tex2D(_MainTex, coord + perp).rgb;
+                    c += tex2D(_MainTex, coord - perp).rgb;
+                    c /= 3.0;
                     float luma = dot(c, float3(0.2126, 0.7152, 0.0722));
                     float w = smoothstep(_FenglingGodRayThreshold, _FenglingGodRayThreshold + 0.25, luma);
                     acc += c * w;
                     weight += w;
+                    coord += delta;
                 }
                 return acc / max(weight, 1.0) * _FenglingGodRayIntensity;
             }
