@@ -4,27 +4,32 @@ using UnityEngine.Rendering;
 namespace Fengling.Rendering
 {
     /// <summary>
-    /// 方向光 4 级级联阴影：4 张独立 RFloat 线性深度图。
-    /// 级联比例/裁剪球按 Catlike/URP 的 ComputeDirectionalShadowMatricesAndCullingPrimitives 路径。
+    /// HDRP 风格统一方向光阴影 atlas：太阳 4 级级联共用一个 4096 RFloat。
+    /// 每级是 atlas 的一个 tile，view/proj 与 tile offset 分开传给 shader。
     /// </summary>
     public sealed class FenglingShadows
     {
         public const int CascadeCount = 4;
+        private const int AtlasSize = 4096;
         private static readonly Vector3 CascadeRatios = new Vector3(0.1f, 0.25f, 0.5f);
 
-        private readonly RenderTexture[] _maps = new RenderTexture[CascadeCount];
-        private readonly int[] _sizes = new int[CascadeCount];
+        private readonly int[] _sizes = { 2048, 1024, 1024, 512 };
+        private readonly Vector2Int[] _offsets =
+        {
+            new Vector2Int(0, 0),
+            new Vector2Int(2048, 0),
+            new Vector2Int(2048, 1024),
+            new Vector2Int(0, 2048),
+        };
+
         private readonly Matrix4x4[] _views = new Matrix4x4[CascadeCount];
         private readonly Matrix4x4[] _vps = new Matrix4x4[CascadeCount];
         private readonly Vector4[] _spheres = new Vector4[CascadeCount];
+        private readonly Vector4[] _tiles = new Vector4[CascadeCount];
         private readonly float[] _splits = new float[CascadeCount];
 
-        private RenderTexture _moonMap;
-        private Matrix4x4 _moonView;
-        private Matrix4x4 _moonProj;
-        private Vector4 _moonSphere;
-        private Light _moon;
-        private Renderer _terrainCaster;
+        private RenderTexture _atlas;
+        public int Resolution = 2048;
 
         private bool _hasRendered;
         private Vector3 _lastLightDir;
@@ -33,42 +38,21 @@ namespace Fengling.Rendering
         private float _lastDistance;
         private int _lastResolution;
 
-        public int Resolution = 1024;
-        public bool enableMoonShadows = false;
-
-        private void EnsureMap(int index, int size)
+        private void EnsureAtlas()
         {
-            if (_maps[index] != null && _maps[index].width == size) return;
-            if (_maps[index] != null)
+            if (_atlas != null && _atlas.width == AtlasSize) return;
+            if (_atlas != null)
             {
-                _maps[index].Release();
-                Object.DestroyImmediate(_maps[index]);
+                _atlas.Release();
+                Object.DestroyImmediate(_atlas);
             }
-            _maps[index] = new RenderTexture(size, size, 24, RenderTextureFormat.RFloat)
+            _atlas = new RenderTexture(AtlasSize, AtlasSize, 24, RenderTextureFormat.RFloat)
             {
-                name = "FenglingShadowCascade" + index,
+                name = "FenglingDirectionalShadowAtlas",
                 filterMode = FilterMode.Bilinear,
                 wrapMode = TextureWrapMode.Clamp,
             };
-            _maps[index].Create();
-        }
-
-        private void EnsureMoonMap(int size)
-        {
-            size = Mathf.Max(256, size / 2);
-            if (_moonMap != null && _moonMap.width == size) return;
-            if (_moonMap != null)
-            {
-                _moonMap.Release();
-                Object.DestroyImmediate(_moonMap);
-            }
-            _moonMap = new RenderTexture(size, size, 24, RenderTextureFormat.RFloat)
-            {
-                name = "FenglingMoonShadow",
-                filterMode = FilterMode.Bilinear,
-                wrapMode = TextureWrapMode.Clamp,
-            };
-            _moonMap.Create();
+            _atlas.Create();
         }
 
         public void Render(ScriptableRenderContext context, Camera camera, CullingResults culling,
@@ -76,17 +60,8 @@ namespace Fengling.Rendering
                            RenderTargetIdentifier restoreTarget, RenderTargetIdentifier restoreDepthTarget)
         {
             Resolution = Mathf.Clamp(resolution, 256, 2048);
-            for (int i = 0; i < CascadeCount; i++)
-            {
-                // 近级高分辨率，远级逐级降：2048 / 1024 / 1024 / 512。
-                int size = i == 0 ? Resolution :
-                           i == 3 ? Mathf.Max(256, Resolution / 4) :
-                                    Mathf.Max(256, Resolution / 2);
-                _sizes[i] = size;
-                EnsureMap(i, size);
-            }
+            EnsureAtlas();
 
-            // 按需更新：太阳方向/相机位姿/阴影距离基本不变时复用缓存。
             if (_hasRendered &&
                 Mathf.Abs(_lastDistance - distance) < 0.01f &&
                 _lastResolution == Resolution &&
@@ -115,148 +90,70 @@ namespace Fengling.Rendering
                 return;
             }
 
+            var clear = CommandBufferPool.Get("Fengling.ShadowAtlasClear");
+            clear.SetRenderTarget(_atlas);
+            clear.ClearRenderTarget(true, true, new Color(1000f, 0f, 0f, 1f));
+            context.ExecuteCommandBuffer(clear);
+            CommandBufferPool.Release(clear);
+
             for (int i = 0; i < CascadeCount; i++)
             {
+                int size = _sizes[i];
+                var offset = _offsets[i];
                 culling.ComputeDirectionalShadowMatricesAndCullingPrimitives(
-                    lightIndex, i, CascadeCount, CascadeRatios, _sizes[i], 0.1f,
-                    out Matrix4x4 view, out Matrix4x4 proj, out ShadowSplitData splitData);
+                    lightIndex, i, CascadeCount, CascadeRatios, size, 0.1f,
+                    out Matrix4x4 view, out Matrix4x4 proj, out ShadowSplitData split);
 
                 _views[i] = view;
                 _vps[i] = proj * view;
-                _spheres[i] = splitData.cullingSphere;
+                _spheres[i] = split.cullingSphere;
                 _splits[i] = distance * (i + 1f) / CascadeCount;
+                _tiles[i] = new Vector4(
+                    size / (float)AtlasSize,
+                    size / (float)AtlasSize,
+                    offset.x / (float)AtlasSize,
+                    offset.y / (float)AtlasSize);
 
-                var setup = CommandBufferPool.Get("Fengling.ShadowCascade" + i);
-                setup.SetRenderTarget(_maps[i]);
-                setup.ClearRenderTarget(true, true, new Color(1000f, 0f, 0f, 1f));
+                var setup = CommandBufferPool.Get("Fengling.ShadowSlice" + i);
+                setup.SetRenderTarget(_atlas);
+                setup.SetViewport(new Rect(offset.x, offset.y, size, size));
                 setup.SetViewProjectionMatrices(view, proj);
                 context.ExecuteCommandBuffer(setup);
                 CommandBufferPool.Release(setup);
 
-                var shadowSettings = new ShadowDrawingSettings(culling, lightIndex)
+                var settings = new ShadowDrawingSettings(culling, lightIndex)
                 {
-                    splitData = splitData,
+                    splitData = split,
                 };
-                var shadowList = context.CreateShadowRendererList(ref shadowSettings);
-                var draw = CommandBufferPool.Get("Fengling.ShadowDraw" + i);
-                draw.DrawRendererList(shadowList);
+                var list = context.CreateShadowRendererList(ref settings);
+                var draw = CommandBufferPool.Get("Fengling.ShadowSliceDraw" + i);
+                draw.DrawRendererList(list);
                 context.ExecuteCommandBuffer(draw);
                 CommandBufferPool.Release(draw);
             }
 
-            // 月亮单独一张低分辨率阴影图（单级，不参与太阳级联）。
-            if (_moon == null)
-            {
-                foreach (var l in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
-                {
-                    if (l != null && l.name == "Moon Light")
-                    {
-                        _moon = l;
-                        break;
-                    }
-                }
-            }
-            if (_moon != null && enableMoonShadows && _moon.intensity > 0.01f)
-            {
-                int moonIndex = -1;
-                var moonVisible = culling.visibleLights;
-                for (int i = 0; i < moonVisible.Length; i++)
-                {
-                    if (moonVisible[i].lightType == LightType.Directional && moonVisible[i].light == _moon)
-                    {
-                        moonIndex = i;
-                        break;
-                    }
-                }
-                if (moonIndex < 0)
-                {
-                    Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 0f);
-                    Shader.SetGlobalColor("_FenglingMoonColor", _moon.color * (_moon.intensity * 0.12f));
-                    goto afterMoon;
-                }
-
-                EnsureMoonMap(Resolution);
-                int moonSize = _moonMap.width;
-                culling.ComputeDirectionalShadowMatricesAndCullingPrimitives(
-                    moonIndex, 0, 1, Vector3.zero, moonSize, 0f,
-                    out _moonView, out _moonProj, out ShadowSplitData moonSplit);
-                _moonSphere = moonSplit.cullingSphere;
-
-                var moonCmd = CommandBufferPool.Get("Fengling.MoonShadow");                moonCmd.SetRenderTarget(_moonMap);
-                moonCmd.ClearRenderTarget(true, true, new Color(1000f, 0f, 0f, 1f));
-                moonCmd.SetViewProjectionMatrices(_moonView, _moonProj);
-                context.ExecuteCommandBuffer(moonCmd);
-                CommandBufferPool.Release(moonCmd);
-
-                if (_terrainCaster == null)
-                {
-                    foreach (var r in Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
-                    {
-                        if (r.name.Contains("CoastTerrain"))
-                        {
-                            _terrainCaster = r;
-                            break;
-                        }
-                    }
-                }
-
-                // Culling 已经生成，改 shadowCastingMode 太晚；用 renderingLayerMask 在绘制时排除地形。
-                const uint TerrainMoonLayer = 2u;
-                uint previousLayer = 1u;
-                if (_terrainCaster != null)
-                {
-                    previousLayer = _terrainCaster.renderingLayerMask;
-                    _terrainCaster.renderingLayerMask = TerrainMoonLayer;
-                }
-
-                var moonDrawing = new DrawingSettings(new ShaderTagId("DepthOnly"), new SortingSettings(camera))
-                {
-                    perObjectData = PerObjectData.None,
-                };
-                var moonFiltering = new FilteringSettings(RenderQueueRange.opaque)
-                {
-                    renderingLayerMask = 0xFFFFFFFFu & ~TerrainMoonLayer,
-                };
-                context.DrawRenderers(culling, ref moonDrawing, ref moonFiltering);
-
-                if (_terrainCaster != null) _terrainCaster.renderingLayerMask = previousLayer;
-
-                Shader.SetGlobalTexture("_FenglingMoonShadowMap", _moonMap);
-                Shader.SetGlobalMatrix("_FenglingMoonShadowView", _moonView);
-                Shader.SetGlobalMatrix("_FenglingMoonShadowProj", _moonProj);
-                Shader.SetGlobalFloat("_FenglingMoonShadowTexel", 1f / moonSize);
-                Shader.SetGlobalVector("_FenglingMoonShadowSphere", _moonSphere);
-                Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 1f);
-                Shader.SetGlobalVector("_FenglingMoonDir", -_moon.transform.forward);
-                Shader.SetGlobalColor("_FenglingMoonColor", _moon.color * (_moon.intensity * 0.12f));
-            }
-            else
-            {
-                Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 0f);
-                Shader.SetGlobalColor("_FenglingMoonColor", Color.black);
-            }
-            afterMoon:
             var restore = CommandBufferPool.Get("Fengling.ShadowRestore");
             restore.SetRenderTarget(restoreTarget, restoreDepthTarget);
             context.ExecuteCommandBuffer(restore);
             CommandBufferPool.Release(restore);
             context.SetupCameraProperties(camera);
 
+            Shader.SetGlobalTexture("_FenglingShadowAtlas", _atlas);
             for (int i = 0; i < CascadeCount; i++)
             {
-                Shader.SetGlobalTexture("_FenglingShadowMap" + i, _maps[i]);
                 Shader.SetGlobalMatrix("_FenglingShadowView" + i, _views[i]);
                 Shader.SetGlobalMatrix("_FenglingShadowVP" + i, _vps[i]);
-                Shader.SetGlobalFloat("_FenglingShadowTexel" + i, 1f / _sizes[i]);
+                Shader.SetGlobalVector("_FenglingShadowTile" + i, _tiles[i]);
             }
             Shader.SetGlobalVectorArray("_FenglingShadowSpheres", _spheres);
             Shader.SetGlobalVector("_FenglingShadowSplits",
                 new Vector4(_splits[0], _splits[1], _splits[2], _splits[3]));
-            Shader.SetGlobalFloat("_FenglingShadowTexel", 1f / Resolution);
+            Shader.SetGlobalFloat("_FenglingShadowTexel", 1f / AtlasSize);
             Shader.SetGlobalFloat("_FenglingShadowNormalBias",
                 Mathf.Max(0.05f, distance / Resolution * 1.5f));
             Shader.SetGlobalFloat("_FenglingShadowSoftness", 1f);
             Shader.SetGlobalFloat("_FenglingShadowEnabled", 1f);
+            Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 0f);
 
             _hasRendered = true;
             _lastLightDir = lightDirection;
@@ -270,6 +167,7 @@ namespace Fengling.Rendering
         {
             _hasRendered = false;
             Shader.SetGlobalFloat("_FenglingShadowEnabled", 0f);
+            Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 0f);
         }
     }
 }

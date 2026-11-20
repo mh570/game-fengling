@@ -48,10 +48,7 @@ Shader "Fengling/Lit"
             float4 _FenglingFillDir;
             float4 _FenglingFillColor;
 
-            sampler2D _FenglingShadowMap0;
-            sampler2D _FenglingShadowMap1;
-            sampler2D _FenglingShadowMap2;
-            sampler2D _FenglingShadowMap3;
+            sampler2D _FenglingShadowAtlas;
             float4x4 _FenglingShadowView0;
             float4x4 _FenglingShadowView1;
             float4x4 _FenglingShadowView2;
@@ -62,11 +59,11 @@ Shader "Fengling/Lit"
             float4x4 _FenglingShadowVP3;
             float4 _FenglingShadowSpheres[4];
             float4 _FenglingShadowSplits;
+            float4 _FenglingShadowTile0;
+            float4 _FenglingShadowTile1;
+            float4 _FenglingShadowTile2;
+            float4 _FenglingShadowTile3;
             float _FenglingShadowTexel;
-            float _FenglingShadowTexel0;
-            float _FenglingShadowTexel1;
-            float _FenglingShadowTexel2;
-            float _FenglingShadowTexel3;
             float _FenglingShadowNormalBias;
             float _FenglingShadowSoftness;
             float _FenglingShadowEnabled;
@@ -106,13 +103,14 @@ Shader "Fengling/Lit"
                 return o;
             }
 
-            float SampleCascade(sampler2D map, float4x4 vp, float4x4 view,
+            float SampleCascade(sampler2D atlas, float4x4 vp, float4x4 view, float4 tile,
                                 float3 worldPos, float bias, float texelSize)
             {
                 float4 c = mul(vp, float4(worldPos, 1.0));
                 c.xyz /= c.w;
-                float2 uv = c.xy * 0.5 + 0.5;
-                if (any(uv < 0.001) || any(uv > 0.999)) return 1.0;
+                float2 uvLocal = c.xy * 0.5 + 0.5;
+                if (any(uvLocal < 0.001) || any(uvLocal > 0.999)) return 1.0;
+                float2 uv = uvLocal * tile.xy + tile.zw;
 
                 float surfaceDepth = -mul(view, float4(worldPos, 1.0)).z;
                 float2 t = float2(texelSize, texelSize) * max(0.25, _FenglingShadowSoftness);
@@ -123,7 +121,7 @@ Shader "Fengling/Lit"
                     for (int x = -2; x <= 2; x++)
                     {
                         float2 offset = float2(x * t.x, y * t.y);
-                        lit += tex2D(map, uv + offset).r > surfaceDepth - bias ? 1 : 0;
+                        lit += tex2D(atlas, uv + offset).r > surfaceDepth - bias ? 1 : 0;
                     }
                 }
                 return lit / 25.0;
@@ -162,10 +160,7 @@ Shader "Fengling/Lit"
                 float shadow = 1.0;
                 if (_FenglingShadowEnabled > 0.5)
                 {
-                    float texel0 = max(0.00001, _FenglingShadowTexel0);
-                    float texel1 = max(0.00001, _FenglingShadowTexel1);
-                    float texel2 = max(0.00001, _FenglingShadowTexel2);
-                    float texel3 = max(0.00001, _FenglingShadowTexel3);
+                    float texel = max(0.00001, _FenglingShadowTexel);
                     float camDepth = -mul(UNITY_MATRIX_V, float4(i.worldPos, 1.0)).z;
                     // 沿法线偏移采样点，减轻斜面 acne（normal bias）。
                     float3 shadowPos = i.worldPos + N * _FenglingShadowNormalBias;
@@ -183,22 +178,22 @@ Shader "Fengling/Lit"
                     float shadowNext = 1.0;
                     if (cascade == 0)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap0, _FenglingShadowVP0, _FenglingShadowView0, shadowPos, 0.08, texel0);
-                        shadowNext = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel1);
+                        shadow = SampleCascade(_FenglingShadowAtlas, _FenglingShadowVP0, _FenglingShadowView0, _FenglingShadowTile0, shadowPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowAtlas, _FenglingShadowVP1, _FenglingShadowView1, _FenglingShadowTile1, shadowPos, 0.08, texel);
                     }
                     else if (cascade == 1)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel1);
-                        shadowNext = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel2);
+                        shadow = SampleCascade(_FenglingShadowAtlas, _FenglingShadowVP1, _FenglingShadowView1, _FenglingShadowTile1, shadowPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowAtlas, _FenglingShadowVP2, _FenglingShadowView2, _FenglingShadowTile2, shadowPos, 0.08, texel);
                     }
                     else if (cascade == 2)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel2);
-                        shadowNext = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel3);
+                        shadow = SampleCascade(_FenglingShadowAtlas, _FenglingShadowVP2, _FenglingShadowView2, _FenglingShadowTile2, shadowPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowAtlas, _FenglingShadowVP3, _FenglingShadowView3, _FenglingShadowTile3, shadowPos, 0.08, texel);
                     }
                     else
                     {
-                        shadow = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel3);
+                        shadow = SampleCascade(_FenglingShadowAtlas, _FenglingShadowVP3, _FenglingShadowView3, _FenglingShadowTile3, shadowPos, 0.08, texel);
                     }
 
                     // 级联交界混合 + 最远距离淡出，避免一条硬切边。
@@ -225,6 +220,7 @@ Shader "Fengling/Lit"
                 {
                     float4x4 moonVp = mul(_FenglingMoonShadowProj, _FenglingMoonShadowView);
                     moonShadow = SampleCascade(_FenglingMoonShadowMap, moonVp, _FenglingMoonShadowView,
+                                               float4(1.0, 1.0, 0.0, 0.0),
                                                i.worldPos, 0.25, max(0.00001, _FenglingMoonShadowTexel));
                 }
                 float3 moonDiffuse = albedo * _FenglingMoonColor.rgb *
