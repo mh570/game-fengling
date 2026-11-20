@@ -70,6 +70,7 @@ namespace Fengling.EditorTools
             Measure("night_clear", 22f, 0.05f, 0.05f, 0.05f, 0f, tod, weather, cam, rt);
             Measure("overcast", 12f, 0.90f, 0.35f, 0.50f, 0f, tod, weather, cam, rt);
             Measure("rain", 12f, 0.80f, 0.35f, 0.40f, 0.90f, tod, weather, cam, rt);
+            MeasureGodRay(tod, weather, cam, rt);
 
             RenderTexture.active = prevActive;
             cam.targetTexture = null;
@@ -85,20 +86,30 @@ namespace Fengling.EditorTools
             EditorApplication.Exit(0);
         }
 
-        private static void Measure(string name, float hour, float cloud, float haze, float fog, float rain,
-                                    Time.TimeOfDaySystem tod, Time.WeatherSystem weather, Camera cam, RenderTexture rt)
+        private static void MeasureGodRay(Time.TimeOfDaySystem tod, Time.WeatherSystem weather, Camera cam, RenderTexture rt)
         {
-            weather.cloudCover = cloud;
-            weather.haze = haze;
-            weather.fog = fog;
-            weather.rain = rain;
-            weather.snow = 0f;
+            weather.cloudCover = 0.2f;
+            weather.haze = 0.30f;
+            weather.fog = 0.45f;
+            weather.rain = 0f;
             tod.paused = true;
-            tod.SetTime(hour);
+            tod.SetTime(16f);
 
-            // 预热，避免第一帧 shader 编译/RT 初始化污染。
+            Vector3 sunDir = -tod.sun.transform.forward;
+            Vector3 flat = new Vector3(sunDir.x, 0f, sunDir.z).normalized;
+            cam.transform.position = new Vector3(0f, 5f, 0f);
+            cam.transform.rotation = Quaternion.LookRotation(flat, Vector3.up);
+
+            Shader.SetGlobalFloat("_FenglingGodRayIntensity", 0f);
+            MeasureLoop("godray_off", cam, rt);
+
+            Shader.SetGlobalFloat("_FenglingGodRayIntensity", 0.30f);
+            MeasureLoop("godray_on", cam, rt);
+        }
+
+        private static void MeasureLoop(string name, Camera cam, RenderTexture rt)
+        {
             for (int i = 0; i < 10; i++) cam.Render();
-
             var times = new List<double>(Frames);
             var sw = new Stopwatch();
             var px = new Texture2D(1, 1, TextureFormat.RGBA32, false);
@@ -120,6 +131,19 @@ namespace Fengling.EditorTools
             double p50 = times[times.Count / 2];
             double p95 = times[Mathf.Clamp((int)(times.Count * 0.95), 0, times.Count - 1)];
             Lines.Add($"{name},avg_ms={avg:F2},p50_ms={p50:F2},p95_ms={p95:F2},fps_p50={1000.0 / p50:F1}");
+        }
+
+        private static void Measure(string name, float hour, float cloud, float haze, float fog, float rain,
+                                    Time.TimeOfDaySystem tod, Time.WeatherSystem weather, Camera cam, RenderTexture rt)
+        {
+            weather.cloudCover = cloud;
+            weather.haze = haze;
+            weather.fog = fog;
+            weather.rain = rain;
+            weather.snow = 0f;
+            tod.paused = true;
+            tod.SetTime(hour);
+            MeasureLoop(name, cam, rt);
         }
     }
 }
