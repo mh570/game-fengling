@@ -65,6 +65,10 @@ namespace Fengling.Water
         [Tooltip("预留：空间浪高扰动。当前未使用，避免 CPU 浮力采样与 GPU 波形不一致")]
         [Range(0f, 1f)] public float waveIrregularity = 0.35f;
         [Range(0f, 3f)] public float sunIntensity = 2f;
+        [Header("Time Of Day")]
+        public bool driveSunFromTime = true;
+        [Range(0f, 1f)] public float sunIntensityScale = 0.35f;
+        public bool tintByTime = true;
 
         [Header("风格：0 = 写实，1 = 风格化（奶蓝奶白）")]
         [Range(0f, 1f)] public float stylized = 0f;   // 默认写实，按 V 切换
@@ -288,6 +292,7 @@ namespace Fengling.Water
 
             _material.SetFloat("_WaterTime", water.WaterTime);
             _material.SetVector("_SunDirection", GetSunDirection());
+            ApplyTimeOfDay();
 
             // 波数组用全局数组传递：运行时 new Material 的数组属性默认只有 1 个元素，
             // SetVectorArray(16) 会被 Unity cap 到 1，导致 GPU 只拿到第 1 个波。
@@ -344,6 +349,25 @@ namespace Fengling.Water
             bool underwater = sample.Inside && camPos.y < sample.Height;
 
             _material.SetFloat("_CameraUnderwater", underwater ? 1f : 0f);
+        }
+
+        private void ApplyTimeOfDay()
+        {
+            var sun = RenderSettings.sun;
+            if (sun != null && driveSunFromTime)
+            {
+                _material.SetColor("_SunColor", sun.color);
+                _material.SetFloat("_SunIntensity", sun.intensity * sunIntensityScale);
+            }
+
+            if (tintByTime)
+            {
+                var ambient = RenderSettings.ambientLight;
+                float brightness = Mathf.Clamp01(Mathf.Max(ambient.r, Mathf.Max(ambient.g, ambient.b)) * 1.4f);
+                Color tint = Color.Lerp(new Color(0.16f, 0.20f, 0.32f), Color.white, brightness);
+                _material.SetColor("_ShallowColor", shallowColor * tint);
+                _material.SetColor("_DeepColor", deepColor * tint);
+            }
         }
 
         private static Vector4 GetSunDirection()
