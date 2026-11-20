@@ -89,6 +89,37 @@
 - 月亮 slice 回滚，不留在主线
 - 真实月影需要进一步研究 HDRP 的 directional light shadow culling / ShadowDrawingSettings 初始化，不能只复用太阳路径
 
+---
+
+## HDRP 源码结论（2026-11-20）
+
+`HDShadowManager.LayoutShadowMaps` 里有明确限制：
+
+> Cascade Shadow atlasing has failed, only one directional light can cast shadows at a time
+
+相关结构：
+
+- 只有一份 `HDDirectionalShadowData`
+- 只有一个 `m_CascadeAtlas`
+- 方向光 cascade atlas 的 layout 只允许一盏方向光
+
+URP 侧同样：
+
+- additional light shadow atlas 对 `LightType.Directional` 直接返回 false
+
+所以：
+
+- **URP/HDRP 原生都不支持太阳+月亮同时真实投影**
+- 我们 Stage 2 的 moon slice 为空，与引擎限制一致
+- 要做到“太阳+月亮都真实投影”，必须自定义双方向光 shadow 系统，不能照抄 URP/HDRP
+
+下一步只有两种：
+
+1. 自定义双方向光 caster（工作量大，需要绕过引擎对第二方向光 shadow caster 的限制）
+2. 月亮降级为 blob / 不投影
+
+Stage 1 太阳 atlas 保留，Stage 2 不进入主线。
+
 ### Stage 3：质量回归
 
 - 5×5 PCF / normal bias / 级联混合 / 缓存
