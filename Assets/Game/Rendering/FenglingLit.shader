@@ -70,6 +70,9 @@ Shader "Fengling/Lit"
             float _FenglingShadowSoftness;
             float _FenglingShadowEnabled;
             float _FenglingShadowStrength;
+            float _FenglingCloudShadowStrength;
+            float _FenglingCloudShadowScale;
+            float4 _FenglingCloudWind;
 
             sampler2D _FenglingMoonShadowMap;
             float4x4 _FenglingMoonShadowView;
@@ -103,6 +106,31 @@ Shader "Fengling/Lit"
                 o.pos = UnityWorldToClipPos(o.worldPos);
                 o.uv = TRANSFORM_TEX(v.uv, _BaseMap);
                 return o;
+            }
+
+            float CloudShadowNoise(float2 p)
+            {
+                float2 i = floor(p);
+                float2 f = frac(p);
+                f = f * f * (3.0 - 2.0 * f);
+                float a = frac(sin(dot(i, float2(127.1, 311.7))) * 43758.5453);
+                float b = frac(sin(dot(i + float2(1, 0), float2(127.1, 311.7))) * 43758.5453);
+                float c = frac(sin(dot(i + float2(0, 1), float2(127.1, 311.7))) * 43758.5453);
+                float d = frac(sin(dot(i + float2(1, 1), float2(127.1, 311.7))) * 43758.5453);
+                return lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+            }
+
+            float CloudShadowFactor(float2 worldXZ)
+            {
+                if (_FenglingCloudShadowStrength <= 0.001) return 1.0;
+                float2 p = worldXZ * _FenglingCloudShadowScale +
+                           _FenglingCloudWind.xy * (_Time.y * 0.01);
+                float n = CloudShadowNoise(p) * 0.5;
+                n += CloudShadowNoise(p * 2.03) * 0.25;
+                n += CloudShadowNoise(p * 4.11) * 0.125;
+                n /= 0.875;
+                float cloud = smoothstep(0.48, 0.72, n);
+                return 1.0 - cloud * _FenglingCloudShadowStrength;
             }
 
             float SampleCascade(sampler2D atlas, float4x4 vp, float4x4 view, float4 tile,
@@ -213,6 +241,7 @@ Shader "Fengling/Lit"
                 float shadowStrength = _FenglingShadowStrength;
                 if (shadowStrength <= 0.001) shadowStrength = 1.0;
                 shadow = lerp(1.0, shadow, saturate(shadowStrength));
+                shadow *= CloudShadowFactor(i.worldPos.xz);
 
                 // 月亮冷色漫反射 + moon shadow（只在 culling sphere 内采样）。
                 float3 Lmoon = normalize(_FenglingMoonDir.xyz);

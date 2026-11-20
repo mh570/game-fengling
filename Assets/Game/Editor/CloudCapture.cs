@@ -47,10 +47,10 @@ namespace Fengling.EditorTools
             if (tod == null || weather == null || cam == null) { EditorApplication.Exit(1); return; }
 
             tod.paused = true;
-            tod.SetTime(16.5f);
             weather.cloudCover = 0.72f;
             weather.haze = 0.25f;
             weather.fog = 0.25f;
+            tod.SetTime(16.5f);
 
             var rts = cam.GetComponent<Player.RtsCameraController>();
             if (rts != null) rts.enabled = false;

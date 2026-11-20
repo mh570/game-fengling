@@ -47,9 +47,9 @@ namespace Fengling.EditorTools
             if (tod == null || weather == null || cam == null) { EditorApplication.Exit(1); return; }
 
             tod.paused = true;
-            tod.SetTime(12f);
             weather.cloudCover = 0.9f;
             weather.haze = 0.35f;
+            tod.SetTime(12f);
 
             var rt = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
             var prev = cam.targetTexture;

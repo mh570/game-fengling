@@ -18,6 +18,7 @@ Shader "Fengling/Skybox"
         _CloudFarOpacity ("Far Cloud Opacity", Range(0, 1)) = 0.35
         _CloudNearCoverage ("Near Cloud Coverage", Range(0, 1)) = 0.55
         _CloudNearOpacity ("Near Cloud Opacity", Range(0, 1)) = 0.55
+        _CloudWind ("Cloud Wind (xy)", Vector) = (0.8, 0.25, 0, 0)
         _SunDirection ("Sun Direction", Vector) = (0.3, 0.8, 0.5, 0)
         _SunColor ("Sun Color", Color) = (1, 0.92, 0.78, 1)
         _SunSize ("Sun Glow", Range(1, 500)) = 90
@@ -57,6 +58,7 @@ Shader "Fengling/Skybox"
             float _CloudFarOpacity;
             float _CloudNearCoverage;
             float _CloudNearOpacity;
+            float4 _CloudWind;
             float4 _SunDirection;
             float4 _SunColor;
             float _SunSize;
@@ -124,6 +126,8 @@ Shader "Fengling/Skybox"
             float4 frag(v2f i) : SV_Target
             {
                 float3 dir = normalize(i.dir);
+                float sunUp = saturate(normalize(_SunDirection.xyz).y);
+                float sunset = saturate(1.0 - sunUp * 4.0);
 
                 // 天顶 -> 地平线渐变
                 float up = saturate(dir.y);
@@ -137,26 +141,29 @@ Shader "Fengling/Skybox"
                 if (dir.y > 0.01)
                 {
                     // 远景高层云：稀疏、偏白、几乎不挡日月
+                    float2 wind = normalize(_CloudWind.xy + float2(0.001, 0.001));
                     float2 farP = dir.xz / max(dir.y, 0.18) * 0.35;
-                    farP += _Time.y * float2(0.0025, 0.0012);
+                    farP += wind * (_Time.y * 0.0025);
                     float farBand = smoothstep(0.02, 0.12, dir.y) * (1.0 - smoothstep(0.65, 0.98, dir.y));
                     float farMask = smoothstep(_CloudFarCoverage, _CloudFarCoverage + 0.20, fbm(farP)) * farBand;
                     float3 farCol = lerp(_CloudDark.rgb, _CloudColor.rgb, 0.78);
+                    farCol = lerp(farCol, _SunColor.rgb, sunset * 0.25);
                     sky = lerp(sky, farCol, farMask * _CloudFarOpacity);
 
                     // 中景主云层
                     float2 midP = dir.xz / max(dir.y, 0.08) * _CloudScale;
-                    midP += _Time.y * _CloudSpeed;
+                    midP += wind * (_Time.y * _CloudSpeed);
                     float midC = fbm(midP);
                     float midBand = smoothstep(0.0, 0.10, dir.y) * (1.0 - smoothstep(0.55, 0.95, dir.y));
                     float midMask = smoothstep(_CloudCoverage, _CloudCoverage + 0.22, midC) * midBand;
                     float shade = smoothstep(0.45, 0.85, midC);
                     float3 midCol = lerp(_CloudDark.rgb, _CloudColor.rgb, shade);
+                    midCol = lerp(midCol, _SunColor.rgb, sunset * 0.35 * smoothstep(0.55, 0.85, midC));
                     sky = lerp(sky, midCol, midMask * 0.92);
 
                     // 近景低云/雾：贴地平线、偏暗、移动更快
                     float2 nearP = dir.xz / max(dir.y, 0.05) * 2.8;
-                    nearP += _Time.y * float2(0.012, 0.005);
+                    nearP += wind * (_Time.y * 0.012);
                     float nearBand = smoothstep(0.01, 0.06, dir.y) * (1.0 - smoothstep(0.30, 0.62, dir.y));
                     float nearMask = smoothstep(_CloudNearCoverage, _CloudNearCoverage + 0.20, fbm(nearP)) * nearBand;
                     sky = lerp(sky, _CloudDark.rgb * 0.9, nearMask * _CloudNearOpacity);

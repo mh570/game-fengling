@@ -213,6 +213,12 @@ namespace Fengling.Time
                 _skyInstance.SetFloat("_CloudFarOpacity", Mathf.Lerp(0.22f, 0.55f, cloudCover));
                 _skyInstance.SetFloat("_CloudNearCoverage", Mathf.Lerp(0.70f, 0.42f, cloudCover));
                 _skyInstance.SetFloat("_CloudNearOpacity", Mathf.Lerp(0.20f, 0.75f, cloudCover));
+                var cloudWind = new Vector4(0.8f, 0.25f, 0f, 0f);
+                _skyInstance.SetVector("_CloudWind", cloudWind);
+
+                Shader.SetGlobalFloat("_FenglingCloudShadowStrength", cloudCover * 0.9f);
+                Shader.SetGlobalFloat("_FenglingCloudShadowScale", 0.07f);
+                Shader.SetGlobalVector("_FenglingCloudWind", cloudWind);
             }
 
             if (driveAmbient)
