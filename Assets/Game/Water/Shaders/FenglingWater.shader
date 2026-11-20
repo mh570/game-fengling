@@ -117,6 +117,9 @@ Shader "Fengling/Water Surface"
             float _FenglingWaterCloud;
             float _FenglingWaterAtmosphere;
             float _FenglingRain;
+            float _FenglingCloudShadowStrength;
+            float _FenglingCloudShadowScale;
+            float4 _FenglingCloudWind;
             float _Roughness;
             float _RoughnessFar;
             float _F0;
@@ -309,6 +312,31 @@ Shader "Fengling/Water Surface"
                 return float4(col, alpha);
             }
 
+            float CloudShadowNoise(float2 p)
+            {
+                float2 i = floor(p);
+                float2 f = frac(p);
+                f = f * f * (3.0 - 2.0 * f);
+                float a = frac(sin(dot(i, float2(127.1, 311.7))) * 43758.5453);
+                float b = frac(sin(dot(i + float2(1, 0), float2(127.1, 311.7))) * 43758.5453);
+                float c = frac(sin(dot(i + float2(0, 1), float2(127.1, 311.7))) * 43758.5453);
+                float d = frac(sin(dot(i + float2(1, 1), float2(127.1, 311.7))) * 43758.5453);
+                return lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+            }
+
+            float CloudShadowFactor(float2 worldXZ)
+            {
+                if (_FenglingCloudShadowStrength <= 0.001) return 1.0;
+                float2 p = worldXZ * _FenglingCloudShadowScale +
+                           _FenglingCloudWind.xy * (_Time.y * 0.01);
+                float n = CloudShadowNoise(p) * 0.5;
+                n += CloudShadowNoise(p * 2.03) * 0.25;
+                n += CloudShadowNoise(p * 4.11) * 0.125;
+                n /= 0.875;
+                float cloud = smoothstep(0.48, 0.72, n);
+                return 1.0 - cloud * _FenglingCloudShadowStrength;
+            }
+
             float4 frag(v2f i) : SV_Target
             {
                 if (_Vertical > 0.5)
@@ -430,7 +458,8 @@ Shader "Fengling/Water Surface"
                 // 正交俯视下太阳高光会被波浪法线放大成大片白斑；先压到很弱。
                 if (unity_OrthoParams.w > 0.5)
                     spec *= 0.03;
-                color += _SunColor.rgb * spec * _SunIntensity * (1.0 - _Stylized) * lerp(1.0, 0.25, saturate(_FenglingWaterCloud));
+                float cloudShadow = CloudShadowFactor(i.worldPos.xz);
+                color += _SunColor.rgb * spec * _SunIntensity * cloudShadow * (1.0 - _Stylized) * lerp(1.0, 0.25, saturate(_FenglingWaterCloud));
 
                 // 平面反射的天空清屏色偏暗，屏幕顶部会露出暗边；
                 // 用一条很窄的 horizon 融合盖住，不影响近处倒影。
