@@ -125,7 +125,11 @@ namespace Fengling.Rendering
                 {
                     splitData = splitData,
                 };
-                context.DrawShadows(ref shadowSettings);
+                var shadowList = context.CreateShadowRendererList(ref shadowSettings);
+                var draw = CommandBufferPool.Get("Fengling.ShadowDraw" + i);
+                draw.DrawRendererList(shadowList);
+                context.ExecuteCommandBuffer(draw);
+                CommandBufferPool.Release(draw);
             }
 
             // 月亮单独一张低分辨率阴影图（单级，不参与太阳级联）。
