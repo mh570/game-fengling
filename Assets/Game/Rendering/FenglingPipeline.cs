@@ -365,6 +365,14 @@ namespace Fengling.Rendering
             cmd.SetGlobalMatrix("_FenglingInvProj", camera.projectionMatrix.inverse);
             cmd.SetGlobalMatrix("_FenglingCameraToWorld", camera.cameraToWorldMatrix);
             cmd.SetGlobalVector("_FenglingCameraPos", camera.transform.position);
+            var sunVec = Shader.GetGlobalVector("_FenglingSunDir");
+            var towardSun = new Vector3(sunVec.x, sunVec.y, sunVec.z).normalized;
+            var sunViewport = camera.WorldToViewportPoint(camera.transform.position + towardSun * 1000f);
+            bool sunOnScreen = sunViewport.z > 0f &&
+                               sunViewport.x > 0f && sunViewport.x < 1f &&
+                               sunViewport.y > 0f && sunViewport.y < 1f;
+            cmd.SetGlobalVector("_FenglingSunScreenPos",
+                new Vector4(sunViewport.x, sunViewport.y, sunOnScreen ? 1f : 0f, 0f));
             cmd.SetGlobalFloat("_FenglingExposure", _settings.exposure);
             cmd.SetGlobalFloat("_FenglingBloomIntensity", _settings.bloomIntensity);
             cmd.SetGlobalFloat("_FenglingBloomThreshold", _settings.bloomThreshold);

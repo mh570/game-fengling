@@ -41,6 +41,9 @@ Shader "Fengling/PostProcess"
             float4 _FenglingSunColor;
             float _FenglingVolumetricDensity;
             float _FenglingGodRayDebug;
+            float4 _FenglingSunScreenPos;
+            float _FenglingGodRayIntensity;
+            float _FenglingGodRayThreshold;
 
             sampler2D _FenglingShadowAtlas;
             float4x4 _FenglingShadowView0;
@@ -84,6 +87,25 @@ Shader "Fengling/PostProcess"
                 if (dist < _FenglingShadowSplits.z) return SampleShadowCascade(_FenglingShadowVP2, _FenglingShadowView2, _FenglingShadowTile2, worldPos);
                 if (dist < _FenglingShadowSplits.w) return SampleShadowCascade(_FenglingShadowVP3, _FenglingShadowView3, _FenglingShadowTile3, worldPos);
                 return 1.0;
+            }
+
+            float3 ScreenSpaceGodRays(float2 uv)
+            {
+                if (_FenglingSunScreenPos.z < 0.5 || _FenglingGodRayIntensity <= 0.001) return 0;
+                float2 delta = (_FenglingSunScreenPos.xy - uv) / 32.0;
+                float2 coord = uv;
+                float3 acc = 0;
+                float weight = 0;
+                for (int i = 0; i < 32; i++)
+                {
+                    coord += delta;
+                    float3 c = tex2D(_MainTex, coord).rgb;
+                    float luma = dot(c, float3(0.2126, 0.7152, 0.0722));
+                    float w = smoothstep(_FenglingGodRayThreshold, _FenglingGodRayThreshold + 0.25, luma);
+                    acc += c * w;
+                    weight += w;
+                }
+                return acc / max(weight, 1.0) * _FenglingGodRayIntensity;
             }
 
             float3 VolumetricLight(float2 uv)
@@ -155,6 +177,7 @@ Shader "Fengling/PostProcess"
                 float3 bloom = tex2D(_BloomTex, i.uv).rgb;
 
                 scene += VolumetricLight(i.uv);
+                scene += ScreenSpaceGodRays(i.uv);
                 scene += bloom * _FenglingBloomIntensity;
                 scene *= exp2(_FenglingExposure);
                 scene = ACESFilm(scene);

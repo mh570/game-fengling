@@ -145,6 +145,9 @@ namespace Fengling.Time
             float volumeDensity = Mathf.Max(0.01f,
                 (weather != null ? weather.fog * 0.02f + weather.haze * 0.005f : 0f));
             Shader.SetGlobalFloat("_FenglingVolumetricDensity", volumeDensity);
+            Shader.SetGlobalFloat("_FenglingGodRayIntensity",
+                sunDir.y > 0f ? Mathf.Lerp(0.10f, 0.45f, Mathf.Clamp01(sunDir.y * 2f)) : 0f);
+            Shader.SetGlobalFloat("_FenglingGodRayThreshold", 0.68f);
             // 月亮：朔望月 -> 相位角 -> 照亮比例；月亮位置由太阳黄经 + 相位角推进。
             MoonPhaseAngle = (float)(elongation * Mathf.Deg2Rad);
             MoonIlluminatedFraction = (float)AstronomyMath.MoonIlluminatedFraction(MoonPhaseAngle);
