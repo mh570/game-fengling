@@ -13,6 +13,7 @@ namespace Fengling.Time
         [Range(0f, 24f)] public float timeOfDay = 8f;
         public int day = 1;
         [Range(0, 3)] public int season = 1; // 0春 1夏 2秋 3冬
+        public int year = 1;
         public bool paused = false;
         [Tooltip("1 现实秒 = 多少游戏分钟；1 = 24 现实分钟一天")]
         [Range(0.01f, 60f)] public float gameMinutesPerSecond = 1f;
@@ -24,6 +25,10 @@ namespace Fengling.Time
         [Range(-60f, 60f)] public float latitude = 35f;
         public float sunMaxIntensity = 8f;
         public float moonMaxIntensity = 3f;
+        [Tooltip("月相校准：0 = 由日期推算；正数把月相向后推")]
+        public float moonPhaseOffsetDays = 0f;
+        public float MoonIlluminatedFraction { get; private set; }
+        public float MoonAgeDays { get; private set; }
 
         [Header("天空")]
         public Material skyMaterial;
@@ -117,9 +122,32 @@ namespace Fengling.Time
                 Mathf.Cos(altitude) * Mathf.Cos(azimuth)).normalized;
 
             float dayFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.08f, 0.18f, sunDir.y));
-            float moonAlt = -sunDir.y;
-            float moonFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.08f, 0.18f, moonAlt)) * (1f - dayFactor);
-            Vector3 moonDir = new Vector3(-sunDir.x, -sunDir.y, -sunDir.z).normalized;
+            // 月亮：朔望月 -> 相位角 -> 照亮比例；月亮位置由太阳黄经 + 相位角推进。
+            const float SynodicMonth = 29.53059f;
+            float daySerial = year * 365f + season * 90f + day;
+            float daysSinceNewMoon = daySerial + timeOfDay / 24f - 0.26f + moonPhaseOffsetDays;
+            MoonAgeDays = Mathf.Repeat(daysSinceNewMoon, SynodicMonth);
+            float phaseAngle = MoonAgeDays / SynodicMonth * Mathf.PI * 2f;
+            MoonIlluminatedFraction = (1f - Mathf.Cos(phaseAngle)) * 0.5f;
+
+            float moonDeclination = declination + 5.14f * Mathf.Sin(phaseAngle);
+            float moonHourAngle = hourAngle + phaseAngle * Mathf.Rad2Deg;
+            float moonDecRad = moonDeclination * Mathf.Deg2Rad;
+            float moonHaRad = moonHourAngle * Mathf.Deg2Rad;
+            float sinMoonAlt = Mathf.Sin(lat) * Mathf.Sin(moonDecRad) +
+                               Mathf.Cos(lat) * Mathf.Cos(moonDecRad) * Mathf.Cos(moonHaRad);
+            sinMoonAlt = Mathf.Clamp(sinMoonAlt, -1f, 1f);
+            float moonAltitude = Mathf.Asin(sinMoonAlt);
+            float cosMoonAz = (Mathf.Sin(moonDecRad) - Mathf.Sin(moonAltitude) * Mathf.Sin(lat)) /
+                              (Mathf.Cos(moonAltitude) * Mathf.Cos(lat) + 1e-5f);
+            float moonAzimuth = Mathf.Acos(Mathf.Clamp(cosMoonAz, -1f, 1f));
+            if (Mathf.Sin(moonHaRad) > 0f) moonAzimuth = Mathf.PI * 2f - moonAzimuth;
+            Vector3 moonDir = new Vector3(
+                Mathf.Cos(moonAltitude) * Mathf.Sin(moonAzimuth),
+                Mathf.Sin(moonAltitude),
+                Mathf.Cos(moonAltitude) * Mathf.Cos(moonAzimuth)).normalized;
+
+            float moonFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.08f, 0.18f, moonDir.y));
 
             // 天空太阳保持真实高度；光照/阴影方向限制最低仰角，避免黎明/黄昏影子无限长。
             Vector3 lightDir = sunDir;
@@ -141,7 +169,7 @@ namespace Fengling.Time
             if (moon != null)
             {
                 moon.transform.rotation = Quaternion.LookRotation(-moonDir, Vector3.up);
-                moon.intensity = moonMaxIntensity * moonFactor;
+                moon.intensity = moonMaxIntensity * moonFactor * MoonIlluminatedFraction;
                 moon.color = new Color(0.52f, 0.66f, 1f);
 
                 // 月亮光照参数直接写全局，避免阴影类查找 Moon Light 失败时月亮完全不亮。
@@ -211,7 +239,7 @@ namespace Fengling.Time
         {
             if (!showHud) return;
             GUI.Box(new Rect(12f, 12f, 360f, 82f), "Time of Day");
-            GUI.Label(new Rect(24f, 36f, 200f, 22f), $"{Mathf.FloorToInt(timeOfDay):00}:{Mathf.FloorToInt((timeOfDay % 1f) * 60f):00}  Day {day}  S{season}");
+            GUI.Label(new Rect(24f, 36f, 300f, 22f), $"{Mathf.FloorToInt(timeOfDay):00}:{Mathf.FloorToInt((timeOfDay % 1f) * 60f):00}  Day {day}  S{season}  Moon {MoonIlluminatedFraction * 100f:0}%");
 
             float newTime = GUI.HorizontalSlider(new Rect(24f, 58f, 250f, 18f), timeOfDay, 0f, 24f);
             if (Mathf.Abs(newTime - timeOfDay) > 0.001f)
