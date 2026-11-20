@@ -22,6 +22,7 @@ namespace Fengling.Rendering
         private Matrix4x4 _moonView;
         private Matrix4x4 _moonProj;
         private Light _moon;
+        private Renderer _terrainCaster;
 
         private bool _hasRendered;
         private Vector3 _lastLightDir;
@@ -180,11 +181,29 @@ namespace Fengling.Rendering
                 {
                     splitData = moonSplit,
                 };
+                if (_terrainCaster == null)
+                {
+                    foreach (var r in Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+                    {
+                        if (r.name.Contains("CoastTerrain"))
+                        {
+                            _terrainCaster = r;
+                            break;
+                        }
+                    }
+                }
+                var previousCasting = _terrainCaster != null
+                    ? _terrainCaster.shadowCastingMode
+                    : ShadowCastingMode.On;
+                if (_terrainCaster != null) _terrainCaster.shadowCastingMode = ShadowCastingMode.Off;
+
                 var moonList = context.CreateShadowRendererList(ref moonSettings);
                 var moonDraw = CommandBufferPool.Get("Fengling.MoonShadowDraw");
                 moonDraw.DrawRendererList(moonList);
                 context.ExecuteCommandBuffer(moonDraw);
                 CommandBufferPool.Release(moonDraw);
+
+                if (_terrainCaster != null) _terrainCaster.shadowCastingMode = previousCasting;
 
                 Shader.SetGlobalTexture("_FenglingMoonShadowMap", _moonMap);
                 Shader.SetGlobalMatrix("_FenglingMoonShadowView", _moonView);

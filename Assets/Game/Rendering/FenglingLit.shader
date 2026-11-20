@@ -209,7 +209,7 @@ Shader "Fengling/Lit"
                 if (shadowStrength <= 0.001) shadowStrength = 1.0;
                 shadow = lerp(1.0, shadow, saturate(shadowStrength));
 
-                // 月亮冷色漫反射；月亮 shadow map 仍有大面积自阴影，先不参与着色。
+                // 月亮冷色漫反射；月亮 shadow map 仍有大面积自阴影，暂不参与着色。
                 float3 Lmoon = normalize(_FenglingMoonDir.xyz);
                 float3 moonDiffuse = albedo * _FenglingMoonColor.rgb * saturate(dot(N, Lmoon));
 
