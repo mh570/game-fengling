@@ -142,12 +142,14 @@ namespace Fengling.Time
             Shader.SetGlobalFloat("_FenglingWaterCloud", cloudCover);
             Shader.SetGlobalFloat("_FenglingWaterAtmosphere", atmosphere);
             Shader.SetGlobalFloat("_FenglingRain", weather != null ? weather.rain : 0f);
-            bool volumetricWeather = weather != null && (weather.fog > 0.20f || weather.haze > 0.20f);
+            bool volumetricWeather = weather != null &&
+                (weather.fog > 0.20f || weather.haze > 0.20f) &&
+                cloudCover < 0.85f && weather.rain < 0.50f;
             float volumeDensity = volumetricWeather
                 ? Mathf.Max(0.0012f, weather.fog * 0.02f + weather.haze * 0.005f)
                 : 0f;
             Shader.SetGlobalFloat("_FenglingVolumetricDensity", volumeDensity);
-            bool godRayWeather = volumetricWeather;
+            bool godRayWeather = volumetricWeather && cloudCover < 0.75f;
             Shader.SetGlobalFloat("_FenglingGodRayIntensity",
                 godRayWeather && sunDir.y > 0f
                     ? Mathf.Lerp(0.08f, 0.32f, Mathf.Clamp01(sunDir.y * 2f))
