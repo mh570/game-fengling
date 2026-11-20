@@ -275,21 +275,22 @@ namespace Fengling.EditorTools
                 camGo.tag = "MainCamera";
                 cam = camGo.AddComponent<Camera>();
             }
-            var fps = cam.gameObject.AddComponent<Player.FirstPersonCamera>();
-            fps.target = player.transform;
-            fps.enabled = false;
-            var top = cam.gameObject.AddComponent<Player.TopDownCamera>();
-            top.pitch = 55f;
-            top.yaw = 45f;
-            top.orthoSize = Mathf.Clamp(p.Size.x * 0.12f, 18f, 28f);
-            top.focus = new Vector3(0f, playerY, playerZ);
-            top.followTarget = player.transform;
-            top.followOffset = Vector3.zero;
-            top.enabled = true;
-            var sw = cam.gameObject.AddComponent<Player.CameraModeSwitch>();
-            sw.firstPerson = fps;
-            sw.topDown = top;
-            sw.startInFirstPerson = false;
+            var rts = cam.GetComponent<Player.RtsCameraController>();
+            if (rts == null) rts = cam.gameObject.AddComponent<Player.RtsCameraController>();
+            rts.focusTarget = player.transform;
+            rts.startFocused = true;
+            rts.terrain = terrain;
+            rts.boundsHalf = new Vector2(terrain.size.x * 0.5f - 5f, terrain.size.y * 0.5f - 5f);
+            rts.yaw = 45f;
+            rts.pitch = 55f;
+            rts.distance = Mathf.Clamp(p.Size.x * 0.35f, 30f, 60f);
+            rts.minDistance = 15f;
+            rts.maxDistance = 120f;
+            rts.edgeScroll = false;
+            cam.orthographic = false;
+            cam.fieldOfView = 45f;
+            cam.nearClipPlane = 0.3f;
+            cam.farClipPlane = 1000f;
 
             // ---- sun + volume
             var sunGo = GameObject.Find("Directional Light");
@@ -316,6 +317,17 @@ namespace Fengling.EditorTools
 
             // 自建管线不读 HDRP Volume；天空/环境光/曝光都由 Fengling 自己负责。
             SkyboxSetup.Apply();
+
+            var timeGo = GameObject.Find("TimeOfDay");
+            if (timeGo == null) timeGo = new GameObject("TimeOfDay");
+            var tod = timeGo.GetComponent<Fengling.Time.TimeOfDaySystem>();
+            if (tod == null) tod = timeGo.AddComponent<Fengling.Time.TimeOfDaySystem>();
+            tod.sun = sun;
+            tod.skyMaterial = RenderSettings.skybox;
+            tod.timeOfDay = 8f;
+            tod.gameMinutesPerSecond = 1f;
+            tod.moonMaxIntensity = 3f;
+            tod.showHud = true;
 
             // ---- save
             Directory.CreateDirectory("Assets/Scenes");
