@@ -121,9 +121,18 @@ namespace Fengling.Time
             float moonFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.08f, 0.18f, moonAlt)) * (1f - dayFactor);
             Vector3 moonDir = new Vector3(-sunDir.x, -sunDir.y, -sunDir.z).normalized;
 
+            // 天空太阳保持真实高度；光照/阴影方向限制最低仰角，避免黎明/黄昏影子无限长。
+            Vector3 lightDir = sunDir;
+            float minLightY = Mathf.Sin(12f * Mathf.Deg2Rad);
+            if (lightDir.y < minLightY)
+            {
+                lightDir.y = minLightY;
+                lightDir.Normalize();
+            }
+
             if (sun != null)
             {
-                sun.transform.rotation = Quaternion.LookRotation(-sunDir, Vector3.up);
+                sun.transform.rotation = Quaternion.LookRotation(-lightDir, Vector3.up);
                 sun.intensity = sunMaxIntensity * dayFactor;
                 sun.color = Color.Lerp(new Color(1f, 0.42f, 0.18f), new Color(1f, 0.95f, 0.86f),
                     Mathf.InverseLerp(0.02f, 0.45f, sunDir.y));
@@ -135,6 +144,10 @@ namespace Fengling.Time
                 moon.intensity = moonMaxIntensity * moonFactor;
                 moon.color = new Color(0.52f, 0.66f, 1f);
             }
+
+            // 低太阳时淡化阴影，避免一条拖到屏幕外的长矛。
+            Shader.SetGlobalFloat("_FenglingShadowStrength",
+                Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.03f, 0.24f, lightDir.y)));
 
             if (_skyInstance != null)
             {

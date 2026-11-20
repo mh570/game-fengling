@@ -53,6 +53,7 @@ Shader "Fengling/Lit"
             float4x4 _FenglingShadowProj;
             float _FenglingShadowDistance;
             float _FenglingShadowEnabled;
+            float _FenglingShadowStrength;
 
             struct appdata
             {
@@ -129,6 +130,11 @@ Shader "Fengling/Lit"
                         shadow = lit / 4.0;
                     }
                 }
+
+                // 低太阳时淡化阴影强度，避免影子拉成一条长矛。
+                float shadowStrength = _FenglingShadowStrength;
+                if (shadowStrength <= 0.001) shadowStrength = 1.0;
+                shadow = lerp(1.0, shadow, saturate(shadowStrength));
 
                 float3 color = diffuse * shadow + ambient + specular * shadow;
                 return float4(color, 1.0);
