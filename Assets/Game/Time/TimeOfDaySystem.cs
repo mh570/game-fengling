@@ -172,9 +172,9 @@ namespace Fengling.Time
                 _skyInstance.SetColor(SunColorId, sun != null ? sun.color : Color.white);
                 _skyInstance.SetColor(MoonColorId, new Color(0.72f, 0.82f, 1f));
                 _skyInstance.SetFloat("_MoonPhaseAngle", MoonPhaseAngle);
-                _skyInstance.SetFloat("_MoonSize", 800f);
-                _skyInstance.SetFloat("_MoonDiskSize", 0.02f);
-                _skyInstance.SetFloat("_MoonDiskBrightness", 0.9f);
+                _skyInstance.SetFloat("_MoonSize", 2000f);
+                _skyInstance.SetFloat("_MoonDiskSize", 0.03f);
+                _skyInstance.SetFloat("_MoonDiskBrightness", 0.4f);
                 _skyInstance.SetFloat(NightFactorId, 1f - dayFactor);
                 _skyInstance.SetFloat(StarIntensityId, Mathf.SmoothStep(0f, 1f, 1f - dayFactor));
 

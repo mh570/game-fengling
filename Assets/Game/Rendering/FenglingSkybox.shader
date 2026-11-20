@@ -157,22 +157,35 @@ Shader "Fengling/Skybox"
                     float3 sunTangentVec = normalize(_SunDirection.xyz - moonDir * dot(_SunDirection.xyz, moonDir));
                     float2 sunTangent = float2(dot(sunTangentVec, right), dot(sunTangentVec, up2));
                     sunTangent = normalize(sunTangent + float2(1e-5, 1e-5));
-                    float x = dot(p, sunTangent);
-                    float cosElongation = cos(_MoonPhaseAngle);
-                    float lit = smoothstep(-0.035, 0.035, x - cosElongation);
 
-                    float3 diskColor = _MoonColor.rgb * _MoonDiskBrightness * (0.04 + lit * 1.0);
-                    float maria = 0.78 + 0.22 * fbm(p * 5.0 + 0.37);
-                    diskColor *= maria;
+                    // 球面法线 + 太阳方向点乘：终止线自然是椭圆弧，不是直线切分。
+                    float3 moonNormal = float3(p, sqrt(saturate(1.0 - dot(p, p))));
+                    float sinElong = sin(_MoonPhaseAngle);
+                    float3 moonLightDir = normalize(float3(
+                        sunTangent.x * sinElong,
+                        sunTangent.y * sinElong,
+                        -cos(_MoonPhaseAngle)));
+                    float ndl = saturate(dot(moonNormal, moonLightDir));
+                    float lit = smoothstep(0.0, 0.08, ndl);
+
+                    // 球面法线：月盘边缘更暗，避免贴纸感。
+                    float r2 = saturate(dot(p, p));
+                    float mu = sqrt(saturate(1.0 - r2));
+                    float limb = 0.55 + 0.45 * mu;
+                    float maria = 0.45 + 0.55 * fbm(p * 5.0 + 0.37);
+                    float craters = smoothstep(0.985, 1.0, hash21(floor(p * 42.0 + 7.3)));
+                    maria *= 1.0 - craters * 0.35;
+                    float3 diskColor = _MoonColor.rgb * _MoonDiskBrightness * limb * maria *
+                                       (0.03 + lit * 1.0);
                     // 地照：暗面保留一点冷光。
-                    diskColor += float3(0.03, 0.04, 0.06) * (1.0 - lit);
+                    diskColor += float3(0.025, 0.035, 0.055) * (1.0 - lit) * mu;
                     sky = lerp(sky, diskColor, disk * saturate(_NightFactor * 1.2 + 0.25));
                 }
 
                 // 月亮光晕：只在夜间出现
                 float moonDot = saturate(dot(dir, moonDir));
                 float moonGlow = pow(moonDot, _MoonSize) * 0.6 + pow(moonDot, 20.0) * 0.08;
-                sky += _MoonColor.rgb * moonGlow * _NightFactor;
+                sky += _MoonColor.rgb * moonGlow * _NightFactor * (1.0 - disk);
 
                 // 星空：方向球面网格 + 稀疏 hash
                 if (_StarIntensity > 0.001 && dir.y > 0.02)

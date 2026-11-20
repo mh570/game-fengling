@@ -52,6 +52,7 @@ namespace Fengling.EditorTools
             if (rts != null) rts.enabled = false;
             cam.transform.position = new Vector3(0f, 5f, 0f);
             cam.transform.rotation = Quaternion.LookRotation(-tod.moon.transform.forward, Vector3.up);
+            cam.fieldOfView = 12f;
 
             var rt = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
             var prev = cam.targetTexture;
