@@ -4359,6 +4359,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1383683145}
   - component: {fileID: 1383683144}
+  - component: {fileID: 1383683146}
   m_Layer: 0
   m_Name: TimeOfDay
   m_TagString: Untagged
@@ -4381,6 +4382,11 @@ MonoBehaviour:
   timeOfDay: 8
   day: 1
   season: 1
+  year: 1
+  calendarYear: 2026
+  calendarMonth: 11
+  calendarDay: 20
+  longitude: 0
   paused: 0
   gameMinutesPerSecond: 1
   speedMultiplier: 1
@@ -4389,7 +4395,9 @@ MonoBehaviour:
   latitude: 35
   sunMaxIntensity: 8
   moonMaxIntensity: 3
+  moonPhaseOffsetDays: 0
   skyMaterial: {fileID: 2100000, guid: d29bbb56ceca0ab4ba17869c5839f29d, type: 2}
+  weather: {fileID: 1383683146}
   driveAmbient: 1
   dayAmbient: 1.2
   nightAmbient: 0.18
@@ -4409,6 +4417,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1383683146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383683143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2757422b031901442899aadb799670cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fengling.Time::Fengling.Time.WeatherSystem
+  cloudCover: 0.35
+  haze: 0.15
+  fog: 0.1
+  rain: 0
+  snow: 0
+  wind: 0.2
 --- !u!1 &1426673324
 GameObject:
   m_ObjectHideFlags: 0
