@@ -133,6 +133,12 @@ namespace Fengling.Time
             float sunVisibility = weather != null ? weather.SunVisibility : 1f;
             float moonVisibility = weather != null ? weather.MoonVisibility : 1f;
             float shadowVisibility = weather != null ? weather.ShadowVisibility : 1f;
+            float atmosphere = weather != null ? weather.Atmosphere : 0f;
+            Color fogColor = Color.Lerp(new Color(0.025f, 0.035f, 0.06f),
+                new Color(0.58f, 0.64f, 0.70f), dayFactor);
+            fogColor = Color.Lerp(fogColor, new Color(0.42f, 0.47f, 0.52f), atmosphere * 0.55f);
+            Shader.SetGlobalColor("_FenglingFogColor", fogColor);
+            Shader.SetGlobalFloat("_FenglingFogDensity", weather != null ? weather.FogDensity : 0f);
             // 月亮：朔望月 -> 相位角 -> 照亮比例；月亮位置由太阳黄经 + 相位角推进。
             MoonPhaseAngle = (float)(elongation * Mathf.Deg2Rad);
             MoonIlluminatedFraction = (float)AstronomyMath.MoonIlluminatedFraction(MoonPhaseAngle);
@@ -152,15 +158,15 @@ namespace Fengling.Time
             {
                 sun.transform.rotation = Quaternion.LookRotation(-lightDir, Vector3.up);
                 sun.intensity = sunMaxIntensity * dayFactor * sunVisibility;
-                sun.color = Color.Lerp(new Color(1f, 0.42f, 0.18f), new Color(1f, 0.95f, 0.86f),
-                    Mathf.InverseLerp(0.02f, 0.45f, sunDir.y));
+                sun.color = Color.Lerp(Color.Lerp(new Color(1f, 0.42f, 0.18f), new Color(1f, 0.95f, 0.86f),
+                    Mathf.InverseLerp(0.02f, 0.45f, sunDir.y)), fogColor, atmosphere * 0.3f);
             }
 
             if (moon != null)
             {
                 moon.transform.rotation = Quaternion.LookRotation(-moonDir, Vector3.up);
                 moon.intensity = moonMaxIntensity * moonFactor * MoonIlluminatedFraction * moonVisibility;
-                moon.color = new Color(0.52f, 0.66f, 1f);
+                moon.color = Color.Lerp(new Color(0.52f, 0.66f, 1f), fogColor, atmosphere * 0.35f);
 
                 // 月亮光照参数直接写全局，避免阴影类查找 Moon Light 失败时月亮完全不亮。
                 Shader.SetGlobalVector("_FenglingMoonDir", new Vector4(moonDir.x, moonDir.y, moonDir.z, 0f));
@@ -189,7 +195,9 @@ namespace Fengling.Time
                 Color dayHorizon = new Color(0.78f, 0.85f, 0.90f);
                 Color nightHorizon = new Color(0.035f, 0.055f, 0.12f);
                 _skyInstance.SetColor(ZenithColorId, Color.Lerp(nightZenith, dayZenith, dayFactor));
-                _skyInstance.SetColor(HorizonColorId, Color.Lerp(nightHorizon, dayHorizon, dayFactor));
+                Color horizon = Color.Lerp(nightHorizon, dayHorizon, dayFactor);
+                horizon = Color.Lerp(horizon, fogColor, atmosphere * 0.6f);
+                _skyInstance.SetColor(HorizonColorId, horizon);
                 _skyInstance.SetColor(CloudColorId, Color.Lerp(new Color(0.10f, 0.12f, 0.18f), Color.white, dayFactor));
                 _skyInstance.SetColor(CloudDarkId, Color.Lerp(new Color(0.03f, 0.04f, 0.08f),
                     new Color(0.62f, 0.66f, 0.72f), dayFactor));

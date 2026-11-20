@@ -41,6 +41,8 @@ Shader "Fengling/Lit"
             float _AmbientFloor;
             float4 _FenglingAmbientColor;
             float _FenglingAmbientScale;
+            float4 _FenglingFogColor;
+            float _FenglingFogDensity;
 
             // 由 FenglingPipeline 每帧写入
             float4 _FenglingSunDir;
@@ -227,6 +229,9 @@ Shader "Fengling/Lit"
                                      saturate(dot(N, Lmoon)) * moonShadow;
 
                 float3 color = (diffuse + specular) * shadow + moonDiffuse + ambient;
+                float fogDist = distance(_WorldSpaceCameraPos, i.worldPos);
+                float fogFactor = 1.0 - exp(-max(0.0, _FenglingFogDensity) * fogDist);
+                color = lerp(color, _FenglingFogColor.rgb, saturate(fogFactor));
                 return float4(color, 1.0);
             }
             ENDHLSL

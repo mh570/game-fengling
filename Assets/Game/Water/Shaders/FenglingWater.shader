@@ -112,6 +112,8 @@ Shader "Fengling/Water Surface"
             float4 _SunDirection;
             float4 _SunColor;
             float _SunIntensity;
+            float4 _FenglingFogColor;
+            float _FenglingFogDensity;
             float _Roughness;
             float _RoughnessFar;
             float _F0;
@@ -485,6 +487,10 @@ Shader "Fengling/Water Surface"
 
                 // ---- 水下整体偏青
                 color = lerp(color, color * float3(0.35, 0.70, 0.90), _CameraUnderwater * 0.5);
+
+                float fogDist = distance(_WorldSpaceCameraPos, i.worldPos);
+                float fogFactor = 1.0 - exp(-max(0.0, _FenglingFogDensity) * fogDist);
+                color = lerp(color, _FenglingFogColor.rgb, saturate(fogFactor));
 
                 return float4(color, alpha);
             }
