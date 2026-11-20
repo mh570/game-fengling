@@ -126,11 +126,9 @@ Shader "Fengling/Lit"
                 if (_FenglingCloudShadowStrength <= 0.001) return 1.0;
                 float2 p = worldXZ * _FenglingCloudShadowScale +
                            _FenglingCloudWind.xy * (_Time.y * 0.01);
-                float n = CloudShadowNoise(p) * 0.5;
-                n += CloudShadowNoise(p * 2.03) * 0.25;
-                n += CloudShadowNoise(p * 4.11) * 0.125;
-                n /= 0.875;
-                float cloud = smoothstep(0.48, 0.72, n);
+                float n = CloudShadowNoise(p) * 0.65;
+                n += CloudShadowNoise(p * 2.03) * 0.35;
+                float cloud = smoothstep(0.44, 0.68, n);
                 return 1.0 - cloud * _FenglingCloudShadowStrength;
             }
 
