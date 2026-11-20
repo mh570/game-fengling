@@ -16,6 +16,7 @@ namespace Fengling.Time
         [Range(0f, 1f)] public float haze = 0.1f;
         [Range(0f, 1f)] public float fog = 0f;
         [Range(0f, 1f)] public float rain = 0f;
+        [Range(0f, 1f)] public float snow = 0f;
         [Range(0f, 1f)] public float wind = 0.2f;
 
         public float SunVisibility => Mathf.Lerp(1f, 0.22f, cloudCover) * (1f - Atmosphere * 0.35f) * (1f - rain * 0.35f);
@@ -29,6 +30,7 @@ namespace Fengling.Time
         {
             Instance = this;
             if (GetComponent<MeshRain>() == null) gameObject.AddComponent<MeshRain>();
+            if (GetComponent<MeshSnow>() == null) gameObject.AddComponent<MeshSnow>();
         }
 
         private void OnDestroy()

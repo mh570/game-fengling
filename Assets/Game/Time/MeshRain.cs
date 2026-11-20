@@ -17,6 +17,7 @@ namespace Fengling.Time
         private MeshRenderer _renderer;
         private Material _material;
         private Camera _camera;
+        private Transform _renderRoot;
 
         private void Awake()
         {
@@ -26,9 +27,13 @@ namespace Fengling.Time
             var shader = Shader.Find("Fengling/Mesh Rain");
             if (shader == null) { enabled = false; return; }
             _material = new Material(shader) { name = "MeshRain (instance)" };
-            var mr = gameObject.AddComponent<MeshFilter>();
-            mr.sharedMesh = _mesh;
-            _renderer = gameObject.AddComponent<MeshRenderer>();
+
+            var go = new GameObject("MeshRainRenderer");
+            _renderRoot = go.transform;
+            _renderRoot.SetParent(transform, false);
+            var mf = go.AddComponent<MeshFilter>();
+            mf.sharedMesh = _mesh;
+            _renderer = go.AddComponent<MeshRenderer>();
             _renderer.sharedMaterial = _material;
             _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             _renderer.receiveShadows = false;
@@ -80,7 +85,8 @@ namespace Fengling.Time
             if (_camera == null) return;
             var p = _camera.transform.position;
             var f = _camera.transform.forward;
-            transform.position = new Vector3(p.x + f.x * 15f, p.y - 10f, p.z + f.z * 15f);
+            if (_renderRoot != null)
+                _renderRoot.position = new Vector3(p.x + f.x * 15f, p.y - 10f, p.z + f.z * 15f);
             Refresh();
         }
 
@@ -97,6 +103,7 @@ namespace Fengling.Time
         {
             if (_material != null) Destroy(_material);
             if (_mesh != null) Destroy(_mesh);
+            if (_renderRoot != null) Destroy(_renderRoot.gameObject);
         }
     }
 }
