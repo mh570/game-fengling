@@ -52,6 +52,8 @@ namespace Fengling.EditorTools
             weather.haze = 0.35f;
             weather.fog = 0.35f;
             weather.rain = 0.9f;
+            var meshRain = Object.FindFirstObjectByType<Time.MeshRain>();
+            if (meshRain != null) meshRain.Refresh();
 
             var rt = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
             var prev = cam.targetTexture;

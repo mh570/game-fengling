@@ -28,7 +28,7 @@ namespace Fengling.Time
         private void Awake()
         {
             Instance = this;
-            if (GetComponent<RainEffect>() == null) gameObject.AddComponent<RainEffect>();
+            if (GetComponent<MeshRain>() == null) gameObject.AddComponent<MeshRain>();
         }
 
         private void OnDestroy()
