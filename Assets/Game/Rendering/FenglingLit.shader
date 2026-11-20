@@ -64,6 +64,7 @@ Shader "Fengling/Lit"
             float4 _FenglingShadowSplits;
             float _FenglingShadowTexel;
             float _FenglingShadowNormalBias;
+            float _FenglingShadowSoftness;
             float _FenglingShadowEnabled;
             float _FenglingShadowStrength;
 
@@ -109,13 +110,18 @@ Shader "Fengling/Lit"
                 if (any(uv < 0.001) || any(uv > 0.999)) return 1.0;
 
                 float surfaceDepth = -mul(view, float4(worldPos, 1.0)).z;
-                float2 t = float2(texelSize, texelSize);
+                float2 t = float2(texelSize, texelSize) * max(0.25, _FenglingShadowSoftness);
                 float lit = 0;
-                lit += tex2D(map, uv + float2(-t.x, -t.y)).r > surfaceDepth - bias ? 1 : 0;
-                lit += tex2D(map, uv + float2( t.x, -t.y)).r > surfaceDepth - bias ? 1 : 0;
-                lit += tex2D(map, uv + float2(-t.x,  t.y)).r > surfaceDepth - bias ? 1 : 0;
-                lit += tex2D(map, uv + float2( t.x,  t.y)).r > surfaceDepth - bias ? 1 : 0;
-                return lit / 4.0;
+                // 5x5 PCF：比 4-tap 更接近 URP 的软阴影边缘。
+                for (int y = -2; y <= 2; y++)
+                {
+                    for (int x = -2; x <= 2; x++)
+                    {
+                        float2 offset = float2(x * t.x, y * t.y);
+                        lit += tex2D(map, uv + offset).r > surfaceDepth - bias ? 1 : 0;
+                    }
+                }
+                return lit / 25.0;
             }
 
             float4 frag(v2f i) : SV_Target

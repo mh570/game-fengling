@@ -196,6 +196,7 @@ namespace Fengling.Rendering
             Shader.SetGlobalFloat("_FenglingShadowTexel", 1f / Resolution);
             Shader.SetGlobalFloat("_FenglingShadowNormalBias",
                 Mathf.Max(0.05f, distance / Resolution * 1.5f));
+            Shader.SetGlobalFloat("_FenglingShadowSoftness", 1f);
             Shader.SetGlobalFloat("_FenglingShadowEnabled", 1f);
 
             _hasRendered = true;
