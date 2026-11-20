@@ -76,6 +76,7 @@ namespace Fengling.EditorTools
             }
 
             var rt = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
+            Shader.SetGlobalFloat("_FenglingGodRayDebug", 0f);
             var prev = cam.targetTexture;
             var prevActive = RenderTexture.active;
             cam.targetTexture = rt;
@@ -93,6 +94,7 @@ namespace Fengling.EditorTools
             Object.DestroyImmediate(rt);
 
             SessionState.SetBool(PendingKey, false);
+            Shader.SetGlobalFloat("_FenglingGodRayDebug", 0f);
             EditorApplication.update -= Tick;
             Debug.Log("[GodRayQA] captured");
             EditorApplication.Exit(0);

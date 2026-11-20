@@ -40,6 +40,7 @@ Shader "Fengling/PostProcess"
             float4 _FenglingSunDir;
             float4 _FenglingSunColor;
             float _FenglingVolumetricDensity;
+            float _FenglingGodRayDebug;
 
             sampler2D _FenglingShadowAtlas;
             float4x4 _FenglingShadowView0;
@@ -101,6 +102,13 @@ Shader "Fengling/PostProcess"
 
                 float3 sunDir = normalize(_FenglingSunDir.xyz);
                 if (sunDir.y <= 0.0) return 0;
+
+                if (_FenglingGodRayDebug > 0.5)
+                {
+                    float3 dbgP = _FenglingCameraPos.xyz + dir * min(depth, 25.0);
+                    float s = SampleSunShadow(dbgP);
+                    return float3(s, 0.0, 1.0 - s);
+                }
 
                 const int STEPS = 18;
                 float stepLen = depth / STEPS;
