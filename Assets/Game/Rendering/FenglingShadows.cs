@@ -121,12 +121,11 @@ namespace Fengling.Rendering
                 context.ExecuteCommandBuffer(setup);
                 CommandBufferPool.Release(setup);
 
-                var drawing = new DrawingSettings(new ShaderTagId("DepthOnly"), new SortingSettings(camera))
+                var shadowSettings = new ShadowDrawingSettings(culling, lightIndex)
                 {
-                    perObjectData = PerObjectData.None,
+                    splitData = splitData,
                 };
-                var filtering = new FilteringSettings(RenderQueueRange.opaque);
-                context.DrawRenderers(culling, ref drawing, ref filtering);
+                context.DrawShadows(ref shadowSettings);
             }
 
             // 月亮单独一张低分辨率阴影图（单级，不参与太阳级联）。
@@ -195,6 +194,8 @@ namespace Fengling.Rendering
             Shader.SetGlobalVector("_FenglingShadowSplits",
                 new Vector4(_splits[0], _splits[1], _splits[2], _splits[3]));
             Shader.SetGlobalFloat("_FenglingShadowTexel", 1f / Resolution);
+            Shader.SetGlobalFloat("_FenglingShadowNormalBias",
+                Mathf.Max(0.05f, distance / Resolution * 1.5f));
             Shader.SetGlobalFloat("_FenglingShadowEnabled", 1f);
 
             _hasRendered = true;

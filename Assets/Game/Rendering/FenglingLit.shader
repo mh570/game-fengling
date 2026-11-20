@@ -63,6 +63,7 @@ Shader "Fengling/Lit"
             float4 _FenglingShadowSpheres[4];
             float4 _FenglingShadowSplits;
             float _FenglingShadowTexel;
+            float _FenglingShadowNormalBias;
             float _FenglingShadowEnabled;
             float _FenglingShadowStrength;
 
@@ -152,6 +153,8 @@ Shader "Fengling/Lit"
                 {
                     float texel = max(0.00001, _FenglingShadowTexel);
                     float camDepth = -mul(UNITY_MATRIX_V, float4(i.worldPos, 1.0)).z;
+                    // 沿法线偏移采样点，减轻斜面 acne（normal bias）。
+                    float3 shadowPos = i.worldPos + N * _FenglingShadowNormalBias;
                     int cascade = 3;
                     for (int ci = 0; ci < 4; ci++)
                     {
@@ -166,22 +169,22 @@ Shader "Fengling/Lit"
                     float shadowNext = 1.0;
                     if (cascade == 0)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap0, _FenglingShadowVP0, _FenglingShadowView0, i.worldPos, 0.08, texel);
-                        shadowNext = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, i.worldPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap0, _FenglingShadowVP0, _FenglingShadowView0, shadowPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel);
                     }
                     else if (cascade == 1)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, i.worldPos, 0.08, texel);
-                        shadowNext = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, i.worldPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel);
                     }
                     else if (cascade == 2)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, i.worldPos, 0.08, texel);
-                        shadowNext = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, i.worldPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel);
+                        shadowNext = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel);
                     }
                     else
                     {
-                        shadow = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, i.worldPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel);
                     }
 
                     // 级联交界混合 + 最远距离淡出，避免一条硬切边。
@@ -217,7 +220,7 @@ Shader "Fengling/Lit"
             Cull Back
             ZWrite On
             ZTest LEqual
-            ColorMask 0
+            ColorMask RGBA
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -232,18 +235,21 @@ Shader "Fengling/Lit"
             struct v2f
             {
                 float4 pos : SV_POSITION;
+                float depth : TEXCOORD0;
             };
 
             v2f vert(appdata v)
             {
                 v2f o;
-                o.pos = UnityObjectToClipPos(v.vertex);
+                float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+                o.pos = UnityWorldToClipPos(worldPos);
+                o.depth = -mul(UNITY_MATRIX_V, float4(worldPos, 1.0)).z;
                 return o;
             }
 
             float4 frag(v2f i) : SV_Target
             {
-                return 0;
+                return float4(i.depth, 0.0, 0.0, 1.0);
             }
             ENDHLSL
         }
