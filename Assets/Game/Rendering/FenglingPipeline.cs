@@ -140,6 +140,8 @@ namespace Fengling.Rendering
                 _shadows.Render(context, camera, culling, sunForShadow.transform.forward,
                                 _settings.shadowDistance, _settings.shadowResolution,
                                 colorTarget, depthTarget);
+                if (_settings.shadowsEnabled)
+                    _shadows.RenderMoonShadow(context, camera, culling, colorTarget, depthTarget);
             }
             else
             {
