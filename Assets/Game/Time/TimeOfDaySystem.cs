@@ -166,10 +166,16 @@ namespace Fengling.Time
                 RenderSettings.ambientLight = Color.Lerp(nightAmb, dayAmb, ambT);
                 RenderSettings.ambientIntensity = 1f;
 
+                // 日出/日落前后用 twilight 抬环境光，避免低太阳时地面死黑。
+                float twilight = 1f - Mathf.SmoothStep(0f, 1f,
+                    Mathf.InverseLerp(0.02f, 0.30f, Mathf.Abs(sunDir.y)));
+                float ambientT = Mathf.Max(dayFactor, twilight * 0.8f);
+
                 // FenglingLit 的 SH 兜底：白天保留 SH，夜晚/黎明用全局色保底。
-                Shader.SetGlobalFloat("_FenglingAmbientScale", Mathf.Lerp(0.08f, 1f, dayFactor));
+                Shader.SetGlobalFloat("_FenglingAmbientScale", Mathf.Lerp(0.08f, 1f, ambientT));
                 Shader.SetGlobalColor("_FenglingAmbientColor",
-                    Color.Lerp(new Color(0.025f, 0.03f, 0.05f), new Color(0.14f, 0.15f, 0.14f), dayFactor));
+                    Color.Lerp(new Color(0.025f, 0.03f, 0.05f),
+                        new Color(0.18f, 0.19f, 0.18f), ambientT));
             }
         }
 
