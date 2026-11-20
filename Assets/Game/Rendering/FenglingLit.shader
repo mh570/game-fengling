@@ -63,6 +63,10 @@ Shader "Fengling/Lit"
             float4 _FenglingShadowSpheres[4];
             float4 _FenglingShadowSplits;
             float _FenglingShadowTexel;
+            float _FenglingShadowTexel0;
+            float _FenglingShadowTexel1;
+            float _FenglingShadowTexel2;
+            float _FenglingShadowTexel3;
             float _FenglingShadowNormalBias;
             float _FenglingShadowSoftness;
             float _FenglingShadowEnabled;
@@ -158,7 +162,10 @@ Shader "Fengling/Lit"
                 float shadow = 1.0;
                 if (_FenglingShadowEnabled > 0.5)
                 {
-                    float texel = max(0.00001, _FenglingShadowTexel);
+                    float texel0 = max(0.00001, _FenglingShadowTexel0);
+                    float texel1 = max(0.00001, _FenglingShadowTexel1);
+                    float texel2 = max(0.00001, _FenglingShadowTexel2);
+                    float texel3 = max(0.00001, _FenglingShadowTexel3);
                     float camDepth = -mul(UNITY_MATRIX_V, float4(i.worldPos, 1.0)).z;
                     // 沿法线偏移采样点，减轻斜面 acne（normal bias）。
                     float3 shadowPos = i.worldPos + N * _FenglingShadowNormalBias;
@@ -176,22 +183,22 @@ Shader "Fengling/Lit"
                     float shadowNext = 1.0;
                     if (cascade == 0)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap0, _FenglingShadowVP0, _FenglingShadowView0, shadowPos, 0.08, texel);
-                        shadowNext = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap0, _FenglingShadowVP0, _FenglingShadowView0, shadowPos, 0.08, texel0);
+                        shadowNext = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel1);
                     }
                     else if (cascade == 1)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel);
-                        shadowNext = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap1, _FenglingShadowVP1, _FenglingShadowView1, shadowPos, 0.08, texel1);
+                        shadowNext = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel2);
                     }
                     else if (cascade == 2)
                     {
-                        shadow = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel);
-                        shadowNext = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap2, _FenglingShadowVP2, _FenglingShadowView2, shadowPos, 0.08, texel2);
+                        shadowNext = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel3);
                     }
                     else
                     {
-                        shadow = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel);
+                        shadow = SampleCascade(_FenglingShadowMap3, _FenglingShadowVP3, _FenglingShadowView3, shadowPos, 0.08, texel3);
                     }
 
                     // 级联交界混合 + 最远距离淡出，避免一条硬切边。
