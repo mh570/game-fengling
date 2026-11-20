@@ -2,7 +2,8 @@
     "name": "Fengling.Player",
     "rootNamespace": "Fengling.Player",
     "references": [
-        "Fengling.Water.Abstractions"
+        "Fengling.Water.Abstractions",
+        "Fengling.Environment"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
