@@ -11,6 +11,7 @@ Shader "Fengling/Skybox"
         _CloudColor ("Cloud Color", Color) = (1, 1, 1, 1)
         _CloudDark ("Cloud Shadow Color", Color) = (0.62, 0.66, 0.72, 1)
         _CloudCoverage ("Cloud Coverage", Range(0, 1)) = 0.45
+        _CloudOpacity ("Cloud Opacity", Range(0, 1)) = 0
         _CloudScale ("Cloud Scale", Float) = 0.9
         _CloudSpeed ("Cloud Speed", Float) = 0.01
         _SunDirection ("Sun Direction", Vector) = (0.3, 0.8, 0.5, 0)
@@ -45,6 +46,7 @@ Shader "Fengling/Skybox"
             float4 _CloudColor;
             float4 _CloudDark;
             float _CloudCoverage;
+            float _CloudOpacity;
             float _CloudScale;
             float _CloudSpeed;
             float4 _SunDirection;
@@ -137,10 +139,13 @@ Shader "Fengling/Skybox"
                     sky = lerp(sky, cloudCol, mask * 0.92);
                 }
 
+                // 云量遮挡日月与星空；云层本身在前面已经混合。
+                float cloudFade = saturate(1.0 - _CloudOpacity);
+
                 // 太阳光晕
                 float sunDot = saturate(dot(dir, normalize(_SunDirection.xyz)));
                 float glow = pow(sunDot, _SunSize) * 3.0 + pow(sunDot, 8.0) * 0.2;
-                sky += _SunColor.rgb * glow;
+                sky += _SunColor.rgb * glow * cloudFade;
 
                 // 月亮盘：亮面朝向太阳，按相位角切出月相。
                 float3 moonDir = normalize(_MoonDirection.xyz);
@@ -179,13 +184,13 @@ Shader "Fengling/Skybox"
                                        (0.03 + lit * 1.0);
                     // 地照：暗面保留一点冷光。
                     diskColor += float3(0.025, 0.035, 0.055) * (1.0 - lit) * mu;
-                    sky = lerp(sky, diskColor, disk * saturate(_NightFactor * 1.2 + 0.25));
+                    sky = lerp(sky, diskColor, disk * saturate(_NightFactor * 1.2 + 0.25) * cloudFade);
                 }
 
                 // 月亮光晕：只在夜间出现
                 float moonDot = saturate(dot(dir, moonDir));
                 float moonGlow = pow(moonDot, _MoonSize) * 0.6 + pow(moonDot, 20.0) * 0.08;
-                sky += _MoonColor.rgb * moonGlow * _NightFactor * (1.0 - disk);
+                sky += _MoonColor.rgb * moonGlow * _NightFactor * (1.0 - disk) * cloudFade;
 
                 // 星空：方向球面网格 + 稀疏 hash
                 if (_StarIntensity > 0.001 && dir.y > 0.02)
@@ -194,7 +199,7 @@ Shader "Fengling/Skybox"
                     float2 cell = floor(sphere * 140.0);
                     float h = hash21(cell);
                     float star = step(0.9975, h) * pow(saturate(dir.y), 1.5);
-                    sky += star * _StarIntensity * float3(0.8, 0.9, 1.0);
+                    sky += star * _StarIntensity * cloudFade * float3(0.8, 0.9, 1.0);
                 }
 
                 return float4(sky * _Exposure, 1.0);

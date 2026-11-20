@@ -37,6 +37,7 @@ namespace Fengling.Time
 
         [Header("天空")]
         public Material skyMaterial;
+        public WeatherSystem weather;
         public bool driveAmbient = true;
         public float dayAmbient = 1.2f;
         public float nightAmbient = 0.18f;
@@ -61,6 +62,7 @@ namespace Fengling.Time
         {
             if (sun == null) sun = RenderSettings.sun;
             if (moon == null) CreateMoon();
+            if (weather == null) weather = FindFirstObjectByType<WeatherSystem>();
             if (skyMaterial == null) skyMaterial = RenderSettings.skybox;
             if (skyMaterial != null)
             {
@@ -127,6 +129,10 @@ namespace Fengling.Time
             Vector3 moonDir = AstronomyMath.HorizonDirection(moonLon, moonLat, days, latitude, longitude);
 
             float dayFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.08f, 0.18f, sunDir.y));
+            float cloudCover = weather != null ? weather.cloudCover : 0f;
+            float sunVisibility = weather != null ? weather.SunVisibility : 1f;
+            float moonVisibility = weather != null ? weather.MoonVisibility : 1f;
+            float shadowVisibility = weather != null ? weather.ShadowVisibility : 1f;
             // 月亮：朔望月 -> 相位角 -> 照亮比例；月亮位置由太阳黄经 + 相位角推进。
             MoonPhaseAngle = (float)(elongation * Mathf.Deg2Rad);
             MoonIlluminatedFraction = (float)AstronomyMath.MoonIlluminatedFraction(MoonPhaseAngle);
@@ -145,7 +151,7 @@ namespace Fengling.Time
             if (sun != null)
             {
                 sun.transform.rotation = Quaternion.LookRotation(-lightDir, Vector3.up);
-                sun.intensity = sunMaxIntensity * dayFactor;
+                sun.intensity = sunMaxIntensity * dayFactor * sunVisibility;
                 sun.color = Color.Lerp(new Color(1f, 0.42f, 0.18f), new Color(1f, 0.95f, 0.86f),
                     Mathf.InverseLerp(0.02f, 0.45f, sunDir.y));
             }
@@ -153,7 +159,7 @@ namespace Fengling.Time
             if (moon != null)
             {
                 moon.transform.rotation = Quaternion.LookRotation(-moonDir, Vector3.up);
-                moon.intensity = moonMaxIntensity * moonFactor * MoonIlluminatedFraction;
+                moon.intensity = moonMaxIntensity * moonFactor * MoonIlluminatedFraction * moonVisibility;
                 moon.color = new Color(0.52f, 0.66f, 1f);
 
                 // 月亮光照参数直接写全局，避免阴影类查找 Moon Light 失败时月亮完全不亮。
@@ -163,7 +169,7 @@ namespace Fengling.Time
 
             // 低太阳时淡化阴影，避免一条拖到屏幕外的长矛。
             Shader.SetGlobalFloat("_FenglingShadowStrength",
-                Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.03f, 0.24f, lightDir.y)));
+                Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.03f, 0.24f, lightDir.y)) * shadowVisibility);
 
             if (_skyInstance != null)
             {
@@ -187,6 +193,8 @@ namespace Fengling.Time
                 _skyInstance.SetColor(CloudColorId, Color.Lerp(new Color(0.10f, 0.12f, 0.18f), Color.white, dayFactor));
                 _skyInstance.SetColor(CloudDarkId, Color.Lerp(new Color(0.03f, 0.04f, 0.08f),
                     new Color(0.62f, 0.66f, 0.72f), dayFactor));
+                _skyInstance.SetFloat("_CloudCoverage", Mathf.Lerp(0.12f, 0.95f, cloudCover));
+                _skyInstance.SetFloat("_CloudOpacity", weather != null ? weather.CloudOpacity : 0f);
             }
 
             if (driveAmbient)

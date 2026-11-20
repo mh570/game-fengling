@@ -91,6 +91,11 @@ namespace Fengling.EditorTools
             if (timeGo == null) timeGo = new GameObject("TimeOfDay");
             var tod = timeGo.GetComponent<Fengling.Time.TimeOfDaySystem>();
             if (tod == null) tod = timeGo.AddComponent<Fengling.Time.TimeOfDaySystem>();
+            var weatherGo = GameObject.Find("Weather");
+            if (weatherGo == null) weatherGo = new GameObject("Weather");
+            var weather = weatherGo.GetComponent<Fengling.Time.WeatherSystem>();
+            if (weather == null) weather = weatherGo.AddComponent<Fengling.Time.WeatherSystem>();
+            tod.weather = weather;
             tod.sun = RenderSettings.sun;
             tod.skyMaterial = RenderSettings.skybox;
             tod.timeOfDay = 8f;
