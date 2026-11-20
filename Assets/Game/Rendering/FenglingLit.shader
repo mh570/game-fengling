@@ -73,6 +73,7 @@ Shader "Fengling/Lit"
             float4x4 _FenglingMoonShadowProj;
             float _FenglingMoonShadowTexel;
             float _FenglingMoonShadowEnabled;
+            float4 _FenglingMoonShadowSphere;
             float4 _FenglingMoonDir;
             float4 _FenglingMoonColor;
 
@@ -209,9 +210,18 @@ Shader "Fengling/Lit"
                 if (shadowStrength <= 0.001) shadowStrength = 1.0;
                 shadow = lerp(1.0, shadow, saturate(shadowStrength));
 
-                // 月亮冷色漫反射；月亮 shadow map 仍有大面积自阴影，暂不参与着色。
+                // 月亮冷色漫反射 + moon shadow（只在 culling sphere 内采样）。
                 float3 Lmoon = normalize(_FenglingMoonDir.xyz);
-                float3 moonDiffuse = albedo * _FenglingMoonColor.rgb * saturate(dot(N, Lmoon));
+                float moonShadow = 1.0;
+                if (_FenglingMoonShadowEnabled > 0.5 &&
+                    distance(i.worldPos, _FenglingMoonShadowSphere.xyz) < _FenglingMoonShadowSphere.w)
+                {
+                    float4x4 moonVp = mul(_FenglingMoonShadowProj, _FenglingMoonShadowView);
+                    moonShadow = SampleCascade(_FenglingMoonShadowMap, moonVp, _FenglingMoonShadowView,
+                                               i.worldPos, 0.25, max(0.00001, _FenglingMoonShadowTexel));
+                }
+                float3 moonDiffuse = albedo * _FenglingMoonColor.rgb *
+                                     saturate(dot(N, Lmoon)) * moonShadow;
 
                 float3 color = (diffuse + specular) * shadow + moonDiffuse + ambient;
                 return float4(color, 1.0);

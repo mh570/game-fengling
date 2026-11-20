@@ -21,6 +21,7 @@ namespace Fengling.Rendering
         private RenderTexture _moonMap;
         private Matrix4x4 _moonView;
         private Matrix4x4 _moonProj;
+        private Vector4 _moonSphere;
         private Light _moon;
         private Renderer _terrainCaster;
 
@@ -32,6 +33,7 @@ namespace Fengling.Rendering
         private int _lastResolution;
 
         public int Resolution = 1024;
+        public bool enableMoonShadows = false;
 
         private void EnsureMap(int index, int size)
         {
@@ -145,7 +147,7 @@ namespace Fengling.Rendering
                     }
                 }
             }
-            if (_moon != null && _moon.intensity > 0.01f)
+            if (_moon != null && enableMoonShadows && _moon.intensity > 0.01f)
             {
                 int moonIndex = -1;
                 var moonVisible = culling.visibleLights;
@@ -169,9 +171,9 @@ namespace Fengling.Rendering
                 culling.ComputeDirectionalShadowMatricesAndCullingPrimitives(
                     moonIndex, 0, 1, Vector3.zero, moonSize, 0f,
                     out _moonView, out _moonProj, out ShadowSplitData moonSplit);
+                _moonSphere = moonSplit.cullingSphere;
 
-                var moonCmd = CommandBufferPool.Get("Fengling.MoonShadow");
-                moonCmd.SetRenderTarget(_moonMap);
+                var moonCmd = CommandBufferPool.Get("Fengling.MoonShadow");                moonCmd.SetRenderTarget(_moonMap);
                 moonCmd.ClearRenderTarget(true, true, new Color(1000f, 0f, 0f, 1f));
                 moonCmd.SetViewProjectionMatrices(_moonView, _moonProj);
                 context.ExecuteCommandBuffer(moonCmd);
@@ -209,6 +211,7 @@ namespace Fengling.Rendering
                 Shader.SetGlobalMatrix("_FenglingMoonShadowView", _moonView);
                 Shader.SetGlobalMatrix("_FenglingMoonShadowProj", _moonProj);
                 Shader.SetGlobalFloat("_FenglingMoonShadowTexel", 1f / moonSize);
+                Shader.SetGlobalVector("_FenglingMoonShadowSphere", _moonSphere);
                 Shader.SetGlobalFloat("_FenglingMoonShadowEnabled", 1f);
                 Shader.SetGlobalVector("_FenglingMoonDir", -_moon.transform.forward);
                 Shader.SetGlobalColor("_FenglingMoonColor", _moon.color * (_moon.intensity * 0.12f));
