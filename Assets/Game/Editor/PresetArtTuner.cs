@@ -30,42 +30,42 @@ namespace Fengling.EditorTools
                     Ground = new Color(0.42f, 0.35f, 0.24f),
                     Shallow = new Color(0.20f, 0.48f, 0.42f),
                     Deep = new Color(0.035f, 0.14f, 0.14f),
-                    Reflection = 0.14f, Sun = 1.5f,
+                    Reflection = 0.08f, Sun = 0.25f,
                 };
                 case "Waterfall": return new Palette
                 {
                     Ground = new Color(0.36f, 0.33f, 0.28f),
                     Shallow = new Color(0.42f, 0.70f, 0.78f),
                     Deep = new Color(0.07f, 0.22f, 0.30f),
-                    Reflection = 0.14f, Sun = 1.3f,
+                    Reflection = 0.10f, Sun = 0.25f,
                 };
                 case "Lake": return new Palette
                 {
-                    Ground = new Color(0.50f, 0.44f, 0.32f),
-                    Shallow = new Color(0.20f, 0.50f, 0.60f),
-                    Deep = new Color(0.020f, 0.10f, 0.20f),
-                    Reflection = 0.12f, Sun = 1.4f,
+                    Ground = new Color(0.44f, 0.38f, 0.27f),
+                    Shallow = new Color(0.06f, 0.28f, 0.34f),
+                    Deep = new Color(0.006f, 0.05f, 0.13f),
+                    Reflection = 0.06f, Sun = 0.25f,
                 };
                 case "Pond": return new Palette
                 {
                     Ground = new Color(0.38f, 0.35f, 0.24f),
                     Shallow = new Color(0.24f, 0.45f, 0.30f),
                     Deep = new Color(0.055f, 0.15f, 0.10f),
-                    Reflection = 0.12f, Sun = 1.4f,
+                    Reflection = 0.08f, Sun = 0.25f,
                 };
                 case "Swamp": return new Palette
                 {
                     Ground = new Color(0.28f, 0.26f, 0.17f),
                     Shallow = new Color(0.18f, 0.25f, 0.14f),
                     Deep = new Color(0.045f, 0.08f, 0.045f),
-                    Reflection = 0.10f, Sun = 1.2f,
+                    Reflection = 0.06f, Sun = 0.20f,
                 };
                 default: return new Palette
                 {
                     Ground = new Color(0.46f, 0.40f, 0.29f),
                     Shallow = new Color(0.24f, 0.54f, 0.62f),
                     Deep = new Color(0.025f, 0.14f, 0.24f),
-                    Reflection = 0.12f, Sun = 1.4f,
+                    Reflection = 0.08f, Sun = 0.25f,
                 };
             }
         }
@@ -93,6 +93,12 @@ namespace Fengling.EditorTools
                     water.reflectionStrength = palette.Reflection;
                     water.sunIntensity = palette.Sun;
                     water.stylized = 0f;
+                    water.stylizedShallow = palette.Shallow;
+                    water.stylizedDeep = palette.Deep;
+                    water.stylizedOpacity = 0.85f;
+                    water.absorptionDistance = 2.2f;
+                    water.opaqueAtDepth = 2.6f;
+                    water.refractionStrength = 0.006f;
                     waters++;
                 }
 

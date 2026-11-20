@@ -723,13 +723,13 @@ MonoBehaviour:
   normalMap2: {fileID: 2800000, guid: 6b19345bf04db7546979292ae07716db, type: 2}
   shallowColor: {r: 0.18, g: 0.25, b: 0.14, a: 1}
   deepColor: {r: 0.045, g: 0.08, b: 0.045, a: 1}
-  absorptionDistance: 4
-  opaqueAtDepth: 4
+  absorptionDistance: 2.2
+  opaqueAtDepth: 2.6
   roughness: 0.5
   f0: 0
   normalStrength: 0.45
-  refractionStrength: 0.015
-  reflectionStrength: 0.1
+  refractionStrength: 0.006
+  reflectionStrength: 0.06
   normalTiling1: 2
   normalTiling2: 5
   horizonColor: {r: 0.65, g: 0.78, b: 0.9, a: 1}
@@ -737,14 +737,14 @@ MonoBehaviour:
   horizonFadeRange: 120
   shoreColor: {r: 0.66, g: 0.6, b: 0.46, a: 1}
   waveIrregularity: 0.35
-  sunIntensity: 1.2
+  sunIntensity: 0.2
   driveSunFromTime: 1
   sunIntensityScale: 0.35
   tintByTime: 1
-  stylized: 0
-  stylizedShallow: {r: 0.72, g: 0.9, b: 0.92, a: 1}
-  stylizedDeep: {r: 0.1, g: 0.38, b: 0.52, a: 1}
-  stylizedOpacity: 0.65
+  stylized: 1
+  stylizedShallow: {r: 0.18, g: 0.25, b: 0.14, a: 1}
+  stylizedDeep: {r: 0.045, g: 0.08, b: 0.045, a: 1}
+  stylizedOpacity: 0.85
   autoTier: 0
   useFoam: 1
   useReflectionCube: 0
