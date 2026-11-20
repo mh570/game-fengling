@@ -11,6 +11,7 @@ namespace Fengling.EditorTools
         private const string PendingKey = "P9.Preset.Pending";
         private const string StartKey = "P9.Preset.Start";
         private const string NameKey = "P9.Preset.Name";
+        private const string ForcedHourKey = "P9.Preset.Hour";
 
         public static void CaptureRiver() => Run("River");
         public static void CaptureWaterfall() => Run("Waterfall");
@@ -19,12 +20,20 @@ namespace Fengling.EditorTools
         public static void CaptureSwamp() => Run("Swamp");
         public static void CaptureEstuary() => Run("Estuary");
 
-        private static void Run(string name)
+        public static void CaptureNoonRiver() => Run("River", 12f);
+        public static void CaptureNoonWaterfall() => Run("Waterfall", 12f);
+        public static void CaptureNoonLake() => Run("Lake", 12f);
+        public static void CaptureNoonPond() => Run("Pond", 12f);
+        public static void CaptureNoonSwamp() => Run("Swamp", 12f);
+        public static void CaptureNoonEstuary() => Run("Estuary", 12f);
+
+        private static void Run(string name, float forcedHour = -1f)
         {
             EditorSceneManager.OpenScene("Assets/Scenes/" + name + ".unity");
             SessionState.SetBool(PendingKey, true);
             SessionState.SetFloat(StartKey, 0f);
             SessionState.SetString(NameKey, name);
+            SessionState.SetFloat(ForcedHourKey, forcedHour);
             EditorApplication.update -= Tick;
             EditorApplication.update += Tick;
             EditorApplication.isPlaying = true;
@@ -54,18 +63,31 @@ namespace Fengling.EditorTools
             var cam = Camera.main;
             if (cam == null) { EditorApplication.Exit(1); return; }
 
+            var tod = Object.FindFirstObjectByType<Time.TimeOfDaySystem>();
+            if (tod != null) tod.paused = true;
+
             var rt = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
             var prev = cam.targetTexture;
             var prevActive = RenderTexture.active;
             cam.targetTexture = rt;
-            cam.Render();
-            RenderTexture.active = rt;
-            var tex = new Texture2D(1280, 720, TextureFormat.RGB24, false);
-            tex.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0);
-            tex.Apply();
             Directory.CreateDirectory("D:/item/game");
-            File.WriteAllBytes("D:/item/game/p9_preset_" + name + ".png", tex.EncodeToPNG());
-            Object.DestroyImmediate(tex);
+
+            float[] hours = { 6f, 18f, 0f };
+            float forcedHour = SessionState.GetFloat(ForcedHourKey, -1f);
+            if (forcedHour >= 0f) hours = new[] { forcedHour };
+            foreach (float hour in hours)
+            {
+                if (tod != null) tod.SetTime(hour);
+                cam.Render();
+                RenderTexture.active = rt;
+                var tex = new Texture2D(1280, 720, TextureFormat.RGB24, false);
+                tex.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0);
+                tex.Apply();
+                string suffix = Mathf.RoundToInt(hour).ToString("00");
+                File.WriteAllBytes("D:/item/game/p9_preset_" + name + "_" + suffix + ".png", tex.EncodeToPNG());
+                Object.DestroyImmediate(tex);
+            }
+
             cam.targetTexture = prev;
             RenderTexture.active = prevActive;
             rt.Release();
