@@ -9,6 +9,7 @@ namespace Fengling.Rendering
     /// </summary>
     public sealed class FenglingShadows
     {
+
         public const int CascadeCount = 4;
         private const int AtlasSize = 4096;
         private const int MoonSize = 2048;
