@@ -62,19 +62,29 @@ Shader "Fengling/Outline"
 
                 float gx = abs(dr - dl);
                 float gy = abs(du - dd);
-                float edge = max(gx, gy);
+
+                // 连续性过滤：排除"天空/水面接缝"这类远距离跳变。
+                // 水面几何与背景的深度差极大，不过滤会被当成边缘（那几条竖白线）。
+                float minD = min(min(min(dl, dr), min(du, dd)), d0);
+                float maxD = max(max(max(dl, dr), max(du, dd)), d0);
+                float spread = maxD / max(0.001, minD);
+                bool valid = (minD > 0.01) && (spread < 30.0);
+
+                float edge = valid ? max(gx, gy) : 0.0;
 
                 // 相对阈值：远处深度差本来就大，用深度归一化避免远处满屏描边
                 float rel = edge / max(0.001, d0 * _DepthThreshold * 8.0);
-                float line = saturate(rel);
+                // 注意：不能叫 line —— HLSL 里它是几何着色器的保留关键字
+                float outlineMask = saturate(rel);
 
                 // 虚线：屏幕坐标 + 噪声产生断续
                 float2 p = i.uv * _DashScale;
                 float n = frac(sin(dot(floor(p), float2(12.9898, 78.233))) * 43758.5453);
                 float dash = step(1.0 - _DashDensity, n);
 
-                float a = line * dash * _Opacity;
+                float a = outlineMask * dash * _Opacity;
                 return float4(_LineColor.rgb, a);
+
             }
             ENDHLSL
         }
