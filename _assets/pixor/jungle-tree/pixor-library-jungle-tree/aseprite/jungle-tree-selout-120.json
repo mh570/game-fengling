@@ -1,0 +1,5017 @@
+{
+  "frames": [
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "509b4689d16c7ba4",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_South_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "ecaa81852cadae85",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "37e00965aa679651",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "f8da35b67488fa72",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_South_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "5b3e52c8afaf3796",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "c8d9192594321002",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "483408e6e23ff80d",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_South_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "211e1b7415629eaf",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "53c92dc7a822fd6b",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "1ce85c2eae631080",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_South_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "db43b841783cfe74",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "f29d151ccf3207d0",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "893d57c6caf39647",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_South_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "822d990d1b017209",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "658d5879b415f11d",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "d380d86e7906528e",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_South_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "66247b5a6557224a",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_South_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 0
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 0.0,
+        "id": "282974ccd4d31ebe",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "South",
+        "tag": "Sway_South"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "bb0d770810f1e20b",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "c5dd1f62be6a2aa6",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "a4f83cb249d4b5ba",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "81fd9abc15ff7d89",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "62c698a047e85e59",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "b62652aba52d382d",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "1f1e933cfe90b0a2",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "6cb86fb83472b78c",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "10f49805e62fbb40",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "a284eef10e32c6ab",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "13aa602061b5803b",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "e201af3770d6550f",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "b54eee9135c1cfe8",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "cb184e2fcaa3623a",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "de55056131c5a1f6",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "034955d1e61aa655",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "e5c24d72fc6f8f25",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southeast_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 120
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 45.0,
+        "id": "c7b28cfb005d15f1",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southeast",
+        "tag": "Sway_Southeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "86591bd7f6f7f687",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_East_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "66f6c432099a5bc2",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "d3ed8c7e4fe62ace",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "77f9ce059d2f28d5",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_East_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "7490724af7c33a8d",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "f2cf1beb2d5822f9",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "625d71d682e75716",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_East_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "cba10f965e06b830",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "a15b6fdf20708f9c",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "71a1869c4d0e619f",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_East_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "89b20d467d77b8f7",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "7188ff0414a0d683",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "a8db236ae7bc5a64",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_East_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "a2a55e6c22cf05ae",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "906d30d361fe7952",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "01c62f84795ac5a9",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_East_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "49b460839df0e321",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_East_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 240
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 90.0,
+        "id": "f28145427adb8a35",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "East",
+        "tag": "Sway_East"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "2a6e8d18c9fa710d",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "c33c82d12b45be6c",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "67540a2933eaa1c8",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "fb13c43a3e9d5dcf",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "444f88bc6aa1c323",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "c2be0515af3c315f",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "4d864c908de9e30c",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "1c61327bb53d3186",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "d133aed4fcbb3582",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "79f87004a8b0d1ed",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "be7bb8e580426341",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "79000abdc8e5dc3d",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "a6aafc3b17e15626",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "4133f8abb31bf548",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "da874a540e13329c",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "365a967e1bd1c87b",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "bd8d6d8da10409a7",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northeast_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 360
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 135.0,
+        "id": "116e398c35995a4b",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northeast",
+        "tag": "Sway_Northeast"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "69b81b9f0d4f29ca",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_North_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "89d047bc4a6e596f",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "427475ceffdc729b",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "6897724b2ccc8e4c",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_North_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "ae36fd7c9edc2f7c",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "bdc904ebf9439788",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "10aec2429db8a4b3",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_North_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "7104f381cc83228d",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "4dd0d57e6aa7dc89",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "596c21fa9ec2ac66",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_North_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "35677fbd23b251c6",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "aec8a13ca1741342",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "0e387de71a5f2e21",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_North_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "22facddf9fc1562b",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "f0dd6a61ca1716af",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "c011e8fc73e79718",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_North_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "726ba9183629c808",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_North_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 480
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 180.0,
+        "id": "435ff2b819654eec",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "North",
+        "tag": "Sway_North"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "29232a0000623d37",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "5b3f22e6c0fed192",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "93c604901e4dec3e",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "a6309060ff6eb5e5",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "6ee0a9fccafd15bd",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "62278dbd8a8f6629",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "cd8caba81f751366",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "7f5d495efada9aa0",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "db212111491d96ec",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "dab42a4fe825590f",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "ebb244f7176b2067",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "a44727ac73ff4053",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "711b9c9ff8b22cd4",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "6da5f3129d7f3fbe",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "b8073ce71514d742",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "7874d338152af419",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "3d94f742195519b1",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Northwest_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 600
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 225.0,
+        "id": "4902e23764d1f5e5",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Northwest",
+        "tag": "Sway_Northwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "50dd63e11a130d95",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_West_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "7abd599495896b94",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "1724e0f223e782f0",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "8880ca88490ae0c7",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_West_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "fbee8f0b0fe5297b",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "11fedbde01803c87",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "47872baf15ea7f34",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_West_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "c5100b5684a8ba0e",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "6d5e1118b31fe13a",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "477efcc5b21c7705",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_West_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "12730b4f26f90c09",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "e38ee39e1b25bcc5",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "871a0289bf4ff4be",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_West_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "b33a5aeeceac3a40",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "f98dac968ca29254",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "96c96e4d87876623",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_West_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "481e455da78dd7af",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_West_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 720
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 270.0,
+        "id": "27c138914449e643",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "West",
+        "tag": "Sway_West"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_00.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "9223f5811b358251",
+        "index": 0,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_01.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 120,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "5eb3c0331c739420",
+        "index": 1,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_02.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 240,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "aadf32a5423a67a4",
+        "index": 2,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_03.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 360,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "72983a7cc3e0a8a3",
+        "index": 3,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_04.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 480,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "43f800d4a1018d1f",
+        "index": 4,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_05.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 600,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "b96829ab62a67f63",
+        "index": 5,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_06.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 720,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "43a4b14eb9e62258",
+        "index": 6,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_07.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 840,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "2f7d7d2636510572",
+        "index": 7,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_08.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 960,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "12afed0dbb19e396",
+        "index": 8,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_09.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1080,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "78ec81e614010319",
+        "index": 9,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_10.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1200,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "556864d29d6919f5",
+        "index": 10,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_11.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1320,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "f9bad4bb5da3a419",
+        "index": 11,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_12.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1440,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "516a66f664055dca",
+        "index": 12,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_13.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1560,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "7435938af476cdc4",
+        "index": 13,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_14.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1680,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "f14ff8b938a875d0",
+        "index": 14,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_15.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1800,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "828fbde84061acd7",
+        "index": 15,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 84,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_16.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 1920,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "8da2dcbc217d343b",
+        "index": 16,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    {
+      "duration": 83,
+      "filename": "jungle-tree-selout-120_Sway_Southwest_17.png",
+      "frame": {
+        "h": 120,
+        "w": 120,
+        "x": 2040,
+        "y": 840
+      },
+      "pixor": {
+        "action": "Sway",
+        "degrees": 315.0,
+        "id": "f845f428ddbd8837",
+        "index": 17,
+        "pivot": {
+          "x": 60,
+          "y": 102
+        },
+        "side": "Southwest",
+        "tag": "Sway_Southwest"
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 120,
+        "w": 120
+      },
+      "spriteSourceSize": {
+        "h": 120,
+        "w": 120,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    }
+  ],
+  "meta": {
+    "app": "Pixor",
+    "format": "I8",
+    "frameTags": [
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 0,
+        "name": "Sway_South",
+        "to": 17
+      },
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 18,
+        "name": "Sway_Southeast",
+        "to": 35
+      },
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 36,
+        "name": "Sway_East",
+        "to": 53
+      },
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 54,
+        "name": "Sway_Northeast",
+        "to": 71
+      },
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 72,
+        "name": "Sway_North",
+        "to": 89
+      },
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 90,
+        "name": "Sway_Northwest",
+        "to": 107
+      },
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 108,
+        "name": "Sway_West",
+        "to": 125
+      },
+      {
+        "color": "#000000ff",
+        "direction": "forward",
+        "from": 126,
+        "name": "Sway_Southwest",
+        "to": 143
+      }
+    ],
+    "image": "jungle-tree-selout-120.png",
+    "layers": [
+      {
+        "blendMode": "normal",
+        "name": "final",
+        "opacity": 255
+      }
+    ],
+    "pixor": {
+      "cell": {
+        "h": 120,
+        "w": 120
+      },
+      "pivot": {
+        "x": 60,
+        "y": 102
+      },
+      "sides": {
+        "East": 90.0,
+        "North": 180.0,
+        "Northeast": 135.0,
+        "Northwest": 225.0,
+        "South": 0.0,
+        "Southeast": 45.0,
+        "Southwest": 315.0,
+        "West": 270.0
+      }
+    },
+    "scale": "1",
+    "size": {
+      "h": 960,
+      "w": 2160
+    },
+    "slices": [
+      {
+        "color": "#0000ffff",
+        "keys": [
+          {
+            "bounds": {
+              "h": 120,
+              "w": 120,
+              "x": 0,
+              "y": 0
+            },
+            "frame": 0,
+            "pivot": {
+              "x": 60,
+              "y": 102
+            }
+          }
+        ],
+        "name": "pivot"
+      }
+    ],
+    "version": "2.5.0"
+  }
+}
