@@ -8,6 +8,7 @@
         "Fengling.Environment",
         "Fengling.Rendering",
         "Fengling.Time",
+        "Fengling.Terrain",
         "Unity.RenderPipelines.HighDefinition.Runtime",
         "Unity.RenderPipelines.Core.Runtime"
     ],
