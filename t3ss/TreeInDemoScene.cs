@@ -42,8 +42,8 @@ namespace T3ssDemo
             mat.SetFloat("_Cutoff", 0.4f);
             mat.SetFloat("_Cuts", 3f);
             mat.SetColor("_BaseColor", Color.white);
-            mat.SetColor("_HighlightColor", new Color(0.70f, 0.86f, 0.46f));
-            mat.SetColor("_ShadowColor", new Color(0.16f, 0.28f, 0.16f));
+            mat.SetColor("_HighlightColor", new Color(0.78f, 0.92f, 0.54f));
+            mat.SetColor("_ShadowColor", new Color(0.24f, 0.40f, 0.22f));
 
             // ---- 在相机前方摆一圈树
             var root = new GameObject("TestTrees");
@@ -83,6 +83,11 @@ namespace T3ssDemo
                 mr.sharedMaterial = mat;
                 mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             }
+
+            // ---- 云影管理器（如果被禁用就打开）
+            var csm = Object.FindFirstObjectByType<CloudShadowManager>();
+            if (csm != null) { csm.enabled = true; Debug.Log("[Demo] 云影已启用"); }
+            else Debug.Log("[Demo] 场景里没有 CloudShadowManager");
 
             // ---- 暖光 + 亮环境
             foreach (var lg in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
@@ -136,6 +141,7 @@ namespace T3ssDemo
             // ---- 渲染（场景自己的相机 + 已配好的 URP 管线）
             var rt = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
             var oldT = cam.targetTexture;
+            cam.orthographicSize = 9f;   // 拉远，看到更多地面层次
             cam.targetTexture = rt;
             cam.Render();
             cam.Render();
