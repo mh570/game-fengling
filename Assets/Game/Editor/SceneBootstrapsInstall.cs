@@ -36,6 +36,7 @@ namespace Fengling.EditorTools
                 dirty |= Ensure<Fengling.Time.EnvironmentBootstrap>("EnvironmentBootstrap");
                 dirty |= Ensure<Fengling.Water.WaterSceneBootstrap>("WaterSceneBootstrap");
                 dirty |= Ensure<Fengling.Environment.TerrainSceneBootstrap>("TerrainSceneBootstrap");
+                dirty |= Ensure<Fengling.Player.PlayerSceneBootstrap>("PlayerSceneBootstrap");
 
                 if (dirty)
                 {

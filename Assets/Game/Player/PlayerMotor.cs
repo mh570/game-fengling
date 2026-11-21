@@ -13,6 +13,9 @@ namespace Fengling.Player
     [AddComponentMenu("Fengling/Player/Player Motor")]
     public sealed class PlayerMotor : MonoBehaviour
     {
+        /// <summary>是否接受移动输入。自由观察模式下为 false，角色原地不动。</summary>
+        public bool acceptMoveInput = true;
+
         [Header("移动")]
         [SerializeField] private float walkSpeed = 4.5f;
         [SerializeField] private float runSpeed = 8f;
@@ -86,7 +89,7 @@ namespace Fengling.Player
 
             transform.Rotate(Vector3.up, mx, Space.Self);
 
-            if (cameraPivot != null)
+            if (cameraPivot != null && acceptMoveInput)
             {
                 _pitch = Mathf.Clamp(_pitch - my, -85f, 85f);
                 cameraPivot.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
@@ -95,17 +98,17 @@ namespace Fengling.Player
 
         private void HandleMove()
         {
-            float h = Input.GetAxisRaw("Horizontal");
-            float v = Input.GetAxisRaw("Vertical");
+            float h = acceptMoveInput ? Input.GetAxisRaw("Horizontal") : 0f;
+            float v = acceptMoveInput ? Input.GetAxisRaw("Vertical") : 0f;
             var input = new Vector3(h, 0f, v);
             if (input.sqrMagnitude > 1f) input.Normalize();
 
-            bool running = Input.GetKey(KeyCode.LeftShift);
+            bool running = acceptMoveInput && Input.GetKey(KeyCode.LeftShift);
             float speed = running ? runSpeed : walkSpeed;
             var planar = transform.TransformDirection(input) * speed;
 
             if (_cc.isGrounded && _velocity.y < 0f) _velocity.y = -2f; // 贴地
-            if (_cc.isGrounded && Input.GetButtonDown("Jump"))
+            if (acceptMoveInput && _cc.isGrounded && Input.GetButtonDown("Jump"))
                 _velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
             _velocity.y += gravity * Time.deltaTime;

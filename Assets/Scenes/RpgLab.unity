@@ -373,6 +373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b99eacc51f1fb1b49ba6c5e841c7dd9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fengling.Player::Fengling.Player.PlayerMotor
+  acceptMoveInput: 1
   walkSpeed: 4.5
   runSpeed: 8
   jumpHeight: 1.2
@@ -755,6 +756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Fengling.Player::Fengling.Player.RtsCameraController
   focusTarget: {fileID: 348097571}
+  playerMotor: {fileID: 0}
   startFocused: 1
   focusOffset: {x: 0, y: 1, z: 0}
   yaw: 45
@@ -1208,6 +1210,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1438238350
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1438238352}
+  - component: {fileID: 1438238351}
+  m_Layer: 0
+  m_Name: PlayerSceneBootstrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1438238351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438238350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80539bf0891361a4b803506abbf10992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fengling.Player::Fengling.Player.PlayerSceneBootstrap
+--- !u!4 &1438238352
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438238350}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1641729785
 GameObject:
   m_ObjectHideFlags: 0
@@ -1488,3 +1534,4 @@ SceneRoots:
   - {fileID: 68201127}
   - {fileID: 1036188487}
   - {fileID: 1103143485}
+  - {fileID: 1438238352}

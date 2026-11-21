@@ -17,6 +17,16 @@ namespace Fengling.Player
     {
         [Header("目标")]
         public Transform focusTarget;
+
+        [Tooltip("聚焦时由相机把 WASD 让给角色；由 PlayerSceneBootstrap 接线")]
+        public PlayerMotor playerMotor;
+
+        /// <summary>是否处于聚焦操控模式（WASD 归角色，相机跟随）。</summary>
+        public bool IsFollowing
+        {
+            get { return _focused; }
+        }
+
         public bool startFocused = true;
         public Vector3 focusOffset = new Vector3(0f, 1f, 0f);
 
@@ -103,8 +113,11 @@ namespace Fengling.Player
                 pitch -= delta.y * mouseRotateSensitivity * 0.1f;
             }
 
-            // WASD / 方向键平移
-            Vector2 move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            // WASD / 方向键平移。
+            // 聚焦模式下 WASD 归角色，相机只跟随，不能再平移，否则两边同时动。
+            Vector2 move = _focused
+                ? Vector2.zero
+                : new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             if (edgeScroll && Application.isFocused)
             {
                 Vector3 mouse = Input.mousePosition;
@@ -116,6 +129,10 @@ namespace Fengling.Player
                     if (mouse.y > Screen.height - edgeSize) move.y += 1f;
                 }
             }
+
+            // 把输入归属告诉角色：聚焦时角色能走，观察时角色原地不动
+            if (playerMotor != null)
+                playerMotor.acceptMoveInput = _focused;
 
             if (move.sqrMagnitude > 0.001f)
             {
