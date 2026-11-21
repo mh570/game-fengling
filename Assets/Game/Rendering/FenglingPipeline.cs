@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -43,7 +44,7 @@ namespace Fengling.Rendering
             }
         }
 
-        protected override void Render(ScriptableRenderContext context, Camera[] cameras)
+        protected override void Render(ScriptableRenderContext context, List<Camera> cameras)
         {
             foreach (var camera in cameras)
             {
