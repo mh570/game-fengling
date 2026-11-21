@@ -255,8 +255,11 @@ namespace Fengling.EditorTools
                 if (hit.point.y < 0.9f) continue;
 
                 float h = Mathf.Lerp(8f, 14f, (float)rng.NextDouble());
-                var parts = BlobTreeBuilder.Build(1000 + placed, h);
-                var mesh = BlobTreeBuilder.Merge(parts);
+                // 用 Creator13/ProceduralTrees 的真树干+分枝生成器
+                int seed = 1000 + placed;
+                UnityEngine.Random.InitState(seed);
+                var mesh = MeshTools.TreeMeshGenerator.CreateTree(
+                    128, 0.26f, h, 3, 0.35f, 3);   // 参数太重会指数爆炸，先小规模
 
                 string path = string.Format("Assets/Game/Terrain/Generated/Tree_{0}.asset", placed);
                 AssetDatabase.DeleteAsset(path);

@@ -9,6 +9,8 @@
         "Fengling.Rendering",
         "Fengling.Time",
         "Fengling.Terrain",
+        "SebLague.Terrain",
+        "ProceduralTrees.MeshTools",
         "Unity.RenderPipelines.HighDefinition.Runtime",
         "Unity.RenderPipelines.Core.Runtime"
     ],
