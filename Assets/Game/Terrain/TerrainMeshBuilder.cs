@@ -165,23 +165,35 @@ namespace Fengling.TerrainSystem
                 for (float cx = -half; cx <= half; cx += 40f)
                 {
                     float lo = float.MaxValue, hi = float.MinValue;
-                    for (int j = -1; j <= 1; j++)
+                    float slopeSum = 0f;
+                    int slopeN = 0;
+                    for (int j = -2; j <= 2; j++)
                     {
-                        for (int i = -1; i <= 1; i++)
+                        for (int i = -2; i <= 2; i++)
                         {
-                            float h = SampleHeight(cx + i * sizeMeters * 0.3f, cz + j * sizeMeters * 0.3f);
+                            float px = cx + i * sizeMeters * 0.2f;
+                            float pz = cz + j * sizeMeters * 0.2f;
+                            float h = SampleHeight(px, pz);
                             if (h < lo) lo = h;
                             if (h > hi) hi = h;
+
+                            // 相邻采样差 → 粗略坡度
+                            float hn = SampleHeight(px + 20f, pz + 20f);
+                            slopeSum += Mathf.Abs(hn - h);
+                            slopeN++;
                         }
                     }
+                    float avgSlope = slopeSum / Mathf.Max(1, slopeN);
 
                     // 要求：最低处接近海平面（0m 上下），最高处有坡（>40m）
                     if (lo > 12f) continue;          // 全在山上，不行
                     if (hi < 35f) continue;          // 太扁，没层次
+                    if (avgSlope > 25f) continue;    // 太陡（悬崖），不行
 
                     float seaCloseness = 1f - Mathf.Abs(lo - 2f) / 20f;   // 越低、越接近 2m 越好
                     float relief = Mathf.Min(hi, 120f) / 120f;
-                    float score = seaCloseness * 2f + relief;
+                    float gentleness = 1f - Mathf.Clamp01(avgSlope / 25f); // 越平缓越好
+                    float score = seaCloseness * 2f + relief + gentleness * 1.5f;
 
                     if (score > bestScore)
                     {

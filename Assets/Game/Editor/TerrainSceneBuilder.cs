@@ -96,11 +96,11 @@ namespace Fengling.EditorTools
             var cam = camGo.AddComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.62f, 0.72f, 0.78f);
-            cam.fieldOfView = 35f;
+            cam.fieldOfView = 50f;
             cam.nearClipPlane = 0.3f;
-            cam.farClipPlane = 600f;
-            camGo.transform.position = new Vector3(region.x + 100f, centerH + 40f, region.y + 30f);
-            camGo.transform.rotation = Quaternion.Euler(40f, 0f, 0f);
+            cam.farClipPlane = 1200f;
+            camGo.transform.position = new Vector3(region.x + 100f, centerH + 120f, region.y + 40f);
+            camGo.transform.rotation = Quaternion.Euler(42f, 0f, 0f);
 
             // 太阳
             var sunGo = new GameObject("Directional Light");
