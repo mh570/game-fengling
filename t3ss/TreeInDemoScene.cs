@@ -49,7 +49,7 @@ namespace T3ssDemo
             var root = new GameObject("TestTrees");
             float camDist = 14f;
             var rng = new System.Random(999);
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 30; i++)
             {
                 var opt = new TreeGenerator.Options
                 {
@@ -71,8 +71,10 @@ namespace T3ssDemo
 
                 // 沿相机前方摆成弧形
                 // 围着原点摆（demo 物体也在原点附近）
-                float ang = i / 8f * Mathf.PI * 2f;
-                float rad = 7.5f;
+                // 丛状分布：3 个圆环
+                int ring = i / 10;
+                float ang = (i % 10) / 10f * Mathf.PI * 2f + ring * 0.5f;
+                float rad = 6f + ring * 4.5f;
                 go.transform.position = new Vector3(Mathf.Cos(ang) * rad, 0f, Mathf.Sin(ang) * rad);
                 go.transform.rotation = Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f);
 
@@ -80,6 +82,52 @@ namespace T3ssDemo
                 var mr = go.AddComponent<MeshRenderer>();
                 mr.sharedMaterial = mat;
                 mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            }
+
+            // ---- 暖光 + 亮环境
+            foreach (var lg in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+            {
+                if (lg.type == LightType.Directional)
+                {
+                    lg.color = new Color(1.0f, 0.95f, 0.82f);
+                    lg.intensity = 1.6f;
+                    lg.shadowStrength = 0.55f;
+                }
+            }
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight = new Color(0.52f, 0.58f, 0.52f);
+
+            // ---- 草（手动 DrawMeshInstanced）
+            var spawner = Object.FindFirstObjectByType<GrassSpawner>();
+            if (spawner != null && spawner.grassMesh != null && spawner.grassMaterial != null)
+            {
+                var gb = new Bounds(Vector3.zero, new Vector3(16f, 4f, 16f));
+                int gcount = 35000;
+                var gmats = new Matrix4x4[gcount];
+                var grng = new System.Random(777);
+                int gplaced = 0;
+                for (int gi = 0; gi < gcount * 3 && gplaced < gcount; gi++)
+                {
+                    float gx = (float)(grng.NextDouble() - 0.5) * gb.size.x;
+                    float gz = (float)(grng.NextDouble() - 0.5) * gb.size.z;
+                    if (!Physics.Raycast(new Vector3(gx, 50f, gz), Vector3.down, out var gh, 200f)) continue;
+                    if (gh.normal.y < 0.9f || Mathf.Abs(gh.point.y) > 0.15f) continue;
+                    float hh = Mathf.Lerp(spawner.minHeight, spawner.maxHeight, (float)grng.NextDouble());
+                    gmats[gplaced] = Matrix4x4.TRS(new Vector3(gx, gh.point.y, gz),
+                        Quaternion.Euler(0f, (float)grng.NextDouble() * 360f, 0f),
+                        new Vector3(hh * 0.75f, hh, hh * 0.75f));
+                    gplaced++;
+                }
+                var mpb = new MaterialPropertyBlock();
+                for (int gi = 0; gi < gplaced; gi += 1023)
+                {
+                    int n = Mathf.Min(1023, gplaced - gi);
+                    var slice = new Matrix4x4[n];
+                    System.Array.Copy(gmats, gi, slice, 0, n);
+                    Graphics.DrawMeshInstanced(spawner.grassMesh, 0, spawner.grassMaterial, slice, n, mpb,
+                        UnityEngine.Rendering.ShadowCastingMode.Off, false);
+                }
+                Debug.Log("[Demo] 草 " + gplaced + " 株");
             }
 
             EditorSceneManager.MarkSceneDirty(scene);
