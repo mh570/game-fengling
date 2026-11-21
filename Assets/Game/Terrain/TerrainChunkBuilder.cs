@@ -41,8 +41,9 @@ namespace Fengling.TerrainSystem
                 }
             }
             // 分带范围也要跟着同一套缩放（朝海平面按比例）
-            float lo = rMin * heightCompression;
-            float hi = rMax * heightCompression;
+            float lo = TerrainCarver.IslandMode ? rMin : rMin * heightCompression;
+            float hi = TerrainCarver.IslandMode ? rMax : rMax * heightCompression;
+            Debug.Log(string.Format("[Chunk] 岛屿诊断 mode={0} center={1} r={2} top={3}", TerrainCarver.IslandMode, TerrainCarver.IslandCenter, TerrainCarver.IslandRadius, TerrainCarver.IslandTop));
             Debug.Log(string.Format("[Chunk] 分带 {0:F1} ~ {1:F1} m（原始 {2:F1} ~ {3:F1}）", lo, hi, rMin, rMax));
 
             for (int cz = 0; cz < chunkCount; cz++)
@@ -96,8 +97,8 @@ namespace Fengling.TerrainSystem
                     float wz = origin.y + (cz * cells + j) * cellSize;
                     float h = TerrainMeshBuilder.SampleHeightSmooth(wx, wz);
                     // 只压平陆地，保留海平面以下（否则海滩/海会被压没）
-                    // 朝海平面按比例缩放：0m 仍是 0m，海岸线保持连续（不会出现悬崖）
-                    h *= compression;
+                    // 岛屿模式下形状已由 MakeIsland 控制，不再压平（否则岛会被压到水面以下）
+                    if (!TerrainCarver.IslandMode) h *= compression;
                     pts[j * n + i] = new Vector3(wx, h, wz);
                 }
             }

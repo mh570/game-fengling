@@ -31,10 +31,45 @@ namespace Fengling.TerrainSystem
         public static River[] Rivers = System.Array.Empty<River>();
         public static Lake[] Lakes = System.Array.Empty<Lake>();
 
+        // ---- 岛屿造型 ----
+        /// <summary>是否把地形"捏"成一座岛（四周环海）</summary>
+        public static bool IslandMode = true;
+        public static Vector2 IslandCenter;
+        public static float IslandRadius = 88f;   // 岛半径（米）
+        public static float IslandTop = 13f;      // 岛心高度
+        public static float SeaDepth = -7f;       // 外海深度
+
+        /// <summary>
+        /// 把一片海岸地形捏成岛：
+        ///   - 中心保留真实地形起伏（缩放到 ±2m，作为细节）
+        ///   - 叠加径向衰减，边缘降到海面以下
+        ///   - 沙滩自然出现在 0m 等值线上
+        /// </summary>
+        public static float MakeIsland(float worldX, float worldZ, float detailH)
+        {
+            if (!IslandMode) return detailH;
+
+            float r = Vector2.Distance(new Vector2(worldX, worldZ), IslandCenter) / Mathf.Max(1f, IslandRadius);
+
+            // 中心 1 → 边缘 0。注意 Unity 的 Mathf.SmoothStep(from,to,t) 是在 from~to 间插值，
+            // 不是 smoothstep(edge0,edge1,x)，所以要先 InverseLerp 再 SmoothStep(0,1,...)。
+            float x = Mathf.InverseLerp(0.55f, 1.0f, r);
+            float mask = 1f - Mathf.SmoothStep(0f, 1f, x);
+
+            // 基础高度：海平面以下 → 岛心
+            float baseH = Mathf.Lerp(SeaDepth, IslandTop, mask);
+
+            // 真实地形起伏作为细节（只在岛内生效）
+            float detail = (detailH - 8f) * 0.16f * mask;
+
+            return baseH + detail;
+        }
+
         /// <summary>对某个采样点应用所有改造，返回修改后的高度</summary>
         public static float Apply(float worldX, float worldZ, float height)
         {
-            float h = height;
+            // 先把地形捏成岛（四周环海），再挖河湖
+            float h = TerrainShape.Enabled ? TerrainShape.Sample(worldX, worldZ) : height;
 
             // 湖泊：圆形下挖
             for (int i = 0; i < Lakes.Length; i++)

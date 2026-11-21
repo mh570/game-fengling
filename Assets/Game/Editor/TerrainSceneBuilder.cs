@@ -25,7 +25,23 @@ namespace Fengling.EditorTools
             var region = TerrainMeshBuilder.FindBestRegion(settings.GridSize * settings.CellSize);
             settings.WorldOrigin = region;
 
-            TerrainCarver.PlanDefault(settings.WorldOrigin, settings.GridSize * settings.CellSize);
+            // 岛心 = 区域中心，半径 88m（地区 200m，外围留 12m 海）
+            float size = settings.GridSize * settings.CellSize;
+            TerrainCarver.IslandCenter = new Vector2(settings.WorldOrigin.x + size * 0.5f,
+                                                     settings.WorldOrigin.y + size * 0.5f);
+            TerrainCarver.IslandRadius = 88f;
+            TerrainCarver.IslandTop = 13f;
+            TerrainCarver.IslandMode = true;
+
+            // 半岛造型
+            TerrainShape.Enabled = true;
+            TerrainShape.Center = new Vector2(settings.WorldOrigin.x + size * 0.5f,
+                                              settings.WorldOrigin.y + size * 0.5f);
+            TerrainShape.HalfSize = size * 0.5f;
+            TerrainShape.FlatHeight = 2.6f;
+            TerrainShape.HillHeight = 26f;
+
+            TerrainCarver.PlanDefault(settings.WorldOrigin, size);
 
             var chunks = TerrainChunkBuilder.Build(
                 settings.WorldOrigin, settings.GridSize, settings.ChunkCount,
