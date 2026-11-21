@@ -168,9 +168,11 @@ namespace Fengling.EditorTools
             string full = Path.GetFullPath(Path.Combine(Application.dataPath, "..", OutputPath));
             File.WriteAllBytes(full, tex.EncodeToPNG());
 
-            Report(tex, -2.2f, 0f, "不透明立方体");
-            Report(tex, 0f, 0f, "透明 Quad");
-            Report(tex, 2.2f, 0f, "粒子");
+            Vector3Int cube = Sample(tex, -2.2f, 0f, "不透明立方体");
+            Vector3Int quad = Sample(tex, 0f, 0f, "透明 Quad");
+            Vector3Int particles = Sample(tex, 2.2f, 0f, "粒子");
+
+            bool passed = CompareWithBaseline(cube, quad, particles);
 
             cam.targetTexture = null;
             RenderTexture.active = null;
@@ -180,10 +182,70 @@ namespace Fengling.EditorTools
 
             Debug.Log("[ProbePlay] 已保存: " + full);
             EditorApplication.isPlaying = false;
-            EditorApplication.Exit(0);
+            EditorApplication.Exit(passed ? 0 : 2);
         }
 
-        private static void Report(Texture2D tex, float worldX, float worldY, string label)
+        private const int Tolerance = 5;
+
+        private static string BaselinePath
+        {
+            get { return Path.GetFullPath(Path.Combine(Application.dataPath, "..", "_probe_baseline.txt")); }
+        }
+
+        /// <summary>
+        /// 第一次运行写入基线，之后每次对比。超过容差退出码为 2，供批处理自动判定。
+        /// </summary>
+        private static bool CompareWithBaseline(Vector3Int cube, Vector3Int quad, Vector3Int particles)
+        {
+            if (!File.Exists(BaselinePath))
+            {
+                File.WriteAllText(BaselinePath,
+                    cube.x + "," + cube.y + "," + cube.z + "\n" +
+                    quad.x + "," + quad.y + "," + quad.z + "\n" +
+                    particles.x + "," + particles.y + "," + particles.z + "\n");
+                Debug.Log("[ProbePlay] 已写入基线: " + BaselinePath);
+                return true;
+            }
+
+            string[] lines = File.ReadAllLines(BaselinePath);
+            if (lines.Length < 3)
+            {
+                Debug.LogWarning("[ProbePlay] 基线格式不对，跳过对比");
+                return true;
+            }
+
+            Vector3Int[] expected = new Vector3Int[3];
+            for (int i = 0; i < 3; i++)
+            {
+                string[] parts = lines[i].Split(',');
+                expected[i] = new Vector3Int(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
+            }
+
+            bool ok = true;
+            ok &= Diff("不透明立方体", expected[0], cube);
+            ok &= Diff("透明 Quad", expected[1], quad);
+            ok &= Diff("粒子", expected[2], particles);
+
+            Debug.Log("[ProbePlay] 基线对比: " + (ok ? "通过" : "偏差超限"));
+            return ok;
+        }
+
+        private static bool Diff(string label, Vector3Int expected, Vector3Int actual)
+        {
+            int dr = Mathf.Abs(expected.x - actual.x);
+            int dg = Mathf.Abs(expected.y - actual.y);
+            int db = Mathf.Abs(expected.z - actual.z);
+            bool ok = dr <= Tolerance && dg <= Tolerance && db <= Tolerance;
+
+            Debug.Log(string.Format(
+                "[ProbePlay] 对比 {0}: 基线({1},{2},{3}) 实测({4},{5},{6}) 偏差({7},{8},{9}) {10}",
+                label, expected.x, expected.y, expected.z,
+                actual.x, actual.y, actual.z, dr, dg, db, ok ? "OK" : "FAIL"));
+
+            return ok;
+        }
+
+        private static Vector3Int Sample(Texture2D tex, float worldX, float worldY, string label)
         {
             int px = Mathf.RoundToInt((worldX / HalfWidth * 0.5f + 0.5f) * Width);
             int py = Mathf.RoundToInt((worldY / HalfHeight * 0.5f + 0.5f) * Height);
@@ -203,8 +265,11 @@ namespace Fengling.EditorTools
                 }
             }
 
+            var result = new Vector3Int(sumR / count, sumG / count, sumB / count);
             Debug.Log(string.Format("[ProbePlay] {0}: 平均 RGB = ({1}, {2}, {3})",
-                label, sumR / count, sumG / count, sumB / count));
+                label, result.x, result.y, result.z));
+
+            return result;
         }
     }
 }
