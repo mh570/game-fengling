@@ -46,6 +46,7 @@ namespace Fengling.TerrainSystem
         private static float[] _heights;   // 原始高度（米）
         private static int _res;
         private static Vector2 _rawMin;    // 高度图在世界里的最小角
+        private static float _regionMin, _regionMax;
 
         /// <summary>加载 RAW（只加载一次）</summary>
         public static bool LoadRaw()
@@ -113,14 +114,18 @@ namespace Fengling.TerrainSystem
         static readonly Color Deep   = new Color(0.310f, 0.400f, 0.290f);
 
         /// <summary>按高度 + 坡度 + 抖动算顶点色</summary>
-        public static Color ComputeColor(float worldX, float worldZ, float height, float slope)
+        public static Color ComputeColor(float worldX, float worldZ, float height, float slope, float regionMin, float regionMax)
         {
-            // 高度分带
+            // 高度分带：按"区域内的相对高度"算，而不是绝对海拔。
+            // 否则拿到一片 50m 高的地，全部会判成沙滩。
+            float top = Mathf.Max(regionMax, regionMin + 8f);
+            float t01 = Mathf.Clamp01((height - regionMin) / Mathf.Max(1f, top - regionMin));
+
             Color c = Sand;
-            c = Color.Lerp(c, Grass,  Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(2f, 12f, height)));
-            c = Color.Lerp(c, Grass2, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(10f, 30f, height)) * 0.65f);
-            c = Color.Lerp(c, Forest, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(30f, 70f, height)));
-            c = Color.Lerp(c, Rock,   Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(90f, 140f, height)));
+            c = Color.Lerp(c, Grass,  Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.06f, 0.18f, t01)));
+            c = Color.Lerp(c, Grass2, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.15f, 0.35f, t01)) * 0.65f);
+            c = Color.Lerp(c, Forest, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.35f, 0.62f, t01)));
+            c = Color.Lerp(c, Rock,   Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.72f, 0.95f, t01)));
 
             // 坡度变岩（陡的地方露岩）
             c = Color.Lerp(c, Rock, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.35f, 0.75f, slope)));
@@ -165,35 +170,35 @@ namespace Fengling.TerrainSystem
                 for (float cx = -half; cx <= half; cx += 40f)
                 {
                     float lo = float.MaxValue, hi = float.MinValue;
-                    float slopeSum = 0f;
-                    int slopeN = 0;
+                    float sum = 0f, sum2 = 0f;
+                    int n = 0;
                     for (int j = -2; j <= 2; j++)
                     {
                         for (int i = -2; i <= 2; i++)
                         {
-                            float px = cx + i * sizeMeters * 0.2f;
-                            float pz = cz + j * sizeMeters * 0.2f;
-                            float h = SampleHeight(px, pz);
+                            float h = SampleHeight(cx + i * sizeMeters * 0.2f, cz + j * sizeMeters * 0.2f);
                             if (h < lo) lo = h;
                             if (h > hi) hi = h;
-
-                            // 相邻采样差 → 粗略坡度
-                            float hn = SampleHeight(px + 20f, pz + 20f);
-                            slopeSum += Mathf.Abs(hn - h);
-                            slopeN++;
+                            sum += h;
+                            sum2 += h * h;
+                            n++;
                         }
                     }
-                    float avgSlope = slopeSum / Mathf.Max(1, slopeN);
+                    float mean = sum / n;
+                    float variance = Mathf.Max(0f, sum2 / n - mean * mean);
+                    float std = Mathf.Sqrt(variance);
 
-                    // 要求：最低处接近海平面（0m 上下），最高处有坡（>40m）
-                    if (lo > 12f) continue;          // 全在山上，不行
-                    if (hi < 35f) continue;          // 太扁，没层次
-                    if (avgSlope > 25f) continue;    // 太陡（悬崖），不行
+                    // 硬性要求：要有海岸线（低处到 0m 附近），也要有缓丘（高处 40~120m），
+                    // 起伏不能太大（排除悬崖），也不能太小（排除纯平地/纯浅海）
+                    if (lo > 3f || lo < -12f) continue;   // 最低处要在海岸线附近
+                    if (hi < 40f) continue;              // 要有坡
+                    if (hi > 130f) continue;             // 别太高
+                    if (std < 8f || std > 22f) continue; // 起伏适中
 
-                    float seaCloseness = 1f - Mathf.Abs(lo - 2f) / 20f;   // 越低、越接近 2m 越好
-                    float relief = Mathf.Min(hi, 120f) / 120f;
-                    float gentleness = 1f - Mathf.Clamp01(avgSlope / 25f); // 越平缓越好
-                    float score = seaCloseness * 2f + relief + gentleness * 1.5f;
+                    float seaCloseness = 1f - Mathf.Abs(lo - 2f) / 12f;
+                    float relif = Mathf.Min(hi, 80f) / 80f;
+                    float flatness = 1f - Mathf.Clamp01(std / 22f);   // 越平越好
+                    float score = seaCloseness * 1.5f + relif + flatness * 3f;
 
                     if (score > bestScore)
                     {
@@ -216,6 +221,19 @@ namespace Fengling.TerrainSystem
             origins = new List<Vector3>();
 
             if (!LoadRaw()) return meshes;
+
+            // 先算这块区域的真实高度范围，供分带使用
+            _regionMin = float.MaxValue; _regionMax = float.MinValue;
+            for (int j = 0; j <= s.GridSize; j += 4)
+            {
+                for (int i = 0; i <= s.GridSize; i += 4)
+                {
+                    float h = SampleHeight(s.WorldOrigin.x + i * s.CellSize, s.WorldOrigin.y + j * s.CellSize);
+                    if (h < _regionMin) _regionMin = h;
+                    if (h > _regionMax) _regionMax = h;
+                }
+            }
+            Debug.Log(string.Format("[Terrain] 颜色分带范围 {0:F1} ~ {1:F1} m", _regionMin, _regionMax));
 
             int chunkCells = s.GridSize / s.ChunkCount;
             if (chunkCells * s.ChunkCount != s.GridSize)
@@ -318,7 +336,7 @@ namespace Fengling.TerrainSystem
                 Vector3 p = k == 0 ? a : (k == 1 ? b : c);
                 vs[vi] = p;
                 ns[vi] = nrm;
-                cs[vi] = ComputeColor(p.x, p.z, p.y, slope);
+                cs[vi] = ComputeColor(p.x, p.z, p.y, slope, _regionMin, _regionMax);
                 ts[vi] = vi;
                 vi++;
             }
