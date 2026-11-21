@@ -100,6 +100,9 @@ namespace Fengling.EditorTools
             // ---- 花草：撒点（技术测试重点）
             ScatterVegetation(center, size);
 
+            // ---- 树：用 Pixor 的像素树 GLB
+            ScatterTrees(center, size);
+
             // GPU Instancing 草场（上万株）
             var grass = new GameObject("GrassField");
             var gf = grass.AddComponent<TerrainSystem.GrassField>();
@@ -201,6 +204,80 @@ namespace Fengling.EditorTools
                 ts[vi] = vi;
                 vi++;
             }
+        }
+
+        /// <summary>撒树：用已下载的像素树 GLB，只放在陆地上</summary>
+        static void ScatterTrees(Vector2 center, float size)
+        {
+            // 新拷贝的 GLB 需要在同一帧内强制同步导入，否则 LoadAssetAtPath 拿不到
+            AssetDatabase.ImportAsset("Assets/Art/Trees/SM_Tree_Rounded.fbx",
+                ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+            var asset = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Trees/SM_Tree_Rounded.fbx");
+            if (asset == null)
+            {
+                Debug.LogWarning("[Detail] 树 GLB 未导入，跳过");
+                return;
+            }
+
+            var root = new GameObject("Trees");
+            var rng = new System.Random(20261122);
+            int placed = 0;
+
+            for (int i = 0; i < 40 && placed < 14; i++)
+            {
+                float x = center.x + (float)(rng.NextDouble() - 0.5) * size * 0.9f;
+                float z = center.y + (float)(rng.NextDouble() - 0.5) * size * 0.9f;
+
+                // 射线打地面，只要陆地且高度够
+                float h;
+                if (!Physics.Raycast(new Vector3(x, 200f, z), Vector3.down, out var hit, 400f)) continue;
+                h = hit.point.y;
+                if (h < 0.9f) continue;   // 沙滩/水里不放
+
+                var tree = (GameObject)PrefabUtility.InstantiatePrefab(asset);
+                tree.name = "Tree_" + placed;
+                tree.transform.SetParent(root.transform, false);
+                tree.transform.position = new Vector3(x, h, z);
+
+                // FBX 自带的是标准材质，自建 SRP 画不了 → 换成 Fengling/Lit
+                var treeMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Game/Rendering/Materials/Mat_Tree.mat");
+                if (treeMat == null)
+                {
+                    var sh = Shader.Find("Fengling/Lit");
+                    if (sh != null)
+                    {
+                        treeMat = new Material(sh) { name = "Mat_Tree" };
+                        treeMat.SetFloat("_CullMode", 0f);
+                        AssetDatabase.CreateAsset(treeMat, "Assets/Game/Rendering/Materials/Mat_Tree.mat");
+                    }
+                }
+                if (treeMat != null)
+                {
+                    foreach (var r in tree.GetComponentsInChildren<Renderer>())
+                        r.sharedMaterial = treeMat;
+                }
+
+                // 缩放到 4~6m 高
+                var bounds = ComputeBounds(tree);
+                float srcH = Mathf.Max(0.01f, bounds.size.y);
+                float targetH = Mathf.Lerp(4f, 6.5f, (float)rng.NextDouble());
+                float s = targetH / srcH;
+                tree.transform.localScale = Vector3.one * s;
+                tree.transform.rotation = Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f);
+
+                placed++;
+            }
+
+            Debug.Log("[Detail] 摆了 " + placed + " 棵树");
+        }
+
+        static Bounds ComputeBounds(GameObject go)
+        {
+            var rs = go.GetComponentsInChildren<Renderer>();
+            if (rs.Length == 0) return new Bounds(go.transform.position, Vector3.one);
+            var b = rs[0].bounds;
+            for (int i = 1; i < rs.Length; i++) b.Encapsulate(rs[i].bounds);
+            return b;
         }
 
         /// <summary>撒草和花（billboard 小面片 + 简单颜色），验证密度</summary>
