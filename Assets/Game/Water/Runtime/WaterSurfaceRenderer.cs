@@ -19,6 +19,12 @@ namespace Fengling.Water
         [Header("数据源")]
         public WaterModule water;
 
+        /// <summary>由 WaterSceneBootstrap 注入，避免自己 Find。</summary>
+        public void SetWaterModule(WaterModule module)
+        {
+            water = module;
+        }
+
         [Header("网格")]
         [Tooltip("每边分段数。128 段 = 16,641 顶点，对 200m 水面每格 1.5m")]
         [Range(16, 256)] public int segments = 128;

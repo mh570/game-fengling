@@ -14,7 +14,7 @@ namespace Fengling.Player
     /// 它永远不知道水面是 Gerstner 还是 FFT，也不知道有没有 shader。
     /// </summary>
     [AddComponentMenu("Fengling/Player/Player Buoyancy")]
-    public sealed class PlayerBuoyancy : MonoBehaviour
+    public sealed class PlayerBuoyancy : MonoBehaviour, IWaterConsumer
     {
         [Tooltip("浮力强度：越大越快被推回水面")]
         [SerializeField] private float buoyancy = 12f;
@@ -46,9 +46,15 @@ namespace Fengling.Player
             if (_water == null) ResolveWater();
         }
 
+        /// <summary>由 WaterSceneBootstrap 注入，不再自己扫描场景。</summary>
+        public void ApplyWater(IWaterSurface water)
+        {
+            _water = water;
+        }
+
         /// <summary>
-        /// 通过接口在场景里找水面，而不是引用 WaterModule 类型。
-        /// 这是"低耦合"的具体代价：一次启动时的查找，换来零编译期依赖。
+        /// 兜底：只有未被 Bootstrap 注入时才执行。
+        /// 保留旧行为，避免没装 WaterSceneBootstrap 的场景（如 Preset）失效。
         /// </summary>
         private void ResolveWater()
         {

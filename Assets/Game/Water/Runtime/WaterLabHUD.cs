@@ -22,6 +22,12 @@ namespace Fengling.Water
 
         private bool _visible = true;
         private WaterSurfaceRenderer _renderer;
+
+        /// <summary>由 WaterSceneBootstrap 注入，避免自己 Find。</summary>
+        public void SetWaterModule(WaterModule module)
+        {
+            water = module;
+        }
         private float _fps;
 
         private void Awake()

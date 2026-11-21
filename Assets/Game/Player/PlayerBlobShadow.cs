@@ -8,10 +8,16 @@ namespace Fengling.Player
     /// 不替代真实阴影，只负责“脚底不悬空”。
     /// </summary>
     [AddComponentMenu("Fengling/Player/Player Blob Shadow")]
-    public sealed class PlayerBlobShadow : MonoBehaviour
+    public sealed class PlayerBlobShadow : MonoBehaviour, ITerrainConsumer
     {
         public Transform target;
         public CoastTerrain terrain;
+
+        /// <summary>由 TerrainSceneBootstrap 注入，避免自己 Find。</summary>
+        public void ApplyTerrain(CoastTerrain value)
+        {
+            terrain = value;
+        }
         public float diameter = 1.6f;
         public float groundOffset = 0.03f;
         public float maxHeight = 2.5f;

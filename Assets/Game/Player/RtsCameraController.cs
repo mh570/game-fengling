@@ -13,7 +13,7 @@ namespace Fengling.Player
     /// </summary>
     [RequireComponent(typeof(Camera))]
     [AddComponentMenu("Fengling/Player/RTS Camera Controller")]
-    public sealed class RtsCameraController : MonoBehaviour
+    public sealed class RtsCameraController : MonoBehaviour, ITerrainConsumer
     {
         [Header("目标")]
         public Transform focusTarget;
@@ -42,6 +42,12 @@ namespace Fengling.Player
 
         [Header("边界 / 地面")]
         public CoastTerrain terrain;
+
+        /// <summary>由 TerrainSceneBootstrap 注入，避免自己 Find。</summary>
+        public void ApplyTerrain(CoastTerrain value)
+        {
+            terrain = value;
+        }
         public Vector2 boundsHalf = new Vector2(95f, 95f);
         public bool clampToBounds = true;
         public float groundClearance = 1.2f;
