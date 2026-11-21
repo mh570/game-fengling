@@ -3045,7 +3045,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fengling.Player::Fengling.Player.RtsCameraController
   focusTarget: {fileID: 1881694714}
   playerMotor: {fileID: 0}
-  startFocused: 1
+  startFocused: 0
   focusOffset: {x: 0, y: 1, z: 0}
   yaw: 45
   pitch: 55
@@ -3066,7 +3066,7 @@ MonoBehaviour:
   clampToBounds: 1
   groundClearance: 1.2
   waterClearance: 1
-  focusKey: 32
+  focusKey: 102
   rotateLeft: 113
   rotateRight: 101
 --- !u!81 &1256249265

@@ -27,7 +27,7 @@ namespace Fengling.Player
             get { return _focused; }
         }
 
-        public bool startFocused = true;
+        public bool startFocused = false;
         public Vector3 focusOffset = new Vector3(0f, 1f, 0f);
 
         [Header("环绕")]
@@ -64,7 +64,7 @@ namespace Fengling.Player
         public float waterClearance = 1f;
 
         [Header("输入")]
-        public KeyCode focusKey = KeyCode.Space;
+        public KeyCode focusKey = KeyCode.F;
         public KeyCode rotateLeft = KeyCode.Q;
         public KeyCode rotateRight = KeyCode.E;
 
@@ -85,6 +85,14 @@ namespace Fengling.Player
             _focused = startFocused && focusTarget != null;
             _focus = _focused ? FocusPoint() : new Vector3(0f, 0f, 20f);
             ApplyImmediate();
+        }
+
+        private void OnGUI()
+        {
+            string mode = _focused ? "聚焦操控（WASD 移动角色）" : "自由观察（WASD 平移相机）";
+            var style = new GUIStyle(GUI.skin.label) { fontSize = 18 };
+            style.normal.textColor = _focused ? new Color(0.5f, 1f, 0.5f) : Color.white;
+            GUI.Label(new Rect(12f, 10f, 520f, 28f), "模式：" + mode + "     [F] 切换", style);
         }
 
         private void Update()
