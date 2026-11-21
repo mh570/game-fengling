@@ -183,7 +183,7 @@ namespace T3ssDemo
             var arrV = verts.ToArray();
             for (int i = 0; i < arrV.Length; i++)
             {
-                if (arrV[i].y < canopyBase * 0.9f) continue;
+                if (i < shellVerts) continue;   // 树干/分枝保留原法线；树冠（壳+卡片）全部球形化
                 var d = arrV[i] - canopyCenter;
                 if (d.sqrMagnitude < 1e-6f) continue;
                 // 全球形法线：整团连续法线场，像水彩
