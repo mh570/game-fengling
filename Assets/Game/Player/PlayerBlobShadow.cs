@@ -26,6 +26,7 @@ namespace Fengling.Player
         private MeshRenderer _renderer;
         private Material _material;
         private float _baseAlpha;
+        private float _smoothedVisible = 1f;
 
         private void Awake()
         {
@@ -48,11 +49,15 @@ namespace Fengling.Player
             float height = target.position.y - ground;
             float visible = Mathf.Clamp01(1f - Mathf.InverseLerp(maxHeight * 0.6f, maxHeight, height));
 
-            // 真实太阳/月影已经存在时，blob 只保留很弱的一层，避免黑球叠加。
+            // 真实阴影强度每帧都在变（太阳高度/云量），直接相乘会让 blob 闪烁。
+            // 先算目标值，再平滑过渡，避免"一卡一卡"。
             float realShadow = Mathf.Max(
                 Shader.GetGlobalFloat("_FenglingShadowStrength"),
                 Shader.GetGlobalFloat("_FenglingMoonShadowStrength"));
-            visible *= Mathf.Clamp01(1f - realShadow * 1.1f);
+            float targetVisible = visible * Mathf.Clamp01(1f - realShadow * 0.8f);
+
+            _smoothedVisible = Mathf.Lerp(
+                _smoothedVisible, targetVisible, 1f - Mathf.Exp(-6f * Time.deltaTime));
 
             Vector3 p = target.position;
             p.y = ground + groundOffset;
@@ -61,9 +66,9 @@ namespace Fengling.Player
             transform.localScale = new Vector3(diameter, diameter, 1f);
 
             Color c = color;
-            c.a = _baseAlpha * visible;
+            c.a = _baseAlpha * _smoothedVisible;
             _material.SetColor("_Color", c);
-            _renderer.enabled = visible > 0.01f;
+            _renderer.enabled = _smoothedVisible > 0.01f;
         }
     }
 }

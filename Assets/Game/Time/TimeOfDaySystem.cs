@@ -239,8 +239,8 @@ namespace Fengling.Time
                 var cloudWind = new Vector4(0.8f, 0.25f, 0f, 0f);
                 _skyInstance.SetVector("_CloudWind", cloudWind);
 
-                Shader.SetGlobalFloat("_FenglingCloudShadowStrength", cloudCover * 0.9f);
-                Shader.SetGlobalFloat("_FenglingCloudShadowScale", 0.07f);
+                Shader.SetGlobalFloat("_FenglingCloudShadowStrength", cloudCover * 0.40f);
+                Shader.SetGlobalFloat("_FenglingCloudShadowScale", 0.18f);
                 Shader.SetGlobalVector("_FenglingCloudWind", cloudWind);
             }
 
