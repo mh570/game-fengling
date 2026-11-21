@@ -1,3 +1,4 @@
+using Fengling.Environment;
 using UnityEngine;
 
 namespace Fengling.Time
@@ -10,6 +11,14 @@ namespace Fengling.Time
     public sealed class WeatherSystem : MonoBehaviour
     {
         public static WeatherSystem Instance { get; private set; }
+
+        /// <summary>环境上下文。由场景 Bootstrap 注入；未注入时行为与之前完全一致。</summary>
+        private EnvironmentContext _context;
+
+        public void Initialize(EnvironmentContext context)
+        {
+            _context = context;
+        }
 
         [Header("云 / 阴晴")]
         [Range(0f, 1f)] public float cloudCover = 0.25f;
@@ -31,6 +40,16 @@ namespace Fengling.Time
             Instance = this;
             if (GetComponent<MeshRain>() == null) gameObject.AddComponent<MeshRain>();
             if (GetComponent<MeshSnow>() == null) gameObject.AddComponent<MeshSnow>();
+        }
+
+        private void Update()
+        {
+            if (_context == null) return;
+
+            // 派生量在这里算好，消费者直接取，避免公式在多处漂移
+            _context.SetWeather(
+                cloudCover, haze, fog, rain, snow, wind,
+                SunVisibility, MoonVisibility, ShadowVisibility, FogDensity);
         }
 
         private void OnDestroy()

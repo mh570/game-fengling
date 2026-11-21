@@ -1,3 +1,4 @@
+using Fengling.Environment;
 using UnityEngine;
 
 namespace Fengling.Time
@@ -9,6 +10,14 @@ namespace Fengling.Time
     [AddComponentMenu("Fengling/Time/Time Of Day System")]
     public sealed class TimeOfDaySystem : MonoBehaviour
     {
+        /// <summary>环境上下文。由场景 Bootstrap 注入；未注入时行为与改造前一致。</summary>
+        private EnvironmentContext _context;
+
+        public void Initialize(EnvironmentContext context)
+        {
+            _context = context;
+        }
+
         [Header("时钟")]
         [Range(0f, 24f)] public float timeOfDay = 8f;
         public int day = 1;
@@ -255,6 +264,22 @@ namespace Fengling.Time
                 Shader.SetGlobalColor("_FenglingAmbientColor",
                     Color.Lerp(new Color(0.07f, 0.08f, 0.12f),
                         new Color(0.18f, 0.19f, 0.18f), ambientT));
+            }
+
+            // 发布到环境上下文：消费者从这里读，不再各自 Find / 读全局变量。
+            // _context 为空时（未注入）这段不执行，行为与改造前完全一致。
+            if (_context != null)
+            {
+                _context.SetCelestial(
+                    day, timeOfDay,
+                    sunDir,
+                    sun != null ? sun.color : Color.white,
+                    sun != null ? sun.intensity : 0f,
+                    moonDir,
+                    moon != null ? moon.color : Color.white,
+                    moon != null ? moon.intensity : 0f,
+                    MoonIlluminatedFraction,
+                    RenderSettings.ambientIntensity);
             }
         }
 

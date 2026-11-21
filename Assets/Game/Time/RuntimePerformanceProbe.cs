@@ -43,7 +43,8 @@ namespace Fengling.Time
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
-            var args = Environment.GetCommandLineArgs();
+            // 必须写全 System.Environment：Fengling.Environment 命名空间会遮蔽它
+            var args = System.Environment.GetCommandLineArgs();
             bool benchmark = false;
             foreach (var a in args)
                 if (a == "-benchmark") benchmark = true;
