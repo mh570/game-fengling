@@ -90,15 +90,15 @@ namespace Fengling.EditorTools
 
             // Unity Terrain 默认材质是内置 shader，在我们的自建 SRP 下会显示洋红。
             // 换成 Fengling/Lit 并打开地表分带（_TerrainMode），复用现有的光照/阴影/云影。
-            var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Game/Rendering/Materials/Mat_Terrain.mat");
+            var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Game/Rendering/Materials/Mat_TerrainNew.mat");
             if (mat == null)
             {
-                var shader = Shader.Find("Fengling/Lit");
+                var shader = Shader.Find("Fengling/Terrain");
                 if (shader != null)
                 {
                     mat = new Material(shader) { name = "Mat_Terrain" };
                     mat.SetFloat("_TerrainMode", 1f);
-                    AssetDatabase.CreateAsset(mat, "Assets/Game/Rendering/Materials/Mat_Terrain.mat");
+                    AssetDatabase.CreateAsset(mat, "Assets/Game/Rendering/Materials/Mat_TerrainNew.mat");
                     AssetDatabase.SaveAssets();
                 }
             }
