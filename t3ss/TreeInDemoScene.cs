@@ -42,8 +42,8 @@ namespace T3ssDemo
             mat.SetFloat("_Cutoff", 0.4f);
             mat.SetFloat("_Cuts", 3f);
             mat.SetColor("_BaseColor", Color.white);
-            mat.SetColor("_HighlightColor", new Color(0.70f, 0.86f, 0.46f));
-            mat.SetColor("_ShadowColor", new Color(0.16f, 0.30f, 0.26f));   // 暗部偏冷
+            mat.SetColor("_HighlightColor", new Color(0.62f, 0.82f, 0.50f));   // 冷绿
+            mat.SetColor("_ShadowColor", new Color(0.13f, 0.26f, 0.26f));   // 暗部冷蓝绿
 
             // ---- 在相机前方摆一圈树
             var root = new GameObject("TestTrees");
@@ -53,10 +53,10 @@ namespace T3ssDemo
             {
                 var opt = new TreeGenerator.Options
                 {
-                    Height = 3.6f + (float)rng.NextDouble() * 1.2f,
-                    LeafCount = 1400,
-                    LeafSize = 0.48f,
-                    Seed = 300 + i,
+                    Height = 3.2f + (float)rng.NextDouble() * 2.0f,
+                    LeafCount = 900 + rng.Next(900),
+                    LeafSize = 0.40f + (float)rng.NextDouble() * 0.20f,
+                    Seed = 300 + i * 17,
                 };
                 var mesh = TreeGenerator.Build(opt, out int sv, out int lv);
 
@@ -88,8 +88,13 @@ namespace T3ssDemo
             var csm = Object.FindFirstObjectByType<CloudShadowManager>();
             if (csm != null)
             {
-                csm.enabled = false;         // 晴空测试：完全关闭云影
-                Debug.Log("[Demo] 云影已关闭（晴空）");
+                csm.enabled = false;         // 停掉 MonoBehaviour
+                // 关键：云影是全局 shader 变量，必须显式清零，否则 shader 还在用上次的值
+                Shader.SetGlobalFloat("_CloudContrast", 0f);
+                Shader.SetGlobalFloat("_CloudPower", 0f);
+                Shader.SetGlobalFloat("_CloudShadowMin", 1f);   // 最小遮蔽=1 → 不压暗
+                Shader.SetGlobalFloat("_CloudThreshold", 0f);
+                Debug.Log("[Demo] 云影全局变量已清零（真晴空）");
             }
             else Debug.Log("[Demo] 场景里没有 CloudShadowManager");
 
@@ -107,6 +112,20 @@ namespace T3ssDemo
             }
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(0.46f, 0.54f, 0.54f);   // 环境光偏冷
+
+            // ---- 地面 patch 调柔：降色差 + 放大噪声尺度
+            foreach (var mr in Object.FindObjectsByType<MeshRenderer>(FindObjectsSortMode.None))
+            {
+                var m = mr.sharedMaterial;
+                if (m == null || !m.HasProperty("_Color2")) continue;
+                if (mr.gameObject.name.Contains("Tree")) continue;
+                var baseC = m.GetColor("_BaseColor");
+                m.SetColor("_Color2", Color.Lerp(baseC, m.GetColor("_Color2"), 0.45f));
+                m.SetColor("_Color3", Color.Lerp(baseC, m.GetColor("_Color3"), 0.45f));
+                if (m.HasProperty("_Noise2Scale")) m.SetFloat("_Noise2Scale", 0.020f);
+                if (m.HasProperty("_Noise3Scale")) m.SetFloat("_Noise3Scale", 0.015f);
+                Debug.Log("[Demo] 地面 patch 已调柔: " + mr.gameObject.name);
+            }
 
             // ---- 草（手动 DrawMeshInstanced）
             var spawner = Object.FindFirstObjectByType<GrassSpawner>();

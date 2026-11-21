@@ -75,8 +75,10 @@ namespace T3ssDemo
             int triBase = 0;
 
             float H = opt.Height;
-            float trunkH = H * 0.55f;
-            float trunkR = Mathf.Max(0.06f, H * 0.035f);
+            // 形状变体：树干比例、树冠比例、粗细都按种子变化
+            float trunkRatio = 0.45f + (float)rng.NextDouble() * 0.20f;   // 0.45~0.65
+            float trunkH = H * trunkRatio;
+            float trunkR = Mathf.Max(0.06f, H * (0.028f + (float)rng.NextDouble() * 0.014f));
 
             // ---- 1. 树干（锥形圆柱）
             AddCylinder(verts, normals, uvs, colors, tris, ref triBase,
@@ -99,13 +101,22 @@ namespace T3ssDemo
 
             shellVerts = verts.Count;
 
-            // ---- 3. 树冠"壳"：3 个错位球（提供体积）
-            float canopyR = H * 0.42f;
-            float canopyBase = trunkH * 0.92f;
+            // ---- 3. 树冠"壳"：3 个错位球（提供体积），位置随种子变化
+            float canopyR = H * (0.34f + (float)rng.NextDouble() * 0.14f);   // 0.34~0.48
+            float canopyBase = trunkH * (0.88f + (float)rng.NextDouble() * 0.10f);
             var shellCenters = new List<Vector4>();   // xyz + radius
             shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR));
-            shellCenters.Add(new Vector4(canopyR * 0.35f, canopyBase + canopyR * 0.25f, canopyR * 0.1f, canopyR * 0.72f));
-            shellCenters.Add(new Vector4(-canopyR * 0.3f, canopyBase + canopyR * 0.62f, -canopyR * 0.15f, canopyR * 0.62f));
+            for (int k = 0; k < 2; k++)
+            {
+                float a = (float)rng.NextDouble() * Mathf.PI * 2f;
+                float d = canopyR * (0.20f + (float)rng.NextDouble() * 0.35f);
+                float rr = canopyR * (0.55f + (float)rng.NextDouble() * 0.22f);
+                shellCenters.Add(new Vector4(
+                    Mathf.Cos(a) * d,
+                    canopyBase + canopyR * (0.18f + (float)rng.NextDouble() * 0.50f),
+                    Mathf.Sin(a) * d,
+                    rr));
+            }
 
             var shellCol = new Color(0.10f, 0.16f, 0.09f, 1f);   // 壳压暗，靠卡片表现树叶
             foreach (var sc in shellCenters)
