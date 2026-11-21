@@ -211,14 +211,14 @@ namespace Fengling.EditorTools
             int placed = 0;
 
             // 花：成簇
-            for (int cluster = 0; cluster < 14; cluster++)
+            for (int cluster = 0; cluster < 22; cluster++)
             {
                 float cx = center.x + (float)(rng.NextDouble() - 0.5) * size * 0.85f;
                 float cz = center.y + (float)(rng.NextDouble() - 0.5) * size * 0.85f;
                 float h = TerrainCarver.Apply(cx, cz, 1.2f);
                 if (h < 0.35f) continue;   // 水里不放
 
-                int perCluster = 8 + rng.Next(10);
+                int perCluster = 12 + rng.Next(14);
                 for (int k = 0; k < perCluster; k++)
                 {
                     float px = cx + (float)(rng.NextDouble() - 0.5) * 1.6f;
@@ -229,7 +229,7 @@ namespace Fengling.EditorTools
                     go.transform.SetParent(root.transform, false);
                     go.transform.position = new Vector3(px, TerrainCarver.Apply(px, pz, 1.2f) + 0.16f, pz);
                     go.transform.rotation = Quaternion.Euler(70f, (float)rng.NextDouble() * 360f, 0f);
-                    go.transform.localScale = Vector3.one * 0.28f;
+                    go.transform.localScale = Vector3.one * 0.55f;
 
                     var col = cluster % 3 == 0
                         ? new Color(0.95f, 0.90f, 0.55f)

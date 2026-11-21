@@ -20,7 +20,7 @@ namespace Fengling.Rendering
         /// 像素风渲染缩放：0.25~1.0。0.5 表示以半分辨率渲染再放大。
         /// 对应参考视频（Godot）里的「视口缩放 x0.56」。
         /// </summary>
-        public static float PixelRenderScale = 0.5f;
+        public static float PixelRenderScale = 0.35f;   // 视频量级：约 1/3 分辨率
         private readonly Material _postMaterial;
         private Light _fillLight;
         private Camera _reflectionCamera;
