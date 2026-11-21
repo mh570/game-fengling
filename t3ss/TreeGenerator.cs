@@ -107,7 +107,7 @@ namespace T3ssDemo
             shellCenters.Add(new Vector4(canopyR * 0.35f, canopyBase + canopyR * 0.25f, canopyR * 0.1f, canopyR * 0.72f));
             shellCenters.Add(new Vector4(-canopyR * 0.3f, canopyBase + canopyR * 0.62f, -canopyR * 0.15f, canopyR * 0.62f));
 
-            var shellCol = new Color(0.24f, 0.40f, 0.20f, 1f);
+            var shellCol = new Color(0.10f, 0.16f, 0.09f, 1f);   // 壳压暗，靠卡片表现树叶
             foreach (var sc in shellCenters)
                 AddSphere(verts, normals, uvs, colors, tris, ref triBase,
                     new Vector3(sc.x, sc.y, sc.z), sc.w, 8, 6, shellCol);
@@ -145,7 +145,7 @@ namespace T3ssDemo
 
                 // 颜色：越靠外越暗（模拟内部遮挡）
                 float outside = Mathf.Clamp01((pos - canopyCenter).magnitude / (canopyR * 1.3f));
-                float lum = Mathf.Lerp(1.0f, 0.55f, outside) * (0.85f + (float)rng.NextDouble() * 0.3f);
+                float lum = Mathf.Lerp(1.15f, 0.80f, outside) * (0.9f + (float)rng.NextDouble() * 0.25f);
                 var lcol = new Color(0.55f * lum, 0.75f * lum, 0.42f * lum, 1f);
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);

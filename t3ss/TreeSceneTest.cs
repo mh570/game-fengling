@@ -52,7 +52,7 @@ namespace T3ssDemo
             if (toon != null)
             {
                 var gm = new Material(toon) { name = "MAT_Ground" };
-                gm.SetColor("_BaseColor", new Color(0.45f, 0.62f, 0.30f));
+                gm.SetColor("_BaseColor", new Color(0.58f, 0.70f, 0.34f));
                 gm.SetColor("_HighlightColor", new Color(0.58f, 0.76f, 0.38f));
                 gm.SetColor("_ShadowColor", new Color(0.26f, 0.40f, 0.22f));
                 ground.GetComponent<MeshRenderer>().sharedMaterial = gm;
@@ -65,7 +65,7 @@ namespace T3ssDemo
                 var opt = new TreeGenerator.Options
                 {
                     Height = 4.0f + (float)rng.NextDouble() * 1.5f,
-                    LeafCount = 900,
+                    LeafCount = 1400,
                     LeafSize = 0.50f,
                     Seed = 100 + i,
                 };
