@@ -103,7 +103,7 @@ Shader "Custom/ToonFoliage"
                 col *= _BaseColor.rgb * tex.rgb * IN.color.rgb;   // 顶点色（树干/叶片区分）
 
                 // 环境光（天空光）：否则背光叶片全黑，整体被拉暗
-                float3 ambient = SampleSH(N) * 0.65;
+                float3 ambient = SampleSH(N) * 0.45;
                 col += ambient * _BaseColor.rgb * IN.color.rgb * tex.rgb;
 
                 return half4(col, 1);

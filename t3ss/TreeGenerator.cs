@@ -38,11 +38,10 @@ namespace T3ssDemo
                         float d = Mathf.Sqrt(dx * dx + dy * dy);
                         if (d <= r)
                         {
-                            // 边缘略暗，做出层次
-                            float edge = Mathf.Clamp01(1f - (d / r) * 0.45f);
-                            var c = new Color(shade * edge, shade * edge, shade * edge, 1f);
+                            // 纯白：颜色全靠顶点色/光照，卡片本身不能再有明暗
+                            // （否则每张卡片都是一个亮点 → 满树白点）
                             int idx = y * size + x;
-                            if (px[idx].a < 0.5f || c.r < px[idx].r) px[idx] = c;
+                            px[idx] = new Color(1f, 1f, 1f, 1f);
                         }
                     }
                 }
@@ -118,7 +117,7 @@ namespace T3ssDemo
                     rr));
             }
 
-            var shellCol = new Color(0.70f, 0.88f, 0.56f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
+            var shellCol = new Color(0.52f, 0.68f, 0.40f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
             int shIdx = 0;
             foreach (var sc in shellCenters)
                 AddSphere(verts, normals, uvs, colors, tris, ref triBase,
@@ -172,7 +171,7 @@ namespace T3ssDemo
                 // 颜色：越靠外越暗（模拟内部遮挡）
                 // 只有 3 档绿（参考视频的树叶糊成色块，不是彩纸）
                 // 单一绿色：水彩感需要无杂色
-                Color lcol = new Color(0.70f, 0.88f, 0.56f, 1f);
+                Color lcol = new Color(0.52f, 0.68f, 0.40f, 1f);
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                 AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);
