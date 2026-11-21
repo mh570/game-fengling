@@ -1,3 +1,4 @@
+using Fengling.Environment;
 using UnityEngine;
 
 namespace Fengling.Time
@@ -7,22 +8,36 @@ namespace Fengling.Time
     /// 透明 Mesh 已在探针中验证可渲染。
     /// </summary>
     [AddComponentMenu("Fengling/Time/Mesh Rain")]
-    public sealed class MeshRain : MonoBehaviour
+    public sealed class MeshRain : MonoBehaviour, IEnvironmentConsumer
     {
         public WeatherSystem weather;
         public int count = 4000;
         public float area = 60f;
 
+        private EnvironmentContext _context;
         private Mesh _mesh;
         private MeshRenderer _renderer;
         private Material _material;
         private Camera _camera;
         private Transform _renderRoot;
 
+        public void ApplyEnvironment(EnvironmentContext context)
+        {
+            _context = context;
+        }
+
+        /// <summary>雨量来源：优先环境上下文，未注入时回退到直接引用。</summary>
+        private float RainAmount
+        {
+            get
+            {
+                if (_context != null) return _context.State.Rain;
+                return weather != null ? weather.rain : 0f;
+            }
+        }
+
         private void Awake()
         {
-            if (weather == null) weather = FindFirstObjectByType<WeatherSystem>();
-
             BuildMesh();
             var shader = Shader.Find("Fengling/Mesh Rain");
             if (shader == null) { enabled = false; return; }
@@ -92,10 +107,11 @@ namespace Fengling.Time
 
         public void Refresh()
         {
-            if (_material != null && weather != null && _renderer != null)
+            float rain = RainAmount;
+            if (_material != null && _renderer != null)
             {
-                _material.SetFloat("_Rain", weather.rain);
-                _renderer.enabled = weather.rain > 0.01f;
+                _material.SetFloat("_Rain", rain);
+                _renderer.enabled = rain > 0.01f;
             }
         }
 

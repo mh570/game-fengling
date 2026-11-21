@@ -40,6 +40,10 @@ namespace Fengling.Time
             if (time != null) time.Initialize(_context);
             if (weather != null) weather.Initialize(_context);
 
+            // 注入 WeatherSystem 引用，让 TimeOfDaySystem 不必自己 Find。
+            // Bootstrap 的执行顺序是 -500，早于 TimeOfDaySystem.Awake，所以能生效。
+            if (time != null && time.weather == null) time.weather = weather;
+
             // ---- 读取方
             int injected = 0;
             MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);

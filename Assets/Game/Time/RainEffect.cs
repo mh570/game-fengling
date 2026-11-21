@@ -1,3 +1,4 @@
+using Fengling.Environment;
 using UnityEngine;
 
 namespace Fengling.Time
@@ -7,21 +8,35 @@ namespace Fengling.Time
     /// 不依赖预制体/贴图，方便先验证天气链路。
     /// </summary>
     [AddComponentMenu("Fengling/Time/Rain Effect")]
-    public sealed class RainEffect : MonoBehaviour
+    public sealed class RainEffect : MonoBehaviour, IEnvironmentConsumer
     {
         public WeatherSystem weather;
         public int maxParticles = 1600;
         public float area = 36f;
         public float fallSpeed = 24f;
 
+        private EnvironmentContext _context;
         private ParticleSystem _ps;
         private ParticleSystemRenderer _renderer;
         private Camera _camera;
 
+        public void ApplyEnvironment(EnvironmentContext context)
+        {
+            _context = context;
+        }
+
+        /// <summary>雨量来源：优先环境上下文，未注入时回退到直接引用。</summary>
+        private float RainAmount
+        {
+            get
+            {
+                if (_context != null) return _context.State.Rain;
+                return weather != null ? weather.rain : 0f;
+            }
+        }
+
         private void Awake()
         {
-            if (weather == null) weather = FindFirstObjectByType<WeatherSystem>();
-
             var go = new GameObject("RainParticles");
             go.transform.SetParent(transform, false);
             _ps = go.AddComponent<ParticleSystem>();
@@ -64,7 +79,7 @@ namespace Fengling.Time
 
         private void Update()
         {
-            if (weather == null || _ps == null) return;
+            if (_ps == null) return;
             if (_camera == null) _camera = Camera.main;
             if (_camera != null)
             {
@@ -73,8 +88,8 @@ namespace Fengling.Time
             }
 
             var emission = _ps.emission;
-            emission.rateOverTime = weather.rain * 1600f;
-            _renderer.enabled = weather.rain > 0.01f;
+            emission.rateOverTime = RainAmount * 1600f;
+            _renderer.enabled = RainAmount > 0.01f;
         }
 
         private void OnDestroy()

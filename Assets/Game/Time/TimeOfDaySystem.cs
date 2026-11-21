@@ -71,7 +71,9 @@ namespace Fengling.Time
         {
             if (sun == null) sun = RenderSettings.sun;
             if (moon == null) CreateMoon();
+            // weather 由 EnvironmentBootstrap 注入；这里只在未注入时兜底
             if (weather == null) weather = FindFirstObjectByType<WeatherSystem>();
+
             if (skyMaterial == null) skyMaterial = RenderSettings.skybox;
             if (skyMaterial != null)
             {

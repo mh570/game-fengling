@@ -1,12 +1,30 @@
+using Fengling.Environment;
 using UnityEngine;
 
 namespace Fengling.Time
 {
     /// <summary>Mesh 雪：与 MeshRain 同一套思路，慢速下落 + 横向漂移。</summary>
     [AddComponentMenu("Fengling/Time/Mesh Snow")]
-    public sealed class MeshSnow : MonoBehaviour
+    public sealed class MeshSnow : MonoBehaviour, IEnvironmentConsumer
     {
         public WeatherSystem weather;
+
+        private EnvironmentContext _context;
+
+        public void ApplyEnvironment(EnvironmentContext context)
+        {
+            _context = context;
+        }
+
+        /// <summary>雪量来源：优先环境上下文，未注入时回退到直接引用。</summary>
+        private float SnowAmount
+        {
+            get
+            {
+                if (_context != null) return _context.State.Snow;
+                return weather != null ? weather.snow : 0f;
+            }
+        }
         public int count = 3200;
         public float area = 60f;
 
@@ -18,7 +36,6 @@ namespace Fengling.Time
 
         private void Awake()
         {
-            if (weather == null) weather = FindFirstObjectByType<WeatherSystem>();
             BuildMesh();
             var shader = Shader.Find("Fengling/Mesh Snow");
             if (shader == null) { enabled = false; return; }
@@ -88,10 +105,11 @@ namespace Fengling.Time
 
         public void Refresh()
         {
-            if (_material != null && weather != null && _renderer != null)
+            float snow = SnowAmount;
+            if (_material != null && _renderer != null)
             {
-                _material.SetFloat("_Snow", weather.snow);
-                _renderer.enabled = weather.snow > 0.01f;
+                _material.SetFloat("_Snow", snow);
+                _renderer.enabled = snow > 0.01f;
             }
         }
 
