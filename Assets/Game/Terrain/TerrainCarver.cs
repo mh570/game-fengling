@@ -135,7 +135,7 @@ namespace Fengling.TerrainSystem
                         new Vector2(x0 + size * 0.33f, z0 + size * 0.42f),
                         new Vector2(x0 + size * 0.38f, z0 + size * 0.32f),
                         new Vector2(x0 + size * 0.42f, z0 + size * 0.22f),
-                        new Vector2(x0 + size * 0.45f, z0 + size * 0.10f),
+                        new Vector2(x0 + size * 0.45f, z0 + size * 0.04f),
                     },
                     width = 1.2f,
                     depth = 0.8f,

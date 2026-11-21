@@ -45,15 +45,11 @@ namespace Fengling.TerrainSystem
             float nx = (worldX - Center.x) / HalfSize;   // -1..1
             float nz = (worldZ - Center.y) / HalfSize;
 
-            // ---- 海岸线：陆地铺满画面，只在南侧（底部）入海
-            // 用噪声让海岸线不规则（不是直线）
-            float coastZ = -0.28f + (Mathf.PerlinNoise(worldX * 0.018f + 4.7f, 3.3f) - 0.5f) * 0.30f;
+            // ---- 海岸线：只在南侧（一条边）有海滩和海水，其余三面全是陆地
+            // 稍微加噪声让海滩线不是死板的直线
+            float coastZ = -0.86f + (Mathf.PerlinNoise(worldX * 0.02f + 4.7f, 3.3f) - 0.5f) * 0.10f;
             float land = Mathf.SmoothStep(0f, 1f,
-                Mathf.InverseLerp(coastZ - 0.16f, coastZ + 0.12f, nz));
-
-            // 东西边缘也稍微收一点，避免地块被裁成断崖
-            float edgeFade = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(1.0f, 0.86f, Mathf.Abs(nx)));
-            land *= edgeFade;
+                Mathf.InverseLerp(coastZ - 0.10f, coastZ + 0.05f, nz));
 
             // ---- 小山（高斯）
             float dx = (nx - HillPos.x) / HillRadius;
