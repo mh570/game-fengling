@@ -99,6 +99,14 @@ namespace Fengling.EditorTools
             // ---- 花草：撒点（技术测试重点）
             ScatterVegetation(center, size);
 
+            // GPU Instancing 草场（上万株）
+            var grass = new GameObject("GrassField");
+            var gf = grass.AddComponent<TerrainSystem.GrassField>();
+            gf.Center = center;
+            gf.Size = size;
+            gf.BaseHeight = 1.2f;
+            gf.Count = 12000;
+
             // ---- 灯光
             var sunGo = new GameObject("Sun");
             var sun = sunGo.AddComponent<Light>();
