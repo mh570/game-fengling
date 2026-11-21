@@ -88,11 +88,8 @@ namespace T3ssDemo
             var csm = Object.FindFirstObjectByType<CloudShadowManager>();
             if (csm != null)
             {
-                csm.enabled = true;
-                csm.cloudContrast = 4f;      // 原来是 20，太极端
-                csm.cloudScale = 80f;
-                csm.cloudWorldY = 26f;
-                Debug.Log("[Demo] 云影已启用 contrast=" + csm.cloudContrast);
+                csm.enabled = false;         // 晴空测试：完全关闭云影
+                Debug.Log("[Demo] 云影已关闭（晴空）");
             }
             else Debug.Log("[Demo] 场景里没有 CloudShadowManager");
 
