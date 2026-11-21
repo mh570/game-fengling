@@ -11,6 +11,11 @@ namespace T3ssDemo
     /// </summary>
     public static class GrassRenderTest
     {
+        static void TrySetColor(Material m, string prop, Color c)
+        {
+            if (m != null && m.HasProperty(prop)) m.SetColor(prop, c);
+        }
+
         [MenuItem("T3SS/画草并渲染")]
         public static void Run()
         {
@@ -37,11 +42,11 @@ namespace T3ssDemo
             }
 
             // ---- 手动生成实例矩阵（表面撒点）
-            int count = 20000;
+            int count = 35000;
             var mats = new Matrix4x4[count];
             var rng = new System.Random(2026);
             // 覆盖撒点范围：聚焦相机可见区，密度提到 ~30 株/㎡
-            var b = new Bounds(new Vector3(0f, 0f, 0f), new Vector3(26f, 4f, 26f));
+            var b = new Bounds(new Vector3(0f, 0f, 0f), new Vector3(16f, 4f, 16f));
             int placed = 0;
             for (int i = 0; i < count * 3 && placed < count; i++)
             {
@@ -49,9 +54,12 @@ namespace T3ssDemo
                 float z = b.center.z + (float)(rng.NextDouble() - 0.5) * b.size.z;
                 float y = 0f;
 
-                // 射线打地面
-                if (Physics.Raycast(new Vector3(x, b.center.y + 50f, z), Vector3.down, out var hit, 200f))
-                    y = hit.point.y;
+                // 射线打地面：只要朝上的面，且高度接近地面（排除方块顶）
+                if (!Physics.Raycast(new Vector3(x, b.center.y + 50f, z), Vector3.down, out var hit, 200f))
+                    continue;
+                if (hit.normal.y < 0.9f) continue;
+                if (Mathf.Abs(hit.point.y) > 0.15f) continue;
+                y = hit.point.y;
 
                 float h = Mathf.Lerp(spawner.minHeight, spawner.maxHeight, (float)rng.NextDouble());
                 float w = h * 0.75f;
@@ -60,6 +68,13 @@ namespace T3ssDemo
                 placed++;
             }
             Debug.Log("[Grass] 生成 " + placed + " 个实例矩阵");
+
+            // ---- 草颜色：把 patch 系统的颜色改成绿色（不继承地形的黄绿）
+            var gm = spawner.grassMaterial;
+            TrySetColor(gm, "_Color1", new Color(0.34f, 0.52f, 0.24f));
+            TrySetColor(gm, "_Color2", new Color(0.42f, 0.60f, 0.28f));
+            TrySetColor(gm, "_Color3", new Color(0.26f, 0.42f, 0.18f));
+            TrySetColor(gm, "_BaseColor", new Color(0.36f, 0.54f, 0.26f));
 
             // ---- 手动绘制（分块，DrawMeshInstanced 上限 1023）
             var mpb = new MaterialPropertyBlock();
