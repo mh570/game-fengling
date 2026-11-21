@@ -93,6 +93,7 @@ Shader "Custom/ToonFoliage"
                 Light mainLight = GetMainLight();
                 float ndl = dot(N, mainLight.direction);
                 float lit = saturate(ndl * 0.5 + 0.5);
+                lit = pow(lit, 0.85) * 1.15;   // 提高主光对比
 
                 float steps = max(1.0, _Cuts);
                 float q = floor(lit * steps) / steps;
@@ -103,7 +104,7 @@ Shader "Custom/ToonFoliage"
                 col *= _BaseColor.rgb * tex.rgb * IN.color.rgb;   // 顶点色（树干/叶片区分）
 
                 // 环境光（天空光）：否则背光叶片全黑，整体被拉暗
-                float3 ambient = SampleSH(N) * 0.45;
+                float3 ambient = SampleSH(N) * 0.28;   // 降低：环境光太均匀会把渐变抹平
                 col += ambient * _BaseColor.rgb * IN.color.rgb * tex.rgb;
 
                 return half4(col, 1);

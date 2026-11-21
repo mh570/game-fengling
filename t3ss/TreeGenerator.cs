@@ -117,7 +117,7 @@ namespace T3ssDemo
                     rr));
             }
 
-            var shellCol = new Color(0.52f, 0.68f, 0.40f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
+            var shellCol = new Color(0.55f, 0.65f, 0.50f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
             int shIdx = 0;
             foreach (var sc in shellCenters)
                 AddSphere(verts, normals, uvs, colors, tris, ref triBase,
@@ -171,7 +171,7 @@ namespace T3ssDemo
                 // 颜色：越靠外越暗（模拟内部遮挡）
                 // 只有 3 档绿（参考视频的树叶糊成色块，不是彩纸）
                 // 单一绿色：水彩感需要无杂色
-                Color lcol = new Color(0.52f, 0.68f, 0.40f, 1f);
+                Color lcol = new Color(0.50f, 0.60f, 0.46f, 1f);   // 压 10%
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                 AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);
