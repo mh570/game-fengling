@@ -105,12 +105,12 @@ namespace T3ssDemo
             float canopyR = H * (0.34f + (float)rng.NextDouble() * 0.14f);   // 0.34~0.48
             float canopyBase = trunkH * (1.30f + (float)rng.NextDouble() * 0.15f);   // 大幅抬高，露出树干
             var shellCenters = new List<Vector4>();   // xyz + radius
-            shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR * 0.60f));
+            shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR * 0.88f));
             for (int k = 0; k < 2; k++)
             {
                 float a = (float)rng.NextDouble() * Mathf.PI * 2f;
                 float d = canopyR * (0.20f + (float)rng.NextDouble() * 0.35f);
-                float rr = canopyR * (0.33f + (float)rng.NextDouble() * 0.14f);
+                float rr = canopyR * (0.52f + (float)rng.NextDouble() * 0.18f);
                 shellCenters.Add(new Vector4(
                     Mathf.Cos(a) * d,
                     canopyBase + canopyR * (0.18f + (float)rng.NextDouble() * 0.50f),
@@ -133,17 +133,28 @@ namespace T3ssDemo
 
             for (int i = 0; i < leafCount; i++)
             {
-                // 随机挑一个壳球，随机球面方向
-                var sc = leafCenters[rng.Next(leafCenters.Count)];
+                // ---- 均匀分布（Fibonacci 球）：t3ssel8r 说纯随机会 "too messy"，
+                //      要用蓝噪声/均匀分布。这里用黄金角螺旋，比随机更均匀。
+                var sc = leafCenters[i % leafCenters.Count];
                 var center = new Vector3(sc.x, sc.y, sc.z);
                 float radius = sc.w;
 
-                float theta = (float)rng.NextDouble() * Mathf.PI * 2f;
-                float phi = Mathf.Acos(2f * (float)rng.NextDouble() - 1f);
+                int perShell = Mathf.Max(1, leafCount / leafCenters.Count);
+                int k = i / leafCenters.Count;
+                float y = 1f - (k + 0.5f) / perShell * 2f;          // -1 → 1
+                float rr2 = Mathf.Sqrt(Mathf.Max(0f, 1f - y * y));
+                float phi2 = k * 2.39996f;                          // 黄金角
                 var dir = new Vector3(
-                    Mathf.Sin(phi) * Mathf.Cos(theta),
-                    Mathf.Cos(phi),
-                    Mathf.Sin(phi) * Mathf.Sin(theta));
+                    Mathf.Cos(phi2) * rr2,
+                    y,
+                    Mathf.Sin(phi2) * rr2);
+
+                // 轻微抖动，避免过于规则
+                dir += new Vector3(
+                    (float)(rng.NextDouble() - 0.5) * 0.18f,
+                    (float)(rng.NextDouble() - 0.5) * 0.18f,
+                    (float)(rng.NextDouble() - 0.5) * 0.18f);
+                dir.Normalize();
 
                 // 位置：球面上 + 随机内外偏移
                 var pos = center + dir * (canopyR * (0.35f + (float)rng.NextDouble() * 0.75f));
@@ -158,14 +169,12 @@ namespace T3ssDemo
                     (float)rng.NextDouble() * 360f);
 
                 // 颜色：越靠外越暗（模拟内部遮挡）
-                // 每张卡片独立颜色：亮度 + 色相都随机，打破单色
-                float tint = 0.82f + (float)rng.NextDouble() * 0.36f;
-                float hueShift = (float)rng.NextDouble() * 0.12f - 0.06f;
-                var lcol = new Color(
-                    Mathf.Clamp01(0.55f * tint + hueShift),
-                    Mathf.Clamp01(0.75f * tint),
-                    Mathf.Clamp01(0.42f * tint - hueShift),
-                    1f);
+                // 只有 3 档绿（参考视频的树叶糊成色块，不是彩纸）
+                int tier = rng.Next(3);
+                Color lcol;
+                if (tier == 0)      lcol = new Color(0.48f, 0.66f, 0.38f, 1f);   // 暗绿
+                else if (tier == 1) lcol = new Color(0.58f, 0.76f, 0.44f, 1f);   // 中绿
+                else                lcol = new Color(0.68f, 0.84f, 0.50f, 1f);   // 亮绿
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                 AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);
