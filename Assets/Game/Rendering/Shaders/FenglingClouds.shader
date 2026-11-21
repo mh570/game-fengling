@@ -4,8 +4,8 @@ Shader "Fengling/Volumetric Clouds"
     {
         _CloudColor ("Cloud Color", Color) = (1, 1, 1, 1)
         _CloudShadeColor ("Cloud Shade Color", Color) = (0.35, 0.40, 0.50, 1)
-        _Coverage ("Coverage", Range(0, 1)) = 0.45
-        _Density ("Density", Range(0, 1)) = 0.6
+        _Coverage ("Coverage", Range(0, 1)) = 0.32
+        _Density ("Density", Range(0, 1)) = 0.9
         _Altitude ("Layer Altitude", Float) = 600
         _Thickness ("Layer Thickness", Float) = 600
         _Scale ("Noise Scale", Float) = 0.0008
@@ -33,6 +33,7 @@ Shader "Fengling/Volumetric Clouds"
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.5
+            // #define CLOUDS_DEBUG_RED 1
 
             #include "UnityCG.cginc"
 
@@ -143,11 +144,14 @@ Shader "Fengling/Volumetric Clouds"
                     p += dir * stepLen;
                     t += DensityAt(p) * stepLen;
                 }
-                return exp(-t * 0.02);
+                return exp(-t * 0.006);
             }
 
             float4 frag(v2f i) : SV_Target
             {
+                #if CLOUDS_DEBUG_RED
+                return float4(1, 0, 0, 1);
+                #endif
                 // 由 UV + 深度重建世界方向
                 float2 ndc = i.uv * 2.0 - 1.0;
                 float4 nearH = mul(_CameraInvViewProj, float4(ndc, 0.0, 1.0));
@@ -210,7 +214,7 @@ Shader "Fengling/Volumetric Clouds"
                         float3 shade = _CloudShadeColor.rgb * 0.25;
                         float3 sampleCol = lerp(shade, lit, sunT) * _SunColor;
 
-                        float extinction = density * stepLen * 0.00025;
+                        float extinction = density * stepLen * 0.004;
                         float a = 1.0 - exp(-extinction);
 
                         scattered += transmittance * a * sampleCol;

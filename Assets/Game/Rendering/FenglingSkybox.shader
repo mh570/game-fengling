@@ -59,6 +59,7 @@ Shader "Fengling/Skybox"
             float _CloudNearCoverage;
             float _CloudNearOpacity;
             float4 _CloudWind;
+            float _FenglingVolumetricClouds;
             float4 _SunDirection;
             float4 _SunColor;
             float _SunSize;
@@ -159,14 +160,14 @@ Shader "Fengling/Skybox"
                     float shade = smoothstep(0.45, 0.85, midC);
                     float3 midCol = lerp(_CloudDark.rgb, _CloudColor.rgb, shade);
                     midCol = lerp(midCol, _SunColor.rgb, sunset * 0.35 * smoothstep(0.55, 0.85, midC));
-                    sky = lerp(sky, midCol, midMask * 0.92);
+                    sky = lerp(sky, midCol, midMask * 0.92 * (1.0 - saturate(_FenglingVolumetricClouds)));
 
                     // 近景低云/雾：贴地平线、偏暗、移动更快
                     float2 nearP = dir.xz / max(dir.y, 0.05) * 2.8;
                     nearP += wind * (_Time.y * 0.06);
                     float nearBand = smoothstep(0.01, 0.06, dir.y) * (1.0 - smoothstep(0.30, 0.62, dir.y));
                     float nearMask = smoothstep(_CloudNearCoverage, _CloudNearCoverage + 0.20, fbm(nearP)) * nearBand;
-                    sky = lerp(sky, _CloudDark.rgb * 0.9, nearMask * _CloudNearOpacity);
+                    sky = lerp(sky, _CloudDark.rgb * 0.9, nearMask * _CloudNearOpacity * (1.0 - saturate(_FenglingVolumetricClouds)));
                 }
 
                 // 云量遮挡日月与星空；云层本身在前面已经混合。

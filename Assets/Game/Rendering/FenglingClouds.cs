@@ -31,7 +31,14 @@ namespace Fengling.Rendering
         public void Render(ScriptableRenderContext context, Camera camera,
                            RenderTargetIdentifier colorTarget, RenderTargetIdentifier depthTarget)
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                Shader.SetGlobalFloat("_FenglingVolumetricClouds", 0f);
+                return;
+            }
+
+            // 通知天空盒：体积云开着时压掉它的中/近层，避免双层云叠在一起
+            Shader.SetGlobalFloat("_FenglingVolumetricClouds", 1f);
 
             if (_material == null && !_shaderMissing)
             {
