@@ -95,7 +95,8 @@ namespace Fengling.TerrainSystem
                     float wx = origin.x + (cx * cells + i) * cellSize;
                     float wz = origin.y + (cz * cells + j) * cellSize;
                     float h = TerrainMeshBuilder.SampleHeightSmooth(wx, wz);
-                    h = mean + (h - mean) * compression;
+                    // 只压平陆地，保留海平面以下（否则海滩/海会被压没）
+                    if (h > 0f) h = mean + (h - mean) * compression;
                     pts[j * n + i] = new Vector3(wx, h, wz);
                 }
             }

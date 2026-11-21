@@ -69,7 +69,7 @@ namespace Fengling.TerrainSystem
                     n++;
                 }
             }
-            return sum / n;
+            return TerrainCarver.Apply(wx, wz, sum / n);
         }
 
         /// <summary>加载 RAW（只加载一次）</summary>

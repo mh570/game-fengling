@@ -25,6 +25,8 @@ namespace Fengling.EditorTools
             var region = TerrainMeshBuilder.FindBestRegion(settings.GridSize * settings.CellSize);
             settings.WorldOrigin = region;
 
+            TerrainCarver.PlanDefault(settings.WorldOrigin, settings.GridSize * settings.CellSize);
+
             var chunks = TerrainChunkBuilder.Build(
                 settings.WorldOrigin, settings.GridSize, settings.ChunkCount,
                 settings.CellSize, TerrainMeshBuilder.HeightCompression);
@@ -88,6 +90,26 @@ namespace Fengling.EditorTools
             float centerH = TerrainMeshBuilder.SampleHeight(region.x + 100f, region.y + 100f);
             Debug.Log(string.Format("[Terrain] 区域高度 {0:F1} ~ {1:F1} m", minH, maxH));
 
+            // 水面：在 0m 处放一张大平面（盖住海和刻出来的河/湖）
+            var waterGo = new GameObject("WaterPlane");
+            waterGo.transform.position = new Vector3(region.x + 100f, 0f, region.y + 100f);
+            waterGo.transform.localScale = new Vector3(2000f, 1f, 2000f);
+            var wmf = waterGo.AddComponent<MeshFilter>();
+            wmf.sharedMesh = BuildQuadMesh();
+            var wmr = waterGo.AddComponent<MeshRenderer>();
+            var wmat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Game/Rendering/Materials/Mat_SimpleWater.mat");
+            if (wmat == null)
+            {
+                var ws = Shader.Find("Fengling/TerrainColor");
+                if (ws != null)
+                {
+                    wmat = new Material(ws) { name = "Mat_SimpleWater" };
+                    wmat.SetColor("_Tint", new Color(0.30f, 0.52f, 0.62f));
+                    AssetDatabase.CreateAsset(wmat, "Assets/Game/Rendering/Materials/Mat_SimpleWater.mat");
+                }
+            }
+            wmr.sharedMaterial = wmat;
+
             // 相机：俯视，接近参考视频的取景
             var camGo = new GameObject("Main Camera");
             camGo.tag = "MainCamera";
@@ -124,6 +146,20 @@ namespace Fengling.EditorTools
 
             Debug.Log(string.Format("[Terrain] 已创建 {0}：{1} 块，{2}x{2} 格，{3}m",
                 ScenePath, chunks.Count, settings.GridSize, settings.GridSize * settings.CellSize));
+        }
+        static Mesh BuildQuadMesh()
+        {
+            var m = new Mesh();
+            m.vertices = new[]
+            {
+                new Vector3(-0.5f, 0f, -0.5f), new Vector3(0.5f, 0f, -0.5f),
+                new Vector3(-0.5f, 0f, 0.5f),  new Vector3(0.5f, 0f, 0.5f),
+            };
+            m.normals = new[] { Vector3.up, Vector3.up, Vector3.up, Vector3.up };
+            m.colors = new[] { Color.white, Color.white, Color.white, Color.white };
+            m.triangles = new[] { 0, 2, 1, 2, 3, 1 };
+            m.RecalculateBounds();
+            return m;
         }
     }
 }
