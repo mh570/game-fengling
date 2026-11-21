@@ -18,9 +18,9 @@ namespace Fengling.TerrainSystem
     {
         static readonly Color Sand   = new Color(0.82f, 0.76f, 0.60f);
         static readonly Color Sand2  = new Color(0.74f, 0.67f, 0.52f);
-        static readonly Color Grass  = new Color(0.42f, 0.60f, 0.28f);
-        static readonly Color Grass2 = new Color(0.52f, 0.68f, 0.34f);
-        static readonly Color Forest = new Color(0.30f, 0.45f, 0.22f);
+        static readonly Color Grass  = new Color(0.44f, 0.56f, 0.30f);   // 暗绿
+        static readonly Color Grass2 = new Color(0.54f, 0.68f, 0.34f);   // 亮一档
+        static readonly Color Forest = new Color(0.40f, 0.52f, 0.28f);   // 最深档（不能再暗，否则发黑）
         static readonly Color Rock   = new Color(0.46f, 0.44f, 0.48f);
         static readonly Color Deep   = new Color(0.26f, 0.36f, 0.26f);
 
@@ -44,10 +44,14 @@ namespace Fengling.TerrainSystem
             }
             else
             {
-                // 草地：用低频噪声做深浅斑块
-                float patch = Mathf.PerlinNoise(worldX * 0.022f + 7.1f, worldZ * 0.022f + 2.9f);
-                c = Color.Lerp(Grass, Grass2, patch);
-                if (patch > 0.62f) c = Color.Lerp(c, Forest, (patch - 0.62f) * 2.2f);
+                // 草地：低频大斑块（视频里最明显的特征——深浅交错的水彩感）
+                float big = Mathf.PerlinNoise(worldX * 0.018f + 7.1f, worldZ * 0.018f + 2.9f);
+                float mid = Mathf.PerlinNoise(worldX * 0.055f + 1.7f, worldZ * 0.055f + 5.3f);
+                float patch = big * 0.72f + mid * 0.28f;
+
+                c = Color.Lerp(Forest, Grass2, Mathf.SmoothStep(0f, 1f, patch));
+                // 最亮的区域再提一档，拉开层次
+                if (patch > 0.66f) c = Color.Lerp(c, new Color(0.60f, 0.74f, 0.38f), (patch - 0.66f) * 2.0f);
             }
 
             // 陡坡露岩

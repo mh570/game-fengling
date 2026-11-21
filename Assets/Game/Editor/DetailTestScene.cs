@@ -58,7 +58,27 @@ namespace Fengling.EditorTools
                 var shader = Shader.Find("Fengling/TerrainColor");
                 if (shader == null) { Debug.LogError("[Detail] 缺 shader"); return; }
                 mat = new Material(shader) { name = "Mat_TerrainColor" };
+                // 地面草地贴图（视频草地质感的来源）
+                var groundTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Textures/grass_pixel.png");
+                if (groundTex != null)
+                {
+                    mat.SetTexture("_MainTex", groundTex);
+                    mat.SetFloat("_TexScale", 0.35f);
+                    mat.SetFloat("_TexStrength", 0.75f);
+                }
                 AssetDatabase.CreateAsset(mat, "Assets/Game/Rendering/Materials/Mat_TerrainColor.mat");
+            }
+
+            // 贴图无论材质是否已存在都要挂上（否则重启后贴图丢失）
+            {
+                var groundTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Textures/grass_pixel.png");
+                if (groundTex != null)
+                {
+                    mat.SetTexture("_MainTex", groundTex);
+                    mat.SetFloat("_TexScale", 0.35f);
+                    mat.SetFloat("_TexStrength", 0.75f);
+                    EditorUtility.SetDirty(mat);
+                }
             }
 
             // 网格存成资产
@@ -109,7 +129,7 @@ namespace Fengling.EditorTools
             gf.Center = center;
             gf.Size = size;
             gf.BaseHeight = 1.2f;
-            gf.Count = 12000;
+            gf.Count = 0;      // 视频里看不到草叶，主要靠贴图 + 花
 
             // ---- 灯光
             var sunGo = new GameObject("Sun");
@@ -133,8 +153,8 @@ namespace Fengling.EditorTools
             cam.backgroundColor = new Color(0.62f, 0.72f, 0.78f);
             cam.fieldOfView = 45f;
             cam.farClipPlane = 300f;
-            camGo.transform.position = new Vector3(0f, 14f, -9f);
-            camGo.transform.rotation = Quaternion.Euler(50f, 0f, 0f);
+            camGo.transform.position = new Vector3(0f, 22f, -15f);
+            camGo.transform.rotation = Quaternion.Euler(48f, 0f, 0f);
 
             new GameObject("EnvironmentBootstrap").AddComponent<Fengling.Time.EnvironmentBootstrap>();
 
@@ -265,7 +285,7 @@ namespace Fengling.EditorTools
             int placed = 0;
 
             // 花：成簇
-            for (int cluster = 0; cluster < 22; cluster++)
+            for (int cluster = 0; cluster < 70; cluster++)
             {
                 float cx = center.x + (float)(rng.NextDouble() - 0.5) * size * 0.85f;
                 float cz = center.y + (float)(rng.NextDouble() - 0.5) * size * 0.85f;
@@ -275,8 +295,8 @@ namespace Fengling.EditorTools
                 int perCluster = 12 + rng.Next(14);
                 for (int k = 0; k < perCluster; k++)
                 {
-                    float px = cx + (float)(rng.NextDouble() - 0.5) * 1.6f;
-                    float pz = cz + (float)(rng.NextDouble() - 0.5) * 1.6f;
+                    float px = cx + (float)(rng.NextDouble() - 0.5) * 1.1f;
+                    float pz = cz + (float)(rng.NextDouble() - 0.5) * 1.1f;
                     var go = GameObject.CreatePrimitive(PrimitiveType.Quad);
                     go.name = "Flower";
                     Object.DestroyImmediate(go.GetComponent<Collider>());

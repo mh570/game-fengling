@@ -6,6 +6,9 @@ Shader "Fengling/TerrainColor"
     Properties
     {
         _Tint ("Tint", Color) = (1, 1, 1, 1)
+        _MainTex ("Ground Tex", 2D) = "white" {}
+        _TexScale ("Tex Scale (per meter)", Float) = 0.5
+        _TexStrength ("Tex Strength", Range(0, 1)) = 0.65
     }
 
     SubShader
@@ -26,6 +29,9 @@ Shader "Fengling/TerrainColor"
             #include "UnityCG.cginc"
 
             float4 _Tint;
+            sampler2D _MainTex;
+            float _TexScale;
+            float _TexStrength;
             float3 _FenglingSunDir;
             float3 _FenglingSunColor;
             float3 _FenglingAmbientColor;
@@ -36,6 +42,7 @@ Shader "Fengling/TerrainColor"
                 float4 pos : SV_POSITION;
                 float3 normal : TEXCOORD0;
                 float4 color : COLOR;
+                float3 worldPos : TEXCOORD2;
             };
 
             v2f vert(appdata_full v)
@@ -44,6 +51,7 @@ Shader "Fengling/TerrainColor"
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 o.color = v.color;
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                 return o;
             }
 
@@ -53,9 +61,14 @@ Shader "Fengling/TerrainColor"
                 float ndl = saturate(dot(N, normalize(-_FenglingSunDir)));
 
                 // 半兰伯特 + 环境：压低对比，参考视频是高环境光低对比
-                float wrap = ndl * 0.75 + 0.25;
+                float wrap = ndl * 0.45 + 0.55;   // 压低对比，避免暗部发黑
 
-                float3 lit = i.color.rgb *
+                // 贴图调制：叠加草地纹理细节（沙地和草地都受益）
+                float2 uv = i.worldPos.xz * _TexScale;
+                float3 tex = tex2D(_MainTex, uv).rgb;
+                float3 baseCol = i.color.rgb * lerp(float3(1,1,1), tex * 2.0, _TexStrength);
+
+                float3 lit = baseCol *
                              (_FenglingSunColor.rgb * wrap * 0.50 +
                               _FenglingAmbientColor.rgb * _FenglingAmbientScale * 0.30);
 
