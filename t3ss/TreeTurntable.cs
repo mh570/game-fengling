@@ -44,7 +44,7 @@ namespace T3ssDemo
             var mat = new Material(shader) { name = "MAT_TT" };
             if (tex != null) mat.SetTexture("_MainTex", tex);
             mat.SetFloat("_Cutoff", 0.4f);
-            mat.SetFloat("_Cuts", 8f);
+            mat.SetFloat("_Cuts", 16f);
             mat.SetFloat("_DitherStrength", 0f);
             mat.SetColor("_BaseColor", Color.white);
             mat.SetColor("_HighlightColor", new Color(0.74f, 0.82f, 0.64f));   // 发白

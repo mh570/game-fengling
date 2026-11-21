@@ -118,7 +118,7 @@ namespace T3ssDemo
                     rr));
             }
 
-            var shellCol = new Color(0.10f, 0.16f, 0.09f, 1f);   // 壳压暗，靠卡片表现树叶
+            var shellCol = new Color(0.70f, 0.88f, 0.56f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
             foreach (var sc in shellCenters)
                 AddSphere(verts, normals, uvs, colors, tris, ref triBase,
                     new Vector3(sc.x, sc.y, sc.z), sc.w, 8, 6, shellCol);
@@ -170,11 +170,8 @@ namespace T3ssDemo
 
                 // 颜色：越靠外越暗（模拟内部遮挡）
                 // 只有 3 档绿（参考视频的树叶糊成色块，不是彩纸）
-                int tier = rng.Next(3);
-                Color lcol;
-                if (tier == 0)      lcol = new Color(0.58f, 0.78f, 0.44f, 1f);   // 暗绿
-                else if (tier == 1) lcol = new Color(0.68f, 0.86f, 0.52f, 1f);   // 中绿
-                else                lcol = new Color(0.80f, 0.94f, 0.62f, 1f);   // 亮绿
+                // 单一绿色：水彩感需要无杂色
+                Color lcol = new Color(0.70f, 0.88f, 0.56f, 1f);
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                 AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);
@@ -189,7 +186,8 @@ namespace T3ssDemo
                 if (arrV[i].y < canopyBase * 0.9f) continue;
                 var d = arrV[i] - canopyCenter;
                 if (d.sqrMagnitude < 1e-6f) continue;
-                arrN[i] = Vector3.Slerp(arrN[i].normalized, d.normalized, 0.35f).normalized;
+                // 全球形法线：整团连续法线场，像水彩
+                arrN[i] = Vector3.Slerp(arrN[i].normalized, d.normalized, 1.0f).normalized;
             }
 
             var mesh = new Mesh();

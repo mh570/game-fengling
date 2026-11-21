@@ -9,7 +9,7 @@ Shader "Custom/ToonFoliage"
         _BaseColor ("Base Color", Color) = (0.30, 0.50, 0.22, 1)
         _HighlightColor ("Highlight", Color) = (0.78, 0.92, 0.54, 1)
         _ShadowColor ("Shadow", Color) = (0.24, 0.40, 0.22, 1)
-        _Cuts ("Cuts", Range(1,16)) = 8
+        _Cuts ("Cuts", Range(1,32)) = 16
         _DitherStrength ("Dither", Range(0,1)) = 0.0
     }
 
