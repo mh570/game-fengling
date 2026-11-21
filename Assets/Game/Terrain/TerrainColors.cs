@@ -16,7 +16,7 @@ namespace Fengling.TerrainSystem
         static readonly Color Deep   = new Color(0.310f, 0.400f, 0.290f);
 
         /// <summary>抖动强度（0=无抖动）</summary>
-        public static float DitherStrength = 0.10f;
+        public static float DitherStrength = 0.035f;
 
         public static Color Compute(float worldX, float worldZ, float height, float slope,
                                     float regionMin, float regionMax)

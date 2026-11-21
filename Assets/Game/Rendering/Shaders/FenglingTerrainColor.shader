@@ -13,7 +13,7 @@ Shader "Fengling/TerrainColor"
         Tags { "RenderPipeline" = "FenglingForward" "RenderType" = "Opaque" "Queue" = "Geometry" }
         ZWrite On
         ZTest LEqual
-        Cull Back
+        Cull Off
 
         Pass
         {
