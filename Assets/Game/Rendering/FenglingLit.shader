@@ -7,6 +7,7 @@ Shader "Fengling/Lit"
     Properties
     {
         _BaseColor ("Base Color", Color) = (0.75, 0.72, 0.65, 1)
+        _TerrainMode ("Terrain Mode (0=普通 1=地表分带)", Range(0, 1)) = 0
         _BaseMap ("Base Map", 2D) = "white" {}
         _Smoothness ("Smoothness", Range(0, 1)) = 0.15
         _Metallic ("Metallic", Range(0, 1)) = 0
@@ -33,6 +34,7 @@ Shader "Fengling/Lit"
             #include "UnityCG.cginc"
 
             float4 _BaseColor;
+            float _TerrainMode;
             sampler2D _BaseMap;
             float4 _BaseMap_ST;
             float _Smoothness;
@@ -163,6 +165,35 @@ Shader "Fengling/Lit"
                 float3 V = normalize(_WorldSpaceCameraPos - i.worldPos);
 
                 float3 albedo = _BaseColor.rgb * tex2D(_BaseMap, i.uv).rgb;
+
+                // ---- 风格化地表分带（_TerrainMode > 0.5 时生效）
+                // 按高度分：沙滩 / 草地 / 密林 / 岩石；陡坡强制岩石；用低频噪声打破硬边。
+                if (_TerrainMode > 0.5)
+                {
+                    // 低频噪声：让分带边界不是等高线
+                    float2 np = i.worldPos.xz * 0.02;
+                    float jitter = (sin(np.x * 1.7 + sin(np.y * 1.3)) * 0.5 +
+                                    sin(np.y * 2.1 + sin(np.x * 0.9)) * 0.5) * 0.5;
+                    float h = i.worldPos.y + jitter * 12.0;
+
+                    float3 sand  = float3(0.788, 0.702, 0.576);   // #C9B393
+                    float3 grass = float3(0.498, 0.627, 0.353);   // #7FA05A
+                    float3 grass2= float3(0.588, 0.702, 0.420);   // #96B36B
+                    float3 forest= float3(0.247, 0.357, 0.227);   // #3F5B3A
+                    float3 rock  = float3(0.431, 0.416, 0.478);   // #6E6A7A
+
+                    float3 c = sand;
+                    c = lerp(c, grass,  smoothstep(12.0, 26.0, h));
+                    c = lerp(c, grass2, smoothstep(26.0, 40.0, h) * 0.6);
+                    c = lerp(c, forest, smoothstep(55.0, 85.0, h));
+                    c = lerp(c, rock,   smoothstep(110.0, 150.0, h));
+
+                    // 陡坡强制岩石
+                    float slope = 1.0 - saturate(dot(normalize(i.worldNormal), float3(0, 1, 0)));
+                    c = lerp(c, rock, smoothstep(0.45, 0.75, slope));
+
+                    albedo = c;
+                }
 
                 // 漫反射
                 float ndl = saturate(dot(N, L));

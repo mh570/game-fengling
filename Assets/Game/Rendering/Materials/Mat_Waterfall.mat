@@ -29,6 +29,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _TerrainMode: 1
     - _AmbientBoost: 1
     - _AmbientFloor: 0.08
     - _Metallic: 0
