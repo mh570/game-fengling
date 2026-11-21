@@ -102,9 +102,9 @@ namespace Fengling.TerrainSystem
                         new Vector2(x0 + size * 0.30f, z0 + size * 0.25f),
                         new Vector2(x0 + size * 0.18f, z0 + size * 0.12f),
                     },
-                    width = 3.0f,
-                    depth = 2.5f,
-                    falloff = 6f,
+                    width = 1.2f,
+                    depth = 0.8f,
+                    falloff = 3f,
                 },
             };
 
@@ -113,9 +113,9 @@ namespace Fengling.TerrainSystem
                 new Lake
                 {
                     center = new Vector2(x0 + size * 0.35f, z0 + size * 0.70f),
-                    radius = 14f,
-                    depth = 3.5f,
-                    falloff = 10f,
+                    radius = 12f,
+                    depth = 1.4f,
+                    falloff = 8f,
                 },
             };
 

@@ -40,16 +40,16 @@ namespace Fengling.TerrainSystem
                     if (h > rMax) rMax = h;
                 }
             }
-            float mean = (rMin + rMax) * 0.5f;
-            float lo = mean + (rMin - mean) * heightCompression;
-            float hi = mean + (rMax - mean) * heightCompression;
+            // 分带范围也要跟着同一套缩放（朝海平面按比例）
+            float lo = rMin * heightCompression;
+            float hi = rMax * heightCompression;
             Debug.Log(string.Format("[Chunk] 分带 {0:F1} ~ {1:F1} m（原始 {2:F1} ~ {3:F1}）", lo, hi, rMin, rMax));
 
             for (int cz = 0; cz < chunkCount; cz++)
             {
                 for (int cx = 0; cx < chunkCount; cx++)
                 {
-                    var mesh = BuildChunk(origin, cx, cz, cells, cellSize, mean, heightCompression, lo, hi);
+                    var mesh = BuildChunk(origin, cx, cz, cells, cellSize, heightCompression, lo, hi);
                     if (mesh == null) continue;
 
                     float centerX = origin.x + (cx * cells + cells * 0.5f) * cellSize;
@@ -68,7 +68,7 @@ namespace Fengling.TerrainSystem
         }
 
         static Mesh BuildChunk(Vector2 origin, int cx, int cz, int cells, float cellSize,
-                               float mean, float compression, float lo, float hi)
+                               float compression, float lo, float hi)
         {
             int n = cells + 1;                 // 每边顶点数
             int quadCount = cells * cells;
@@ -96,7 +96,8 @@ namespace Fengling.TerrainSystem
                     float wz = origin.y + (cz * cells + j) * cellSize;
                     float h = TerrainMeshBuilder.SampleHeightSmooth(wx, wz);
                     // 只压平陆地，保留海平面以下（否则海滩/海会被压没）
-                    if (h > 0f) h = mean + (h - mean) * compression;
+                    // 朝海平面按比例缩放：0m 仍是 0m，海岸线保持连续（不会出现悬崖）
+                    h *= compression;
                     pts[j * n + i] = new Vector3(wx, h, wz);
                 }
             }
