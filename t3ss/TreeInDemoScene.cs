@@ -160,6 +160,34 @@ namespace T3ssDemo
                 Debug.Log("[Demo] 草 " + gplaced + " 株");
             }
 
+            // ---- GodRay 光柱
+            var grShader = Shader.Find("Custom/GodRay");
+            if (grShader != null)
+            {
+                var grMat = new Material(grShader) { name = "MAT_GodRay" };
+                grMat.SetColor("_Color", new Color(1.0f, 0.95f, 0.78f, 1f));
+                grMat.SetFloat("_Intensity", 0.26f);
+                grMat.SetFloat("_EdgeSoftness", 0.80f);
+                grMat.SetFloat("_TopFade", 0.30f);
+                grMat.SetFloat("_BottomFade", 0.60f);
+                grMat.SetFloat("_NoiseStrength", 0.65f);
+                grMat.SetFloat("_NoiseScale", 1.2f);
+                var cloudNoise = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Textures/CloudNoise.png");
+                if (cloudNoise != null) grMat.SetTexture("_NoiseTex", cloudNoise);
+
+                var opt = new GodRayBuilder.Options
+                {
+                    ShaftCount = 24,
+                    AreaRadius = 8f,
+                    Height = 13f,
+                    Width = 3.4f,
+                    Seed = 4242,
+                };
+                GodRayBuilder.Spawn(opt, grMat, null, out int shaftCount);
+                Debug.Log("[Demo] GodRay 光柱 " + shaftCount + " 根");
+            }
+            else Debug.Log("[Demo] 缺 Custom/GodRay shader");
+
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Test/ShaderTest_Trees.unity");
 
