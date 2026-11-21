@@ -103,14 +103,14 @@ namespace T3ssDemo
 
             // ---- 3. 树冠"壳"：3 个错位球（提供体积），位置随种子变化
             float canopyR = H * (0.34f + (float)rng.NextDouble() * 0.14f);   // 0.34~0.48
-            float canopyBase = trunkH * (0.88f + (float)rng.NextDouble() * 0.10f);
+            float canopyBase = trunkH * (1.08f + (float)rng.NextDouble() * 0.12f);   // 抬高，露出树干
             var shellCenters = new List<Vector4>();   // xyz + radius
-            shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR));
+            shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR * 0.60f));
             for (int k = 0; k < 2; k++)
             {
                 float a = (float)rng.NextDouble() * Mathf.PI * 2f;
                 float d = canopyR * (0.20f + (float)rng.NextDouble() * 0.35f);
-                float rr = canopyR * (0.55f + (float)rng.NextDouble() * 0.22f);
+                float rr = canopyR * (0.33f + (float)rng.NextDouble() * 0.14f);
                 shellCenters.Add(new Vector4(
                     Mathf.Cos(a) * d,
                     canopyBase + canopyR * (0.18f + (float)rng.NextDouble() * 0.50f),
@@ -146,7 +146,10 @@ namespace T3ssDemo
                     Mathf.Sin(phi) * Mathf.Sin(theta));
 
                 // 位置：球面上 + 随机内外偏移
-                var pos = center + dir * (radius * (0.70f + (float)rng.NextDouble() * 0.60f));
+                var pos = center + dir * (canopyR * (0.35f + (float)rng.NextDouble() * 0.75f));
+                // 垂直向上偏置：叶片不下垂到树干以下
+                float minY = canopyBase * 0.92f;
+                if (pos.y < minY) pos.y = minY + (float)rng.NextDouble() * canopyR * 0.25f;
 
                 // 朝向：完全随机
                 var rot = Quaternion.Euler(
@@ -155,9 +158,14 @@ namespace T3ssDemo
                     (float)rng.NextDouble() * 360f);
 
                 // 颜色：越靠外越暗（模拟内部遮挡）
-                float outside = Mathf.Clamp01((pos - canopyCenter).magnitude / (canopyR * 1.3f));
-                float lum = Mathf.Lerp(1.15f, 0.80f, outside) * (0.9f + (float)rng.NextDouble() * 0.25f);
-                var lcol = new Color(0.55f * lum, 0.75f * lum, 0.42f * lum, 1f);
+                // 每张卡片独立颜色：亮度 + 色相都随机，打破单色
+                float tint = 0.82f + (float)rng.NextDouble() * 0.36f;
+                float hueShift = (float)rng.NextDouble() * 0.12f - 0.06f;
+                var lcol = new Color(
+                    Mathf.Clamp01(0.55f * tint + hueShift),
+                    Mathf.Clamp01(0.75f * tint),
+                    Mathf.Clamp01(0.42f * tint - hueShift),
+                    1f);
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                 AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);
