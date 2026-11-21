@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace Fengling.Rendering
 {
@@ -16,6 +17,21 @@ namespace Fengling.Rendering
         private Light _fillLight;
         private Camera _reflectionCamera;
         private RenderTexture _reflectionRT;
+
+        // ---- RenderGraph 外壳（2026-11-21 第 3 步）
+        // 默认关闭：本步只验证 API 用法和结构，不改变现有渲染行为。
+        // 打开后走 RecordRenderGraphPath，用一个 unsafe pass 包住现有逻辑。
+        // 开关打开前必须先用探针确认偏差为 0。
+        // 用 static 而非 const：const 会让编译器把分支裁掉并报"不可达代码"。
+        private static bool UseRenderGraph = false;
+        private RenderGraph _renderGraph;
+
+        /// <summary>unsafe pass 的数据：把 pipeline 和 camera 传进渲染函数。</summary>
+        private sealed class CameraPassData
+        {
+            public FenglingPipeline Pipeline;
+            public Camera Camera;
+        }
 
         private static readonly ShaderTagId[] OpaqueTags =
         {
@@ -50,8 +66,57 @@ namespace Fengling.Rendering
             {
                 if (camera == null) continue;
                 if (camera.cameraType == CameraType.Reflection) continue;
-                RenderCamera(context, camera);
+
+                if (UseRenderGraph) RecordRenderGraphPath(context, camera);
+                else RenderCamera(context, camera);
             }
+        }
+
+        /// <summary>
+        /// RenderGraph 迁移的第 3 步：把整段现有渲染逻辑塞进一个 unsafe pass。
+        ///
+        /// 为什么用 unsafe pass 而不是直接写 raster pass：
+        ///   直接声明式重写 408 行是"重写"不是"迁移"，无法逐步验证。
+        ///   unsafe pass 允许原样执行 CommandBuffer，从而保证这一步行为完全不变。
+        ///
+        /// 下一步：把 Opaque / Transparent / Skybox 逐个从 unsafe 转成 raster pass，
+        /// 每转一个都跑探针，偏差必须为 0。
+        /// </summary>
+        private void RecordRenderGraphPath(ScriptableRenderContext context, Camera camera)
+        {
+            if (_renderGraph == null) _renderGraph = new RenderGraph("FenglingRenderGraph");
+
+            CommandBuffer cmd = CommandBufferPool.Get("Fengling.RenderGraph");
+
+            var parameters = new RenderGraphParameters
+            {
+                executionId = camera.GetEntityId(),
+                currentFrameIndex = Time.frameCount,
+                scriptableRenderContext = context,
+                commandBuffer = cmd,
+            };
+
+            _renderGraph.BeginRecording(parameters);
+
+            using (var builder = _renderGraph.AddUnsafePass<CameraPassData>("Fengling.Camera", out var data))
+            {
+                data.Pipeline = this;
+                data.Camera = camera;
+
+                // 内容不可裁剪：这是我们唯一的绘制入口
+                builder.AllowPassCulling(false);
+                builder.SetRenderFunc<CameraPassData>((passData, ctx) =>
+                {
+                    // 用外层捕获的 context：UnsafeGraphContext 不暴露 renderContext，
+                    // 而现有渲染逻辑需要 ScriptableRenderContext 本身。
+                    passData.Pipeline.RenderCamera(context, passData.Camera);
+                });
+            }
+
+            _renderGraph.EndRecordingAndExecute();
+
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
         }
 
         private void RenderCamera(ScriptableRenderContext context, Camera camera)
