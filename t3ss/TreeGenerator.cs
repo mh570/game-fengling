@@ -82,8 +82,8 @@ namespace T3ssDemo
 
             // ---- 1. 树干（锥形圆柱）
             AddCylinder(verts, normals, uvs, colors, tris, ref triBase,
-                Vector3.zero, trunkH, trunkR, trunkR * 0.55f, 6,
-                new Color(0.22f, 0.16f, 0.12f, 1f));
+                Vector3.zero, trunkH, trunkR, trunkR * 0.55f, 8,
+                new Color(0.29f, 0.20f, 0.25f, 1f));
 
             // ---- 2. 分枝（2~3 根，斜向上）
             int branches = 2 + rng.Next(2);
@@ -96,7 +96,7 @@ namespace T3ssDemo
                 var dir = new Vector3(Mathf.Cos(ang), 1.1f, Mathf.Sin(ang)).normalized;
                 var end = start + dir * len;
                 AddCylinderBetween(verts, normals, uvs, colors, tris, ref triBase, start, end,
-                    trunkR * 0.45f, trunkR * 0.28f, 5, new Color(0.22f, 0.16f, 0.12f, 1f));
+                    trunkR * 0.45f, trunkR * 0.28f, 6, new Color(0.29f, 0.20f, 0.25f, 1f));
             }
 
             shellVerts = verts.Count;
@@ -237,36 +237,23 @@ namespace T3ssDemo
             var right = Vector3.Cross(axis, up).normalized;
             var fwd = Vector3.Cross(right, axis).normalized;
 
-            // 平面着色：每个面独立 4 个顶点，法线 = 面法线，颜色微变
+            // 平滑法线圆柱（t3ssel8r 的做法：纯色光滑柱体）
+            int start = b;
             for (int i = 0; i < sides; i++)
             {
-                float a0 = i / (float)sides * Mathf.PI * 2f;
-                float a1 = (i + 1) / (float)sides * Mathf.PI * 2f;
-                var d0 = right * Mathf.Cos(a0) + fwd * Mathf.Sin(a0);
-                var d1 = right * Mathf.Cos(a1) + fwd * Mathf.Sin(a1);
-
-                var p0 = a + d0 * rA;
-                var p1 = a + d1 * rA;
-                var p2 = bb + d0 * rB;
-                var p3 = bb + d1 * rB;
-
-                // 面法线
-                var faceN = Vector3.Cross(p1 - p0, p2 - p0).normalized;
-                if (Vector3.Dot(faceN, (p0 + p1 + p2 + p3) * 0.25f - (a + bb) * 0.5f) < 0f) faceN = -faceN;
-
-                // 每个面亮度微变（像素画的手绘感）
-                float fv = 0.82f + (i * 37 % 11) / 11f * 0.36f;
-                var fc = new Color(col.r * fv, col.g * fv, col.b * fv, 1f);
-
-                v.Add(p0); n.Add(faceN); uv.Add(new Vector2(0, 0)); c.Add(fc);
-                v.Add(p1); n.Add(faceN); uv.Add(new Vector2(1, 0)); c.Add(fc);
-                v.Add(p2); n.Add(faceN); uv.Add(new Vector2(0, 1)); c.Add(fc);
-                v.Add(p3); n.Add(faceN); uv.Add(new Vector2(1, 1)); c.Add(fc);
-                t.Add(b + 0); t.Add(b + 1); t.Add(b + 2);
-                t.Add(b + 1); t.Add(b + 3); t.Add(b + 2);
-                b += 4;
+                float ang = i / (float)sides * Mathf.PI * 2f;
+                var dir = right * Mathf.Cos(ang) + fwd * Mathf.Sin(ang);
+                v.Add(a + dir * rA); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 0)); c.Add(col);
+                v.Add(bb + dir * rB); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 1)); c.Add(col);
             }
-        }
+            for (int i = 0; i < sides; i++)
+            {
+                int i0 = start + i * 2;
+                int i1 = start + ((i + 1) % sides) * 2;
+                t.Add(i0); t.Add(i1); t.Add(i0 + 1);
+                t.Add(i1); t.Add(i1 + 1); t.Add(i0 + 1);
+            }
+            b += sides * 2;        }
 
         static void AddSphere(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Color> c,
                               List<int> t, ref int b, Vector3 center, float radius,
