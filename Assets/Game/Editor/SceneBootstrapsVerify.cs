@@ -15,13 +15,26 @@ namespace Fengling.EditorTools
     /// </summary>
     public static class SceneBootstrapsVerify
     {
-        private const string ScenePath = "Assets/Scenes/RpgLab.unity";
+        private static string ScenePath = "Assets/Scenes/RpgLab.unity";
         private const string PendingKey = "SceneBootstrapsVerify.Pending";
         private const string StartKey = "SceneBootstrapsVerify.Start";
 
         private static readonly List<string> Failures = new List<string>();
 
         public static void Run()
+        {
+            ScenePath = "Assets/Scenes/RpgLab.unity";
+            RunInternal();
+        }
+
+        /// <summary>WaterLab 是唯一含 PlayerBuoyancy 的场景，用于验证浮力注入。</summary>
+        public static void RunWaterLab()
+        {
+            ScenePath = "Assets/Scenes/WaterLab.unity";
+            RunInternal();
+        }
+
+        private static void RunInternal()
         {
             EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
