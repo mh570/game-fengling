@@ -14,6 +14,7 @@ namespace Fengling.Rendering
         private readonly FenglingPipelineSettings _settings;
         private readonly FenglingShadows _shadows = new FenglingShadows();
         private readonly FenglingClouds _clouds = new FenglingClouds();
+        private readonly FenglingOutline _outline = new FenglingOutline();
         private readonly Material _postMaterial;
         private Light _fillLight;
         private Camera _reflectionCamera;
@@ -307,6 +308,9 @@ namespace Fengling.Rendering
             context.DrawRenderers(culling, ref transparentSettings, ref transparentFilter);
 
             PostProcess(context, camera, colorRT, width, height);
+
+            // 边缘亮线：放在后处理之后，让白线不被 Bloom 冲淡
+            _outline.Render(context, camera, colorTarget, depthTarget);
             RenderTexture.ReleaseTemporary(colorRT);
             RenderTexture.ReleaseTemporary(depthRT);
             RenderTexture.ReleaseTemporary(sceneColorRT);
