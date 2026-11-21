@@ -13,6 +13,7 @@ namespace Fengling.Rendering
     {
         private readonly FenglingPipelineSettings _settings;
         private readonly FenglingShadows _shadows = new FenglingShadows();
+        private readonly FenglingClouds _clouds = new FenglingClouds();
         private readonly Material _postMaterial;
         private Light _fillLight;
         private Camera _reflectionCamera;
@@ -251,6 +252,9 @@ namespace Fengling.Rendering
             // ---- 天空盒
             if (camera.clearFlags == CameraClearFlags.Skybox)
                 context.DrawSkybox(camera);
+
+            // ---- 体积云（在陆地之后、水面之前合成）
+            _clouds.Render(context, camera, colorTarget, depthTarget);
 
             // ---- 场景颜色 / 线性深度拷贝（全分辨率）
             // 水面在透明队列里，必须先拷贝不透明+天空的颜色，才能做折射。

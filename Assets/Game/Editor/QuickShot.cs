@@ -20,11 +20,13 @@ namespace Fengling.EditorTools
         private const string HourKey = "QuickShot.Hour";
         private const string NameKey = "QuickShot.Name";
         private const string FogKey = "QuickShot.ClearFog";
+        private const string SkyKey = "QuickShot.Sky";
 
         public static void RunLake() { Shot("Assets/Scenes/Lake.unity", 12f, "lake_12h.png", false); }
         public static void RunLakeNoFog() { Shot("Assets/Scenes/Lake.unity", 12f, "lake_12h_nofog.png", true); }
         public static void RunLake18() { Shot("Assets/Scenes/Lake.unity", 18f, "lake_18h.png", false); }
         public static void RunRpgLab() { Shot("Assets/Scenes/RpgLab.unity", 12f, "rgplab_12h.png", false); }
+        public static void RunLakeSky() { Shot("Assets/Scenes/Lake.unity", 12f, "lake_sky.png", false); SessionState.SetBool(SkyKey, true); }
 
         private static void Shot(string scene, float hour, string outName, bool clearFog)
         {
@@ -91,6 +93,13 @@ namespace Fengling.EditorTools
             }
             if (cam == null) { Debug.LogError("[Shot] 没有可用相机"); EditorApplication.Exit(1); return; }
 
+            if (SessionState.GetBool(SkyKey, false))
+            {
+                var rts = Object.FindFirstObjectByType<Fengling.Player.RtsCameraController>();
+                if (rts != null) rts.enabled = false;
+                cam.transform.rotation = Quaternion.Euler(-18f, 45f, 0f);
+                Debug.Log("[Shot] 已切换到仰视机位");
+            }
             Debug.Log("[Shot] 相机 " + cam.name + " pos=" + cam.transform.position.ToString("F1") +
                       " hour=" + hour + " clearFog=" + clearFog +
                       " weatherFog=" + (weather != null ? weather.fog : -1f));
