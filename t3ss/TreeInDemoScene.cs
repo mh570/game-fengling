@@ -42,8 +42,8 @@ namespace T3ssDemo
             mat.SetFloat("_Cutoff", 0.4f);
             mat.SetFloat("_Cuts", 3f);
             mat.SetColor("_BaseColor", Color.white);
-            mat.SetColor("_HighlightColor", new Color(0.78f, 0.92f, 0.54f));
-            mat.SetColor("_ShadowColor", new Color(0.24f, 0.40f, 0.22f));
+            mat.SetColor("_HighlightColor", new Color(0.70f, 0.86f, 0.46f));
+            mat.SetColor("_ShadowColor", new Color(0.16f, 0.30f, 0.26f));   // 暗部偏冷
 
             // ---- 在相机前方摆一圈树
             var root = new GameObject("TestTrees");
@@ -100,7 +100,7 @@ namespace T3ssDemo
                 }
             }
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.52f, 0.58f, 0.52f);
+            RenderSettings.ambientLight = new Color(0.46f, 0.54f, 0.54f);   // 环境光偏冷
 
             // ---- 草（手动 DrawMeshInstanced）
             var spawner = Object.FindFirstObjectByType<GrassSpawner>();

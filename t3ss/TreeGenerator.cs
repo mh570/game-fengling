@@ -161,7 +161,7 @@ namespace T3ssDemo
                 if (arrV[i].y < canopyBase * 0.9f) continue;
                 var d = arrV[i] - canopyCenter;
                 if (d.sqrMagnitude < 1e-6f) continue;
-                arrN[i] = Vector3.Slerp(arrN[i].normalized, d.normalized, 0.55f).normalized;
+                arrN[i] = Vector3.Slerp(arrN[i].normalized, d.normalized, 0.35f).normalized;
             }
 
             var mesh = new Mesh();
