@@ -47,8 +47,8 @@ namespace T3ssDemo
             mat.SetFloat("_Cuts", 8f);
             mat.SetFloat("_DitherStrength", 0f);
             mat.SetColor("_BaseColor", Color.white);
-            mat.SetColor("_HighlightColor", new Color(0.60f, 0.72f, 0.50f));   // 降饱和
-            mat.SetColor("_ShadowColor", new Color(0.22f, 0.32f, 0.26f));   // 提高暗部（降低对比）
+            mat.SetColor("_HighlightColor", new Color(0.74f, 0.82f, 0.64f));   // 发白
+            mat.SetColor("_ShadowColor", new Color(0.46f, 0.58f, 0.46f));   // 暗部也提亮（低对比）
 
             // ---- 生成一棵树
             var opt = new TreeGenerator.Options
@@ -77,7 +77,7 @@ namespace T3ssDemo
             if (toon != null)
             {
                 var gm = new Material(toon);
-                gm.SetColor("_BaseColor", new Color(0.62f, 0.72f, 0.42f));
+                gm.SetColor("_BaseColor", new Color(0.70f, 0.78f, 0.50f));
                 gm.SetColor("_Color2", new Color(0.56f, 0.68f, 0.38f));
                 gm.SetColor("_Color3", new Color(0.50f, 0.62f, 0.34f));
                 ground.GetComponent<MeshRenderer>().sharedMaterial = gm;
@@ -91,6 +91,11 @@ namespace T3ssDemo
             lg.shadows = LightShadows.Soft;
             lg.shadowStrength = 0.5f;
             lg.transform.rotation = Quaternion.Euler(55f, -35f, 0f);
+            // 大气透视：雾让远处发白
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.Exponential;
+            RenderSettings.fogDensity = 0.055f;
+            RenderSettings.fogColor = new Color(0.80f, 0.86f, 0.88f);
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(0.50f, 0.56f, 0.54f);
 

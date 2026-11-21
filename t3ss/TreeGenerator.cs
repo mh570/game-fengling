@@ -172,9 +172,9 @@ namespace T3ssDemo
                 // 只有 3 档绿（参考视频的树叶糊成色块，不是彩纸）
                 int tier = rng.Next(3);
                 Color lcol;
-                if (tier == 0)      lcol = new Color(0.48f, 0.66f, 0.38f, 1f);   // 暗绿
-                else if (tier == 1) lcol = new Color(0.58f, 0.76f, 0.44f, 1f);   // 中绿
-                else                lcol = new Color(0.68f, 0.84f, 0.50f, 1f);   // 亮绿
+                if (tier == 0)      lcol = new Color(0.58f, 0.78f, 0.44f, 1f);   // 暗绿
+                else if (tier == 1) lcol = new Color(0.68f, 0.86f, 0.52f, 1f);   // 中绿
+                else                lcol = new Color(0.80f, 0.94f, 0.62f, 1f);   // 亮绿
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                 AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);

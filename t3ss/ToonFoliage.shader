@@ -102,6 +102,10 @@ Shader "Custom/ToonFoliage"
                 float3 col = lerp(_ShadowColor.rgb, _HighlightColor.rgb, q);
                 col *= _BaseColor.rgb * tex.rgb * IN.color.rgb;   // 顶点色（树干/叶片区分）
 
+                // 环境光（天空光）：否则背光叶片全黑，整体被拉暗
+                float3 ambient = SampleSH(N) * 0.65;
+                col += ambient * _BaseColor.rgb * IN.color.rgb * tex.rgb;
+
                 return half4(col, 1);
             }
             ENDHLSL
