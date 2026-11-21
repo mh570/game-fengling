@@ -49,6 +49,7 @@ Shader "Custom/ToonFoliage"
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
                 float2 uv         : TEXCOORD0;
+                float4 color      : COLOR;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -58,6 +59,7 @@ Shader "Custom/ToonFoliage"
                 float3 positionWS  : TEXCOORD0;
                 float3 normalWS    : TEXCOORD1;
                 float2 uv          : TEXCOORD2;
+                float4 color       : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -71,6 +73,7 @@ Shader "Custom/ToonFoliage"
                 OUT.positionWS = p.positionWS;
                 OUT.normalWS = n.normalWS;
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.color = IN.color;
                 return OUT;
             }
 
@@ -97,7 +100,7 @@ Shader "Custom/ToonFoliage"
                 q = saturate(q + (dither - 0.5 * _DitherStrength) / steps);
 
                 float3 col = lerp(_ShadowColor.rgb, _HighlightColor.rgb, q);
-                col *= _BaseColor.rgb * tex.rgb;
+                col *= _BaseColor.rgb * tex.rgb * IN.color.rgb;   // 顶点色（树干/叶片区分）
 
                 return half4(col, 1);
             }

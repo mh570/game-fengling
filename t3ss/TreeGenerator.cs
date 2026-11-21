@@ -78,7 +78,7 @@ namespace T3ssDemo
             // 形状变体：树干比例、树冠比例、粗细都按种子变化
             float trunkRatio = 0.45f + (float)rng.NextDouble() * 0.20f;   // 0.45~0.65
             float trunkH = H * trunkRatio;
-            float trunkR = Mathf.Max(0.08f, H * (0.045f + (float)rng.NextDouble() * 0.018f));   // 加粗
+            float trunkR = Mathf.Max(0.10f, H * (0.060f + (float)rng.NextDouble() * 0.022f));   // 更粗
 
             // ---- 1. 树干（锥形圆柱）
             AddCylinder(verts, normals, uvs, colors, tris, ref triBase,
@@ -93,7 +93,7 @@ namespace T3ssDemo
                 float baseY = trunkH * (0.55f + (float)rng.NextDouble() * 0.25f);
                 float len = trunkH * (0.35f + (float)rng.NextDouble() * 0.2f);
                 var start = new Vector3(Mathf.Cos(ang) * trunkR * 0.4f, baseY, Mathf.Sin(ang) * trunkR * 0.4f);
-                var dir = new Vector3(Mathf.Cos(ang), 1.1f, Mathf.Sin(ang)).normalized;
+                var dir = new Vector3(Mathf.Cos(ang) * 0.55f, 2.2f, Mathf.Sin(ang) * 0.55f).normalized;   // 分枝更竖直
                 var end = start + dir * len;
                 AddCylinderBetween(verts, normals, uvs, colors, tris, ref triBase, start, end,
                     trunkR * 0.45f, trunkR * 0.28f, 6, new Color(0.29f, 0.20f, 0.25f, 1f));
@@ -103,7 +103,7 @@ namespace T3ssDemo
 
             // ---- 3. 树冠"壳"：3 个错位球（提供体积），位置随种子变化
             float canopyR = H * (0.34f + (float)rng.NextDouble() * 0.14f);   // 0.34~0.48
-            float canopyBase = trunkH * (1.08f + (float)rng.NextDouble() * 0.12f);   // 抬高，露出树干
+            float canopyBase = trunkH * (1.30f + (float)rng.NextDouble() * 0.15f);   // 大幅抬高，露出树干
             var shellCenters = new List<Vector4>();   // xyz + radius
             shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR * 0.60f));
             for (int k = 0; k < 2; k++)
@@ -148,7 +148,7 @@ namespace T3ssDemo
                 // 位置：球面上 + 随机内外偏移
                 var pos = center + dir * (canopyR * (0.35f + (float)rng.NextDouble() * 0.75f));
                 // 垂直向上偏置：叶片不下垂到树干以下
-                float minY = canopyBase * 0.92f;
+                float minY = canopyBase * 1.02f;
                 if (pos.y < minY) pos.y = minY + (float)rng.NextDouble() * canopyR * 0.25f;
 
                 // 朝向：完全随机
