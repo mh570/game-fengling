@@ -105,12 +105,12 @@ namespace T3ssDemo
             float canopyR = H * (0.34f + (float)rng.NextDouble() * 0.14f);   // 0.34~0.48
             float canopyBase = trunkH * (1.30f + (float)rng.NextDouble() * 0.15f);   // 大幅抬高，露出树干
             var shellCenters = new List<Vector4>();   // xyz + radius
-            shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR * 0.88f));
+            shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR));
             for (int k = 0; k < 2; k++)
             {
                 float a = (float)rng.NextDouble() * Mathf.PI * 2f;
                 float d = canopyR * (0.20f + (float)rng.NextDouble() * 0.35f);
-                float rr = canopyR * (0.52f + (float)rng.NextDouble() * 0.18f);
+                float rr = canopyR * (0.60f + (float)rng.NextDouble() * 0.20f);
                 shellCenters.Add(new Vector4(
                     Mathf.Cos(a) * d,
                     canopyBase + canopyR * (0.18f + (float)rng.NextDouble() * 0.50f),
@@ -119,9 +119,10 @@ namespace T3ssDemo
             }
 
             var shellCol = new Color(0.70f, 0.88f, 0.56f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
+            int shIdx = 0;
             foreach (var sc in shellCenters)
                 AddSphere(verts, normals, uvs, colors, tris, ref triBase,
-                    new Vector3(sc.x, sc.y, sc.z), sc.w, 8, 6, shellCol);
+                    new Vector3(sc.x, sc.y, sc.z), sc.w, 14, 10, shellCol, 0.18f, opt.Seed * 31 + shIdx++);
 
             // 整体树冠中心（用于球形法线）
             var canopyCenter = new Vector3(0f, canopyBase + canopyR * 0.45f, 0f);
@@ -157,7 +158,7 @@ namespace T3ssDemo
                 dir.Normalize();
 
                 // 位置：球面上 + 随机内外偏移
-                var pos = center + dir * (canopyR * (0.35f + (float)rng.NextDouble() * 0.75f));
+                var pos = center + dir * (radius * (1.10f + (float)rng.NextDouble() * 0.20f));   // 球面外
                 // 垂直向上偏置：叶片不下垂到树干以下
                 float minY = canopyBase * 1.02f;
                 if (pos.y < minY) pos.y = minY + (float)rng.NextDouble() * canopyR * 0.25f;
@@ -264,9 +265,10 @@ namespace T3ssDemo
 
         static void AddSphere(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Color> c,
                               List<int> t, ref int b, Vector3 center, float radius,
-                              int lon, int lat, Color col)
+                              int lon, int lat, Color col, float jag = 0f, int seed = 0)
         {
             int start = b;
+            var jagRng = new System.Random(seed);
             for (int j = 0; j <= lat; j++)
             {
                 float vv = j / (float)lat;
@@ -279,7 +281,16 @@ namespace T3ssDemo
                         Mathf.Sin(phi) * Mathf.Cos(theta),
                         Mathf.Cos(phi),
                         Mathf.Sin(phi) * Mathf.Sin(theta));
-                    v.Add(center + dir * radius);
+
+                    // 锯齿化：每个顶点随机内缩/外扩，形成不规则的团
+                    float r = radius;
+                    if (jag > 0f)
+                    {
+                        float jitter = 1f + ((float)jagRng.NextDouble() - 0.5f) * 2f * jag;
+                        r *= jitter;
+                    }
+
+                    v.Add(center + dir * r);
                     n.Add(dir);
                     uv.Add(new Vector2(uu, vv));
                     c.Add(col);
