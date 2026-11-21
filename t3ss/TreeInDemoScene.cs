@@ -86,7 +86,14 @@ namespace T3ssDemo
 
             // ---- 云影管理器（如果被禁用就打开）
             var csm = Object.FindFirstObjectByType<CloudShadowManager>();
-            if (csm != null) { csm.enabled = true; Debug.Log("[Demo] 云影已启用"); }
+            if (csm != null)
+            {
+                csm.enabled = true;
+                csm.cloudContrast = 4f;      // 原来是 20，太极端
+                csm.cloudScale = 80f;
+                csm.cloudWorldY = 26f;
+                Debug.Log("[Demo] 云影已启用 contrast=" + csm.cloudContrast);
+            }
             else Debug.Log("[Demo] 场景里没有 CloudShadowManager");
 
             // ---- 暖光 + 亮环境
@@ -96,7 +103,9 @@ namespace T3ssDemo
                 {
                     lg.color = new Color(1.0f, 0.95f, 0.82f);
                     lg.intensity = 1.6f;
-                    lg.shadowStrength = 0.55f;
+                    lg.shadowStrength = 0.45f;
+                    // 太阳抬高：影子变短，落在树正下方
+                    lg.transform.rotation = Quaternion.Euler(62f, -35f, 0f);
                 }
             }
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
