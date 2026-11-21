@@ -10,6 +10,7 @@ Shader "Fengling/Lit"
         _TerrainMode ("Terrain Mode (0=普通 1=地表分带)", Range(0, 1)) = 0
         _BaseMap ("Base Map", 2D) = "white" {}
         _Smoothness ("Smoothness", Range(0, 1)) = 0.15
+        _CullMode ("Cull Mode (0=Off 1=Front 2=Back)", Float) = 2
         _Metallic ("Metallic", Range(0, 1)) = 0
         _AmbientBoost ("Ambient Boost", Range(0, 3)) = 1
         _AmbientFloor ("Ambient Floor", Range(0, 0.5)) = 0.08
@@ -23,7 +24,7 @@ Shader "Fengling/Lit"
         {
             Name "FenglingForward"
             Tags { "LightMode" = "FenglingForward" }
-            Cull Back
+            Cull [_CullMode]
             ZWrite On
             ZTest LEqual
 
@@ -307,7 +308,7 @@ Shader "Fengling/Lit"
         {
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
-            Cull Back
+            Cull [_CullMode]
             ZWrite On
             ZTest LEqual
             ColorMask RGBA
@@ -348,7 +349,7 @@ Shader "Fengling/Lit"
         {
             Name "DepthOnly"
             Tags { "LightMode" = "DepthOnly" }
-            Cull Back
+            Cull [_CullMode]
             ZWrite On
             ZTest LEqual
             ColorMask RGBA
