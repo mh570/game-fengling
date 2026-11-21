@@ -25,6 +25,10 @@ namespace Fengling.Player
             {
                 rts.playerMotor = motor;
 
+                // 移动方向以相机为基准（W = 屏幕向上），否则角色面朝相机时 W 会倒着走
+                motor.cameraTransform = rts.transform;
+                motor.acceptMoveInput = rts.IsFollowing;
+
                 // 聚焦目标缺失时自动指向角色，否则空格永远聚焦不到人
                 if (rts.focusTarget == null)
                     rts.focusTarget = motor.transform;

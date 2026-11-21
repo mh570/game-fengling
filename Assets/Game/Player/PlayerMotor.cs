@@ -26,6 +26,12 @@ namespace Fengling.Player
         [SerializeField] private float mouseSensitivity = 2.5f;
         [SerializeField] private Transform cameraPivot;
 
+        [Header("转向")]
+        [Tooltip("移动方向以这个相机为基准（W = 屏幕向上）。由 PlayerSceneBootstrap 注入")]
+        public Transform cameraTransform;
+        [Tooltip("转身平滑速度，越大转得越快")]
+        public float turnSpeed = 12f;
+
         private CharacterController _cc;
         private Vector3 _velocity;
         private float _pitch;
@@ -84,11 +90,10 @@ namespace Fengling.Player
 
         private void HandleLook()
         {
-            float mx = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
             float my = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
 
-            transform.Rotate(Vector3.up, mx, Space.Self);
-
+            // 不再用鼠标旋转角色：角色朝向由移动方向决定（RTS 手感）。
+            // 否则"面朝相机时按 W 会倒着走"，而且鼠标和移动方向会互相打架。
             if (cameraPivot != null && acceptMoveInput)
             {
                 _pitch = Mathf.Clamp(_pitch - my, -85f, 85f);
@@ -105,7 +110,29 @@ namespace Fengling.Player
 
             bool running = acceptMoveInput && Input.GetKey(KeyCode.LeftShift);
             float speed = running ? runSpeed : walkSpeed;
-            var planar = transform.TransformDirection(input) * speed;
+
+            // 相机相对移动：W = 屏幕向上，D = 屏幕向右
+            Vector3 fwd = Vector3.forward;
+            Vector3 right = Vector3.right;
+            if (cameraTransform != null)
+            {
+                fwd = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up);
+                if (fwd.sqrMagnitude < 0.0001f) fwd = Vector3.forward;
+                fwd.Normalize();
+                right = Vector3.Cross(Vector3.up, fwd);
+            }
+
+            Vector3 dir = fwd * input.z + right * input.x;
+            if (dir.sqrMagnitude > 1f) dir.Normalize();
+            var planar = dir * speed;
+
+            // 朝移动方向转身（平滑），这样能看出角色正面朝哪
+            if (dir.sqrMagnitude > 0.0001f)
+            {
+                Quaternion target = Quaternion.LookRotation(dir, Vector3.up);
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation, target, 1f - Mathf.Exp(-turnSpeed * Time.deltaTime));
+            }
 
             if (_cc.isGrounded && _velocity.y < 0f) _velocity.y = -2f; // 贴地
             if (acceptMoveInput && _cc.isGrounded && Input.GetButtonDown("Jump"))
