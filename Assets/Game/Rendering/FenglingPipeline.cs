@@ -240,7 +240,13 @@ namespace Fengling.Rendering
                 opaqueSettings.SetShaderPassName(i, OpaqueTags[i]);
 
             var opaqueFilter = new FilteringSettings(RenderQueueRange.opaque);
-            context.DrawRenderers(culling, ref opaqueSettings, ref opaqueFilter);
+            // 用 RendererList 取代废弃的 DrawRenderers（该 API 在 Unity 6.5 会被移除）
+            var opaqueParams = new RendererListParams(culling, opaqueSettings, opaqueFilter);
+            var opaqueList = context.CreateRendererList(ref opaqueParams);
+            var opaqueDraw = CommandBufferPool.Get("Fengling.OpaqueDraw");
+            opaqueDraw.DrawRendererList(opaqueList);
+            context.ExecuteCommandBuffer(opaqueDraw);
+            CommandBufferPool.Release(opaqueDraw);
 
             // ---- 天空盒
             if (camera.clearFlags == CameraClearFlags.Skybox)
