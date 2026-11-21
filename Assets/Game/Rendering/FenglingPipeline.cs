@@ -23,8 +23,9 @@ namespace Fengling.Rendering
         // 打开后走 RecordRenderGraphPath，用一个 unsafe pass 包住现有逻辑。
         // 开关打开前必须先用探针确认偏差为 0。
         // 用 static 而非 const：const 会让编译器把分支裁掉并报"不可达代码"。
-        private static bool UseRenderGraph = false;
+        private static bool UseRenderGraph = true;
         private RenderGraph _renderGraph;
+        private bool _loggedRenderGraphOnce;
 
         /// <summary>unsafe pass 的数据：把 pipeline 和 camera 传进渲染函数。</summary>
         private sealed class CameraPassData
@@ -85,6 +86,13 @@ namespace Fengling.Rendering
         private void RecordRenderGraphPath(ScriptableRenderContext context, Camera camera)
         {
             if (_renderGraph == null) _renderGraph = new RenderGraph("FenglingRenderGraph");
+
+            // 一次性日志：证明这条路径真的被执行，而不是开关没生效
+            if (!_loggedRenderGraphOnce)
+            {
+                _loggedRenderGraphOnce = true;
+                Debug.Log("[SRP] 已走 RenderGraph 路径（unsafe pass 包装）");
+            }
 
             CommandBuffer cmd = CommandBufferPool.Get("Fengling.RenderGraph");
 
