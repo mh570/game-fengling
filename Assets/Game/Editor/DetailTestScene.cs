@@ -20,8 +20,8 @@ namespace Fengling.EditorTools
     public static class DetailTestScene
     {
         const string ScenePath = "Assets/Scenes/Detail30.unity";
-        const int Cells = 30;          // 30x30 米
-        const float CellSize = 1f;
+        const int Cells = 80;          // 80 格
+        const float CellSize = 1.5f;   // 1.5m/格 → 120x120m（看不到边）
         const int Chunks = 1;          // 一块就够
 
         [MenuItem("Fengling/Terrain/30x30 技术测试场景")]
@@ -151,10 +151,10 @@ namespace Fengling.EditorTools
             var cam = camGo.AddComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.62f, 0.72f, 0.78f);
-            cam.fieldOfView = 45f;
+            cam.fieldOfView = 50f;
             cam.farClipPlane = 300f;
-            camGo.transform.position = new Vector3(0f, 22f, -15f);
-            camGo.transform.rotation = Quaternion.Euler(48f, 0f, 0f);
+            camGo.transform.position = new Vector3(0f, 62f, -48f);
+            camGo.transform.rotation = Quaternion.Euler(52f, 0f, 0f);
 
             new GameObject("EnvironmentBootstrap").AddComponent<Fengling.Time.EnvironmentBootstrap>();
 
@@ -246,7 +246,7 @@ namespace Fengling.EditorTools
                 AssetDatabase.CreateFolder("Assets/Game/Terrain", "Generated");
 
             int placed = 0;
-            for (int i = 0; i < 60 && placed < 12; i++)
+            for (int i = 0; i < 400 && placed < 45; i++)
             {
                 float x = center.x + (float)(rng.NextDouble() - 0.5) * size * 0.85f;
                 float z = center.y + (float)(rng.NextDouble() - 0.5) * size * 0.85f;
@@ -254,7 +254,7 @@ namespace Fengling.EditorTools
                 if (!Physics.Raycast(new Vector3(x, 200f, z), Vector3.down, out var hit, 400f)) continue;
                 if (hit.point.y < 0.9f) continue;
 
-                float h = Mathf.Lerp(4.5f, 8f, (float)rng.NextDouble());
+                float h = Mathf.Lerp(8f, 14f, (float)rng.NextDouble());
                 var parts = BlobTreeBuilder.Build(1000 + placed, h);
                 var mesh = BlobTreeBuilder.Merge(parts);
 
@@ -271,6 +271,31 @@ namespace Fengling.EditorTools
                 var mr = go.AddComponent<MeshRenderer>();
                 mr.sharedMaterial = mat;
                 mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+
+                // 树影：深绿色、有角度的扁平暗斑（视频里不是黑色圆形）
+                var shadow = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                shadow.SetActive(false);   // 临时关闭：现在渲染成黑色方块，等修好再开
+                shadow.name = "Shadow";
+                Object.DestroyImmediate(shadow.GetComponent<Collider>());
+                shadow.transform.SetParent(go.transform, false);
+                shadow.transform.localPosition = new Vector3(0.8f, 0.03f, 0.5f);
+                shadow.transform.localRotation = Quaternion.Euler(90f, 25f, 0f);
+                float shadowR = h * 0.45f;
+                shadow.transform.localScale = new Vector3(shadowR, shadowR * 0.7f, 1f);
+                var smr = shadow.GetComponent<MeshRenderer>();
+                var smat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Game/Rendering/Materials/Mat_TreeShadow.mat");
+                if (smat == null)
+                {
+                    var ssh = Shader.Find("Fengling/TerrainColor");
+                    if (ssh != null)
+                    {
+                        smat = new Material(ssh) { name = "Mat_TreeShadow" };
+                        smat.SetColor("_Tint", new Color(0.18f, 0.28f, 0.13f));
+                        AssetDatabase.CreateAsset(smat, "Assets/Game/Rendering/Materials/Mat_TreeShadow.mat");
+                    }
+                }
+                smr.sharedMaterial = smat;
+                smr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
                 placed++;
             }

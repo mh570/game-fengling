@@ -25,7 +25,7 @@ namespace Fengling.TerrainSystem
         static readonly Color Deep   = new Color(0.26f, 0.36f, 0.26f);
 
         /// <summary>抖动强度</summary>
-        public static float DitherStrength = 0.05f;
+        public static float DitherStrength = 0f;   // 视频里没有高频噪点
 
         public static Color Compute(float worldX, float worldZ, float height, float slope,
                                     float regionMin, float regionMax)
@@ -45,8 +45,8 @@ namespace Fengling.TerrainSystem
             else
             {
                 // 草地：低频大斑块（视频里最明显的特征——深浅交错的水彩感）
-                float big = Mathf.PerlinNoise(worldX * 0.018f + 7.1f, worldZ * 0.018f + 2.9f);
-                float mid = Mathf.PerlinNoise(worldX * 0.055f + 1.7f, worldZ * 0.055f + 5.3f);
+                float big = Mathf.PerlinNoise(worldX * 0.008f + 7.1f, worldZ * 0.008f + 2.9f);
+                float mid = Mathf.PerlinNoise(worldX * 0.022f + 1.7f, worldZ * 0.022f + 5.3f);
                 float patch = big * 0.72f + mid * 0.28f;
 
                 c = Color.Lerp(Forest, Grass2, Mathf.SmoothStep(0f, 1f, patch));
@@ -56,6 +56,23 @@ namespace Fengling.TerrainSystem
 
             // 陡坡露岩
             c = Color.Lerp(c, Rock, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.40f, 0.75f, slope)));
+
+            // 宽土路：视频 03 里贯穿画面的主体（米色偏棕黄）
+            // 用正弦曲线让路蜿蜒，宽度 7m（半宽 3.5m），边缘用噪声打碎
+            float roadCenter = Mathf.Sin(worldZ * 0.045f) * 9f + Mathf.Sin(worldZ * 0.017f + 1.3f) * 5f;
+            float roadHalf = 6.5f + (Mathf.PerlinNoise(worldZ * 0.12f, 3.7f) - 0.5f) * 1.8f;   // 加宽到 13m
+            float dRoad = Mathf.Abs(worldX - roadCenter);
+            float roadT = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(roadHalf * 0.7f, roadHalf + 1.6f, dRoad));
+
+            if (height > 0.5f && roadT > 0.01f)
+            {
+                var dirt = new Color(0.62f, 0.53f, 0.40f);
+                var dirt2 = new Color(0.70f, 0.62f, 0.48f);
+                // 路面本身有深浅变化
+                float rn = Mathf.PerlinNoise(worldX * 0.09f + 3.1f, worldZ * 0.09f + 8.7f);
+                var roadCol = Color.Lerp(dirt, dirt2, rn);
+                c = Color.Lerp(c, roadCol, roadT);
+            }
 
             // 水线白边：视频里最醒目的特征（岸边一圈白）
             float waterline = 1f - Mathf.Clamp01(Mathf.Abs(height + 0.05f) / 0.30f);
