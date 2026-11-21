@@ -27,6 +27,8 @@ namespace Fengling.EditorTools
         public static void RunLake18() { Shot("Assets/Scenes/Lake.unity", 18f, "lake_18h.png", false); }
         public static void RunRpgLab() { Shot("Assets/Scenes/RpgLab.unity", 12f, "rgplab_12h.png", false); }
         public static void RunIsland() { Shot("Assets/Scenes/Island.unity", 10f, "island_10h.png", false); }
+        public static void RunDetail30() { Shot("Assets/Scenes/Detail30.unity", 10f, "detail30.png", true); }
+        public static void RunSeb() { Shot("Assets/Scenes/TerrainSeb.unity", 10f, "terrain_seb.png", false); }
         public static void RunTerrain200() { Shot("Assets/Scenes/Terrain200.unity", 10f, "terrain200_10h.png", true); }
         public static void RunLakeSky() { Shot("Assets/Scenes/Lake.unity", 12f, "lake_sky.png", false); SessionState.SetBool(SkyKey, true); }
 
