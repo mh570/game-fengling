@@ -34,6 +34,10 @@ namespace Fengling.Player
                     rts.focusTarget = motor.transform;
             }
 
+            // 玩家没有正面标识就补一个，方便看出朝向
+            if (motor != null && motor.GetComponent<PlayerFacingMarker>() == null)
+                motor.gameObject.AddComponent<PlayerFacingMarker>();
+
             Debug.Log("[Player] 接线: rts=" + (rts != null) +
                       " motor=" + (motor != null) +
                       " focusTarget=" + (rts != null && rts.focusTarget != null));
