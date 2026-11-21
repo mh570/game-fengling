@@ -72,8 +72,6 @@ namespace Fengling.Player
             _camera.nearClipPlane = 0.3f;
             _camera.farClipPlane = 1000f;
 
-            if (terrain == null)
-
             _focused = startFocused && focusTarget != null;
             _focus = _focused ? FocusPoint() : new Vector3(0f, 0f, 20f);
             ApplyImmediate();
