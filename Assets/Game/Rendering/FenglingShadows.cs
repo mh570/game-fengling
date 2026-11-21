@@ -79,12 +79,18 @@ namespace Fengling.Rendering
             var sun = RenderSettings.sun;
             for (int i = 0; i < visible.Length; i++)
             {
-                if (visible[i].lightType == LightType.Directional &&
-                    (sun == null || visible[i].light == sun))
-                {
-                    lightIndex = i;
-                    break;
-                }
+                var v = visible[i];
+                if (v.lightType != LightType.Directional) continue;
+
+                // 只认 RenderSettings.sun；若没设 sun，才退化为"第一个平行光"
+                if (sun != null && v.light != sun) continue;
+
+                // 必须真的投射阴影，否则 ShadowDrawingSettings 会抛
+                // "Light index must be a valid shadow casting light"
+                if (v.light == null || v.light.shadows == LightShadows.None) continue;
+
+                lightIndex = i;
+                break;
             }
             if (lightIndex < 0)
             {
