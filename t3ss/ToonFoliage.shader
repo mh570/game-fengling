@@ -95,10 +95,9 @@ Shader "Custom/ToonFoliage"
                 float lit = saturate(ndl * 0.5 + 0.5);
                 lit = pow(lit, 0.85) * 1.15;   // 提高主光对比
 
-                float steps = max(1.0, _Cuts);
-                float q = floor(lit * steps) / steps;
-                float dither = Bayer4(IN.positionHCS.xy) * _DitherStrength;
-                q = saturate(q + (dither - 0.5 * _DitherStrength) / steps);
+                // 叶片用平滑着色：量化会在卡片尺度上产生棋盘跳变
+                // （参考视频的树冠是连续渐变，没有色带）
+                float q = saturate(lit);
 
                 float3 col = lerp(_ShadowColor.rgb, _HighlightColor.rgb, q);
                 col *= _BaseColor.rgb * tex.rgb * IN.color.rgb;   // 顶点色（树干/叶片区分）

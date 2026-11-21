@@ -22,12 +22,12 @@ namespace T3ssDemo
             for (int i = 0; i < px.Length; i++) px[i] = new Color(1, 1, 1, 0);
 
             var rng = new System.Random(seed);
-            int leaves = 6 + rng.Next(4);
+            int leaves = 14 + rng.Next(6);   // 更多圆，填满方形
             for (int k = 0; k < leaves; k++)
             {
-                float cx = size * 0.5f + (float)(rng.NextDouble() - 0.5) * size * 0.62f;
-                float cy = size * 0.5f + (float)(rng.NextDouble() - 0.5) * size * 0.62f;
-                float r = size * (0.10f + (float)rng.NextDouble() * 0.09f);
+                float cx = size * 0.5f + (float)(rng.NextDouble() - 0.5) * size * 0.50f;
+                float cy = size * 0.5f + (float)(rng.NextDouble() - 0.5) * size * 0.50f;
+                float r = size * (0.14f + (float)rng.NextDouble() * 0.10f);   // 更大的圆
                 float shade = 0.72f + (float)rng.NextDouble() * 0.28f;
 
                 for (int y = 0; y < size; y++)
