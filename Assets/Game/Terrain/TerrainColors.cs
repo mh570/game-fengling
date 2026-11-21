@@ -53,6 +53,10 @@ namespace Fengling.TerrainSystem
             // 陡坡露岩
             c = Color.Lerp(c, Rock, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.40f, 0.75f, slope)));
 
+            // 水线白边：视频里最醒目的特征（岸边一圈白）
+            float waterline = 1f - Mathf.Clamp01(Mathf.Abs(height + 0.05f) / 0.30f);
+            c = Color.Lerp(c, new Color(0.96f, 0.97f, 0.94f), waterline * 0.80f);
+
             // 像素抖动
             float d = Dither(worldX, worldZ);
             c *= Mathf.Lerp(1f - DitherStrength, 1f + DitherStrength, d);

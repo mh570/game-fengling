@@ -80,17 +80,18 @@ namespace Fengling.EditorTools
             // ---- 水面（y = 0）
             var water = GameObject.CreatePrimitive(PrimitiveType.Plane);
             water.name = "Water";
-            water.transform.position = new Vector3(0f, 0.02f, 0f);
-            water.transform.localScale = new Vector3(size * 0.05f, 1f, size * 0.05f);
+            water.transform.position = new Vector3(-4f, 0.02f, 2f);
+            water.transform.localScale = new Vector3(1.7f, 1f, 1.7f);   // 约 17m，略大于池塘
             Object.DestroyImmediate(water.GetComponent<Collider>());
             var wmat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Game/Rendering/Materials/Mat_Water.mat");
             if (wmat == null)
             {
-                var ws = Shader.Find("Fengling/TerrainColor");
+                var ws = Shader.Find("Fengling/Water");
                 if (ws != null)
                 {
                     wmat = new Material(ws) { name = "Mat_Water" };
-                    wmat.SetColor("_Tint", new Color(0.30f, 0.56f, 0.62f));
+                    wmat.SetColor("_ShallowColor", new Color(0.58f, 0.82f, 0.80f));
+                    wmat.SetColor("_DeepColor", new Color(0.12f, 0.34f, 0.42f));
                     AssetDatabase.CreateAsset(wmat, "Assets/Game/Rendering/Materials/Mat_Water.mat");
                 }
             }
