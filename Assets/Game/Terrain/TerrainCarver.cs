@@ -130,12 +130,12 @@ namespace Fengling.TerrainSystem
                 {
                     points = new[]
                     {
-                        new Vector2(x0 + size * 0.80f, z0 + size * 0.90f),
-                        new Vector2(x0 + size * 0.68f, z0 + size * 0.72f),
-                        new Vector2(x0 + size * 0.58f, z0 + size * 0.55f),
-                        new Vector2(x0 + size * 0.42f, z0 + size * 0.40f),
-                        new Vector2(x0 + size * 0.30f, z0 + size * 0.25f),
-                        new Vector2(x0 + size * 0.18f, z0 + size * 0.12f),
+                        new Vector2(x0 + size * 0.24f, z0 + size * 0.62f),
+                        new Vector2(x0 + size * 0.27f, z0 + size * 0.52f),
+                        new Vector2(x0 + size * 0.33f, z0 + size * 0.42f),
+                        new Vector2(x0 + size * 0.38f, z0 + size * 0.32f),
+                        new Vector2(x0 + size * 0.42f, z0 + size * 0.22f),
+                        new Vector2(x0 + size * 0.45f, z0 + size * 0.10f),
                     },
                     width = 1.2f,
                     depth = 0.8f,
@@ -147,9 +147,9 @@ namespace Fengling.TerrainSystem
             {
                 new Lake
                 {
-                    center = new Vector2(x0 + size * 0.35f, z0 + size * 0.70f),
-                    radius = 12f,
-                    depth = 1.4f,
+                    center = new Vector2(x0 + size * 0.24f, z0 + size * 0.62f),
+                    radius = 16f,
+                    depth = 2.0f,
                     falloff = 8f,
                 },
             };
