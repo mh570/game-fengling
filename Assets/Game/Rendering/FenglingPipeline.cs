@@ -15,6 +15,12 @@ namespace Fengling.Rendering
         private readonly FenglingShadows _shadows = new FenglingShadows();
         private readonly FenglingClouds _clouds = new FenglingClouds();
         private readonly FenglingOutline _outline = new FenglingOutline();
+
+        /// <summary>
+        /// 像素风渲染缩放：0.25~1.0。0.5 表示以半分辨率渲染再放大。
+        /// 对应参考视频（Godot）里的「视口缩放 x0.56」。
+        /// </summary>
+        public static float PixelRenderScale = 0.5f;
         private readonly Material _postMaterial;
         private Light _fillLight;
         private Camera _reflectionCamera;
@@ -135,12 +141,17 @@ namespace Fengling.Rendering
 
             context.SetupCameraProperties(camera);
 
-            int width = Mathf.Max(1, camera.pixelWidth);
-            int height = Mathf.Max(1, camera.pixelHeight);
+            // ---- 像素风：以低分辨率渲染，再用 Point 采样放大
+            // 对应 Godot 的 SubViewport + ViewportContainer（视口缩放 x0.5~1.0）
+            // 这是"告诉引擎我在做像素风 3D"的第一条配置。
+            float scale = Mathf.Clamp(PixelRenderScale, 0.25f, 1f);
+            int width = Mathf.Max(1, Mathf.RoundToInt(camera.pixelWidth * scale));
+            int height = Mathf.Max(1, Mathf.RoundToInt(camera.pixelHeight * scale));
 
             var colorRT = RenderTexture.GetTemporary(
                 width, height, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
             colorRT.name = "FenglingColor";
+            colorRT.filterMode = FilterMode.Point;   // 放大时不插值 → 硬像素边缘
             var depthRT = RenderTexture.GetTemporary(
                 width, height, 24, RenderTextureFormat.Depth, RenderTextureReadWrite.Linear);
             depthRT.name = "FenglingDepth";
