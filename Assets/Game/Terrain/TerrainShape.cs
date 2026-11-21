@@ -35,7 +35,7 @@ namespace Fengling.TerrainSystem
         /// <summary>海面以下的深度</summary>
         public static float SeaDepth = 8f;
         /// <summary>噪声起伏幅度</summary>
-        public static float NoiseAmp = 1.6f;
+        public static float NoiseAmp = 0.35f;   // 平地：只留极轻微起伏
 
         /// <summary>计算某点的半岛高度（世界坐标）</summary>
         public static float Sample(float worldX, float worldZ)

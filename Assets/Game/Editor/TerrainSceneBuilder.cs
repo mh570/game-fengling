@@ -38,8 +38,8 @@ namespace Fengling.EditorTools
             TerrainShape.Center = new Vector2(settings.WorldOrigin.x + size * 0.5f,
                                               settings.WorldOrigin.y + size * 0.5f);
             TerrainShape.HalfSize = size * 0.5f;
-            TerrainShape.FlatHeight = 2.6f;
-            TerrainShape.HillHeight = 26f;
+            TerrainShape.FlatHeight = 2.2f;
+            TerrainShape.HillHeight = 0f;      // 平地：不要山
 
             TerrainCarver.PlanDefault(settings.WorldOrigin, size);
 

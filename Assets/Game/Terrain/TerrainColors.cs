@@ -3,38 +3,57 @@ using UnityEngine;
 namespace Fengling.TerrainSystem
 {
     /// <summary>
-    /// 地形顶点色：高度分带 + 坡度变岩 + 像素抖动。
-    /// 调色板取自参考视频分析（有限、低饱和、偏冷绿）。
+    /// 地形顶点色。
+    ///
+    /// 因为地形是**平的**（参考视频也如此），所以这里用**绝对高度**分色，
+    /// 不用"区域内相对高度"——那样平地会被判成岩石，整片变灰。
+    ///
+    /// 规则：
+    ///   水面下   → 深色水底
+    ///   0~0.9m   → 沙滩
+    ///   0.9m 以上 → 草地（用低频噪声做深浅变化）
+    ///   坡度陡   → 岩石
     /// </summary>
     public static class TerrainColors
     {
-        static readonly Color Sand   = new Color(0.788f, 0.702f, 0.576f);
-        static readonly Color Grass  = new Color(0.498f, 0.627f, 0.353f);
-        static readonly Color Grass2 = new Color(0.588f, 0.702f, 0.420f);
-        static readonly Color Forest = new Color(0.247f, 0.357f, 0.227f);
-        static readonly Color Rock   = new Color(0.431f, 0.416f, 0.478f);
-        static readonly Color Deep   = new Color(0.310f, 0.400f, 0.290f);
+        static readonly Color Sand   = new Color(0.82f, 0.76f, 0.60f);
+        static readonly Color Sand2  = new Color(0.74f, 0.67f, 0.52f);
+        static readonly Color Grass  = new Color(0.42f, 0.60f, 0.28f);
+        static readonly Color Grass2 = new Color(0.52f, 0.68f, 0.34f);
+        static readonly Color Forest = new Color(0.30f, 0.45f, 0.22f);
+        static readonly Color Rock   = new Color(0.46f, 0.44f, 0.48f);
+        static readonly Color Deep   = new Color(0.26f, 0.36f, 0.26f);
 
-        /// <summary>抖动强度（0=无抖动）</summary>
-        public static float DitherStrength = 0.035f;
+        /// <summary>抖动强度</summary>
+        public static float DitherStrength = 0.05f;
 
         public static Color Compute(float worldX, float worldZ, float height, float slope,
                                     float regionMin, float regionMax)
         {
-            float top = Mathf.Max(regionMax, regionMin + 8f);
-            float t = Mathf.Clamp01((height - regionMin) / Mathf.Max(1f, top - regionMin));
+            Color c;
 
-            Color c = Sand;
-            c = Color.Lerp(c, Grass,  Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.06f, 0.18f, t)));
-            c = Color.Lerp(c, Grass2, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.15f, 0.35f, t)) * 0.65f);
-            c = Color.Lerp(c, Forest, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.35f, 0.62f, t)));
-            c = Color.Lerp(c, Rock,   Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.72f, 0.95f, t)));
+            if (height < -0.15f)
+            {
+                // 水底
+                c = Color.Lerp(Deep, Sand, Mathf.InverseLerp(-6f, -0.15f, height));
+            }
+            else if (height < 0.9f)
+            {
+                // 沙滩
+                c = Color.Lerp(Sand2, Sand, Mathf.InverseLerp(-0.15f, 0.9f, height));
+            }
+            else
+            {
+                // 草地：用低频噪声做深浅斑块
+                float patch = Mathf.PerlinNoise(worldX * 0.022f + 7.1f, worldZ * 0.022f + 2.9f);
+                c = Color.Lerp(Grass, Grass2, patch);
+                if (patch > 0.62f) c = Color.Lerp(c, Forest, (patch - 0.62f) * 2.2f);
+            }
 
-            c = Color.Lerp(c, Rock, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.35f, 0.75f, slope)));
+            // 陡坡露岩
+            c = Color.Lerp(c, Rock, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.40f, 0.75f, slope)));
 
-            if (height < 0f)
-                c = Color.Lerp(c, Deep, Mathf.InverseLerp(0f, -15f, height));
-
+            // 像素抖动
             float d = Dither(worldX, worldZ);
             c *= Mathf.Lerp(1f - DitherStrength, 1f + DitherStrength, d);
 
@@ -43,8 +62,8 @@ namespace Fengling.TerrainSystem
 
         static float Dither(float x, float z)
         {
-            int ix = Mathf.FloorToInt(x);
-            int iz = Mathf.FloorToInt(z);
+            int ix = Mathf.FloorToInt(x * 0.5f);
+            int iz = Mathf.FloorToInt(z * 0.5f);
             int h = (ix * 73856093) ^ (iz * 19349663);
             h = (h ^ (h >> 13)) & 0x7fffffff;
             return (h % 16) / 15f;
