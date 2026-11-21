@@ -104,6 +104,9 @@ namespace Fengling.EditorTools
             }
             if (mat != null) terrain.materialTemplate = mat;
 
+            // LOD 精度：1 = 几乎不降级，用来排查 LOD 接缝
+            terrain.basemapDistance = 0f;
+
             // 相机：俯视
             var camGo = new GameObject("Main Camera");
             camGo.tag = "MainCamera";
