@@ -26,16 +26,19 @@ namespace Fengling.Water
 
             int injected = 0;
 
-            // 同程序集：直接按具体类型注入
-            foreach (WaterSurfaceRenderer renderer in FindObjectsByType<WaterSurfaceRenderer>(FindObjectsSortMode.None))
+            // 同程序集：直接按具体类型注入。数组只取一次，后面复用。
+            WaterSurfaceRenderer[] surfaces = FindObjectsByType<WaterSurfaceRenderer>(FindObjectsSortMode.None);
+            foreach (WaterSurfaceRenderer renderer in surfaces)
             {
                 renderer.SetWaterModule(module);
                 injected++;
             }
 
+            WaterSurfaceRenderer primary = surfaces.Length > 0 ? surfaces[0] : null;
             foreach (WaterLabHUD hud in FindObjectsByType<WaterLabHUD>(FindObjectsSortMode.None))
             {
                 hud.SetWaterModule(module);
+                hud.SetWaterRenderer(primary);
                 injected++;
             }
 

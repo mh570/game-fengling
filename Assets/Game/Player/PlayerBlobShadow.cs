@@ -37,7 +37,6 @@ namespace Fengling.Player
                 _material = _renderer.material;
             }
             if (terrain == null)
-                terrain = Object.FindFirstObjectByType<CoastTerrain>();
             _baseAlpha = color.a;
         }
 

@@ -38,36 +38,12 @@ namespace Fengling.Player
         private void Awake()
         {
             _cc = GetComponent<CharacterController>();
-            ResolveWater();
         }
 
-        private void Start()
-        {
-            if (_water == null) ResolveWater();
-        }
-
-        /// <summary>由 WaterSceneBootstrap 注入，不再自己扫描场景。</summary>
+        /// <summary>由 WaterSceneBootstrap 注入。</summary>
         public void ApplyWater(IWaterSurface water)
         {
             _water = water;
-        }
-
-        /// <summary>
-        /// 兜底：只有未被 Bootstrap 注入时才执行。
-        /// 保留旧行为，避免没装 WaterSceneBootstrap 的场景（如 Preset）失效。
-        /// </summary>
-        private void ResolveWater()
-        {
-            var providers = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            foreach (var mb in providers)
-            {
-                if (mb is IWaterProvider p)
-                {
-                    _water = p.Water;
-                    return;
-                }
-            }
-            _water = null;
         }
 
         private void Update()

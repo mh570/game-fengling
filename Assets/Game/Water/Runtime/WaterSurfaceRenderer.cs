@@ -124,7 +124,6 @@ namespace Fengling.Water
 
         private void Awake()
         {
-            if (water == null) water = FindFirstObjectByType<WaterModule>();
 
             if (buildMesh)
             {

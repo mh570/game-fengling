@@ -28,12 +28,17 @@ namespace Fengling.Water
         {
             water = module;
         }
+
+        /// <summary>水面渲染器同样由 WaterSceneBootstrap 注入。</summary>
+        public void SetWaterRenderer(WaterSurfaceRenderer renderer)
+        {
+            _renderer = renderer;
+        }
+
         private float _fps;
 
         private void Awake()
         {
-            if (water == null) water = FindFirstObjectByType<WaterModule>();
-            _renderer = FindFirstObjectByType<WaterSurfaceRenderer>();
             if (player == null)
             {
                 var go = GameObject.Find("Player");

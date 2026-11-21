@@ -73,7 +73,6 @@ namespace Fengling.Player
             _camera.farClipPlane = 1000f;
 
             if (terrain == null)
-                terrain = Object.FindFirstObjectByType<CoastTerrain>();
 
             _focused = startFocused && focusTarget != null;
             _focus = _focused ? FocusPoint() : new Vector3(0f, 0f, 20f);
