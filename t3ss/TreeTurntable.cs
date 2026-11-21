@@ -44,17 +44,18 @@ namespace T3ssDemo
             var mat = new Material(shader) { name = "MAT_TT" };
             if (tex != null) mat.SetTexture("_MainTex", tex);
             mat.SetFloat("_Cutoff", 0.4f);
-            mat.SetFloat("_Cuts", 3f);
+            mat.SetFloat("_Cuts", 8f);
+            mat.SetFloat("_DitherStrength", 0f);
             mat.SetColor("_BaseColor", Color.white);
-            mat.SetColor("_HighlightColor", new Color(0.62f, 0.82f, 0.50f));
-            mat.SetColor("_ShadowColor", new Color(0.13f, 0.26f, 0.26f));
+            mat.SetColor("_HighlightColor", new Color(0.60f, 0.72f, 0.50f));   // 降饱和
+            mat.SetColor("_ShadowColor", new Color(0.22f, 0.32f, 0.26f));   // 提高暗部（降低对比）
 
             // ---- 生成一棵树
             var opt = new TreeGenerator.Options
             {
                 Height = 5.0f,
-                LeafCount = 2600,
-                LeafSize = 0.50f,
+                LeafCount = 7000,
+                LeafSize = 0.16f,
                 Seed = 4242,
             };
             var mesh = TreeGenerator.Build(opt, out int sv, out int lv);
