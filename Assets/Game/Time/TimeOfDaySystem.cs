@@ -152,7 +152,7 @@ namespace Fengling.Time
             Shader.SetGlobalFloat("_FenglingWaterAtmosphere", atmosphere);
             Shader.SetGlobalFloat("_FenglingRain", weather != null ? weather.rain : 0f);
             bool volumetricWeather = weather != null &&
-                (weather.fog > 0.20f || weather.haze > 0.20f) &&
+                (weather.fog > 0.08f || weather.haze > 0.05f) &&
                 cloudCover < 0.85f && weather.rain < 0.50f;
             float volumeDensity = volumetricWeather
                 ? Mathf.Max(0.0012f, weather.fog * 0.02f + weather.haze * 0.005f)

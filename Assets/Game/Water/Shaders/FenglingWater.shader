@@ -532,9 +532,14 @@ Shader "Fengling/Water Surface"
                 // ---- 水下整体偏青
                 color = lerp(color, color * float3(0.35, 0.70, 0.90), _CameraUnderwater * 0.5);
 
+                // 与 FenglingLit 一致的距离分级雾，避免水面被整片糊成灰色
                 float fogDist = distance(_WorldSpaceCameraPos, i.worldPos);
-                float fogFactor = 1.0 - exp(-max(0.0, _FenglingFogDensity) * fogDist);
-                color = lerp(color, _FenglingFogColor.rgb, saturate(fogFactor));
+                float fogStart = 35.0;
+                float fogEnd = 260.0;
+                float fogT = saturate((fogDist - fogStart) / max(1.0, fogEnd - fogStart));
+                float fogFactor = fogT * fogT * saturate(_FenglingFogDensity * 120.0);
+                fogFactor = min(fogFactor, 0.85);
+                color = lerp(color, _FenglingFogColor.rgb, fogFactor);
                 color = lerp(color, _FenglingFogColor.rgb, saturate(_FenglingWaterCloud) * 0.18);
 
                 return float4(color, alpha);

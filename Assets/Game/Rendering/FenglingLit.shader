@@ -258,9 +258,15 @@ Shader "Fengling/Lit"
                                      saturate(dot(N, Lmoon)) * moonShadow;
 
                 float3 color = (diffuse + specular) * shadow + moonDiffuse + ambient;
+                // 距离分级雾：近处清晰、远处渐蒙、封顶不糊死。
+                // 旧的 1-exp(-density*dist) 在相机拉远时会把整屏糊成雾色。
                 float fogDist = distance(_WorldSpaceCameraPos, i.worldPos);
-                float fogFactor = 1.0 - exp(-max(0.0, _FenglingFogDensity) * fogDist);
-                color = lerp(color, _FenglingFogColor.rgb, saturate(fogFactor));
+                float fogStart = 35.0;
+                float fogEnd = 260.0;
+                float fogT = saturate((fogDist - fogStart) / max(1.0, fogEnd - fogStart));
+                float fogFactor = fogT * fogT * saturate(_FenglingFogDensity * 120.0);
+                fogFactor = min(fogFactor, 0.85);
+                color = lerp(color, _FenglingFogColor.rgb, fogFactor);
                 return float4(color, 1.0);
             }
             ENDHLSL

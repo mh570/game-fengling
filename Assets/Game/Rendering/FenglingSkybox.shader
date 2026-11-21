@@ -13,7 +13,7 @@ Shader "Fengling/Skybox"
         _CloudCoverage ("Cloud Coverage", Range(0, 1)) = 0.45
         _CloudOpacity ("Cloud Opacity", Range(0, 1)) = 0
         _CloudScale ("Cloud Scale", Float) = 0.9
-        _CloudSpeed ("Cloud Speed", Float) = 0.01
+        _CloudSpeed ("Cloud Speed", Float) = 0.05
         _CloudFarCoverage ("Far Cloud Coverage", Range(0, 1)) = 0.55
         _CloudFarOpacity ("Far Cloud Opacity", Range(0, 1)) = 0.35
         _CloudNearCoverage ("Near Cloud Coverage", Range(0, 1)) = 0.55
@@ -143,7 +143,7 @@ Shader "Fengling/Skybox"
                     // 远景高层云：稀疏、偏白、几乎不挡日月
                     float2 wind = normalize(_CloudWind.xy + float2(0.001, 0.001));
                     float2 farP = dir.xz / max(dir.y, 0.18) * 0.35;
-                    farP += wind * (_Time.y * 0.0025);
+                    farP += wind * (_Time.y * 0.012);
                     float farBand = smoothstep(0.02, 0.12, dir.y) * (1.0 - smoothstep(0.65, 0.98, dir.y));
                     float farMask = smoothstep(_CloudFarCoverage, _CloudFarCoverage + 0.20, fbm(farP)) * farBand;
                     float3 farCol = lerp(_CloudDark.rgb, _CloudColor.rgb, 0.78);
@@ -163,7 +163,7 @@ Shader "Fengling/Skybox"
 
                     // 近景低云/雾：贴地平线、偏暗、移动更快
                     float2 nearP = dir.xz / max(dir.y, 0.05) * 2.8;
-                    nearP += wind * (_Time.y * 0.012);
+                    nearP += wind * (_Time.y * 0.06);
                     float nearBand = smoothstep(0.01, 0.06, dir.y) * (1.0 - smoothstep(0.30, 0.62, dir.y));
                     float nearMask = smoothstep(_CloudNearCoverage, _CloudNearCoverage + 0.20, fbm(nearP)) * nearBand;
                     sky = lerp(sky, _CloudDark.rgb * 0.9, nearMask * _CloudNearOpacity);
