@@ -48,6 +48,30 @@ namespace Fengling.TerrainSystem
         private static Vector2 _rawMin;    // 高度图在世界里的最小角
         private static float _regionMin, _regionMax;
 
+        /// <summary>高度平滑半径（格）。去掉 1m 采样造成的尖刺和垂直面。</summary>
+        public static int SmoothRadius = 4;
+
+        /// <summary>高度压平系数：0=完全压平，1=原始起伏。参考视频的地形很平缓，所以取小值。</summary>
+        public static float HeightCompression = 0.35f;
+
+        private static float _regionMean;
+
+        /// <summary>平滑采样：对邻域取平均，消除尖刺</summary>
+        public static float SampleHeightSmooth(float wx, float wz)
+        {
+            float sum = 0f;
+            int n = 0;
+            for (int j = -SmoothRadius; j <= SmoothRadius; j++)
+            {
+                for (int i = -SmoothRadius; i <= SmoothRadius; i++)
+                {
+                    sum += SampleHeight(wx + i, wz + j);
+                    n++;
+                }
+            }
+            return sum / n;
+        }
+
         /// <summary>加载 RAW（只加载一次）</summary>
         public static bool LoadRaw()
         {
@@ -237,6 +261,7 @@ namespace Fengling.TerrainSystem
                         Debug.Log(string.Format("[Terrain] Build origin=({0},{1}) grid={2} cell={3}",
                 s.WorldOrigin.x, s.WorldOrigin.y, s.GridSize, s.CellSize));
             Debug.Log(string.Format("[Terrain] 颜色分带范围 {0:F1} ~ {1:F1} m", _regionMin, _regionMax));
+            _regionMean = (_regionMin + _regionMax) * 0.5f;
 
             int chunkCells = s.GridSize / s.ChunkCount;
             if (chunkCells * s.ChunkCount != s.GridSize)
@@ -288,7 +313,9 @@ namespace Fengling.TerrainSystem
                 {
                     float wx = s.WorldOrigin.x + (cx * cells + i) * s.CellSize;
                     float wz = s.WorldOrigin.y + (cz * cells + j) * s.CellSize;
-                    float h = SampleHeight(wx, wz) * s.HeightScale;
+                    float h = SampleHeightSmooth(wx, wz);
+                    h = _regionMean + (h - _regionMean) * HeightCompression;  // 压平
+                    h *= s.HeightScale;
                     pts[j * n + i] = new Vector3(wx, h, wz);
                 }
             }
