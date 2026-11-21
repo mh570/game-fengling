@@ -82,7 +82,7 @@ namespace Fengling.EditorTools
             {
                 for (int x = -100; x <= 100; x += 5)
                 {
-                    float h = TerrainMeshBuilder.SampleHeight(region.x + x, region.y + z);
+                    float h = TerrainMeshBuilder.SampleHeight(region.x + 100f + x, region.y + 100f + z);
                     if (h < minH) minH = h;
                     if (h > maxH) maxH = h;
                 }

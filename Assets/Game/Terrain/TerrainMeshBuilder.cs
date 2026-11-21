@@ -162,7 +162,8 @@ namespace Fengling.TerrainSystem
             if (!LoadRaw()) return new Vector2(-100f, -100f);
 
             float half = RawSpanMeters * 0.5f - sizeMeters * 0.5f - 10f;
-            Vector2 best = new Vector2(-sizeMeters * 0.5f, -sizeMeters * 0.5f);
+            float halfSize = sizeMeters * 0.5f;
+            Vector2 best = new Vector2(-halfSize, -halfSize);   // 返回左下角，与 Build 的约定一致
             float bestScore = float.MinValue;
 
             for (float cz = -half; cz <= half; cz += 40f)
@@ -203,7 +204,7 @@ namespace Fengling.TerrainSystem
                     if (score > bestScore)
                     {
                         bestScore = score;
-                        best = new Vector2(cx, cz);
+                        best = new Vector2(cx - halfSize, cz - halfSize);   // 中心 → 左下角
                     }
                 }
             }
@@ -233,6 +234,8 @@ namespace Fengling.TerrainSystem
                     if (h > _regionMax) _regionMax = h;
                 }
             }
+                        Debug.Log(string.Format("[Terrain] Build origin=({0},{1}) grid={2} cell={3}",
+                s.WorldOrigin.x, s.WorldOrigin.y, s.GridSize, s.CellSize));
             Debug.Log(string.Format("[Terrain] 颜色分带范围 {0:F1} ~ {1:F1} m", _regionMin, _regionMax));
 
             int chunkCells = s.GridSize / s.ChunkCount;
