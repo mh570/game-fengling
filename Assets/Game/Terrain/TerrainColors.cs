@@ -66,8 +66,8 @@ namespace Fengling.TerrainSystem
 
             if (height > 0.5f && roadT > 0.01f)
             {
-                var dirt = new Color(0.62f, 0.53f, 0.40f);
-                var dirt2 = new Color(0.70f, 0.62f, 0.48f);
+                var dirt = new Color(0.95f, 0.86f, 0.70f);   // 提亮：贴图会乘掉约 40%
+                var dirt2 = new Color(1.0f, 0.93f, 0.78f);
                 // 路面本身有深浅变化
                 float rn = Mathf.PerlinNoise(worldX * 0.09f + 3.1f, worldZ * 0.09f + 8.7f);
                 var roadCol = Color.Lerp(dirt, dirt2, rn);

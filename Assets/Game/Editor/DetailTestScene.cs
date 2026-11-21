@@ -64,7 +64,7 @@ namespace Fengling.EditorTools
                 {
                     mat.SetTexture("_MainTex", groundTex);
                     mat.SetFloat("_TexScale", 0.35f);
-                    mat.SetFloat("_TexStrength", 0.75f);
+                    mat.SetFloat("_TexStrength", 0.45f);   // 降低贴图强度，否则土路被压成橄榄色
                 }
                 AssetDatabase.CreateAsset(mat, "Assets/Game/Rendering/Materials/Mat_TerrainColor.mat");
             }
@@ -76,7 +76,7 @@ namespace Fengling.EditorTools
                 {
                     mat.SetTexture("_MainTex", groundTex);
                     mat.SetFloat("_TexScale", 0.35f);
-                    mat.SetFloat("_TexStrength", 0.75f);
+                    mat.SetFloat("_TexStrength", 0.45f);   // 降低贴图强度，否则土路被压成橄榄色
                     EditorUtility.SetDirty(mat);
                 }
             }
