@@ -49,10 +49,10 @@ namespace Fengling.TerrainSystem
         private static float _regionMin, _regionMax;
 
         /// <summary>高度平滑半径（格）。去掉 1m 采样造成的尖刺和垂直面。</summary>
-        public static int SmoothRadius = 4;
+        public static int SmoothRadius = 10;
 
         /// <summary>高度压平系数：0=完全压平，1=原始起伏。参考视频的地形很平缓，所以取小值。</summary>
-        public static float HeightCompression = 0.35f;
+        public static float HeightCompression = 0.28f;
 
         private static float _regionMean;
 

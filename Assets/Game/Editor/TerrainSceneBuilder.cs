@@ -27,7 +27,7 @@ namespace Fengling.EditorTools
 
             var chunks = TerrainChunkBuilder.Build(
                 settings.WorldOrigin, settings.GridSize, settings.ChunkCount,
-                settings.CellSize, TerrainMeshBuilder.HeightCompression, 0);
+                settings.CellSize, TerrainMeshBuilder.HeightCompression);
 
             if (chunks.Count == 0)
             {
@@ -62,7 +62,8 @@ namespace Fengling.EditorTools
 
                 var go = new GameObject("Chunk_" + i);
                 go.transform.SetParent(root.transform, false);
-                go.transform.position = chunks[i].position;
+                // 顶点已经是世界坐标，不能再加偏移
+                go.transform.position = Vector3.zero;
 
                 var mf = go.AddComponent<MeshFilter>();
                 mf.sharedMesh = savedMesh;
