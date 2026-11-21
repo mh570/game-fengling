@@ -83,7 +83,10 @@ namespace Fengling.Player
             _camera.farClipPlane = 1000f;
 
             _focused = startFocused && focusTarget != null;
-            _focus = _focused ? FocusPoint() : new Vector3(0f, 0f, 20f);
+
+            // 初始化焦点：有玩家就以玩家为中心，否则才用默认点。
+            // 之前无条件用 (0,0,20)，而大多数场景那儿是水面 —— 开局就"停在海上"。
+            _focus = focusTarget != null ? FocusPoint() : new Vector3(0f, 0f, 20f);
             ApplyImmediate();
         }
 
