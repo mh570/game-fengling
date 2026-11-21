@@ -47,8 +47,8 @@ namespace T3ssDemo
             mat.SetFloat("_Cuts", 16f);
             mat.SetFloat("_DitherStrength", 0f);
             mat.SetColor("_BaseColor", Color.white);
-            mat.SetColor("_HighlightColor", new Color(0.72f, 0.84f, 0.62f));
-            mat.SetColor("_ShadowColor", new Color(0.46f, 0.56f, 0.46f));
+            mat.SetColor("_HighlightColor", new Color(0.56f, 0.69f, 0.43f));   // 目标 sRGB #8CA676
+            mat.SetColor("_ShadowColor", new Color(0.17f, 0.27f, 0.16f));   // 目标 sRGB #64805A
 
             // ---- 生成一棵树
             var opt = new TreeGenerator.Options
@@ -104,12 +104,12 @@ namespace T3ssDemo
             camGo.tag = "MainCamera";
             var cam = camGo.AddComponent<Camera>();
             cam.orthographic = true;
-            cam.orthographicSize = 4.2f;
+            cam.orthographicSize = 4.2f;   // 128px 下树约占 110px
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.72f, 0.80f, 0.86f);
             cam.farClipPlane = 100f;
 
-            var rt = new RenderTexture(512, 512, 24, RenderTextureFormat.ARGB32);
+            var rt = new RenderTexture(128, 128, 24, RenderTextureFormat.ARGB32);
             cam.targetTexture = rt;
             Directory.CreateDirectory("Shots/Turntable");
 
@@ -124,8 +124,8 @@ namespace T3ssDemo
                 cam.Render();
                 cam.Render();
                 RenderTexture.active = rt;
-                var shot = new Texture2D(512, 512, TextureFormat.RGB24, false);
-                shot.ReadPixels(new Rect(0, 0, 512, 512), 0, 0);
+                var shot = new Texture2D(128, 128, TextureFormat.RGB24, false);
+                shot.ReadPixels(new Rect(0, 0, 128, 128), 0, 0);
                 shot.Apply();
                 RenderTexture.active = null;
 

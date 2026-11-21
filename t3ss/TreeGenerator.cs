@@ -117,7 +117,7 @@ namespace T3ssDemo
                     rr));
             }
 
-            var shellCol = new Color(0.55f, 0.65f, 0.50f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
+            var shellCol = new Color(0.62f, 0.72f, 0.54f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
             int shIdx = 0;
             foreach (var sc in shellCenters)
                 AddSphere(verts, normals, uvs, colors, tris, ref triBase,
@@ -157,7 +157,7 @@ namespace T3ssDemo
                 dir.Normalize();
 
                 // 位置：球面上 + 随机内外偏移
-                var pos = center + dir * (radius * (1.10f + (float)rng.NextDouble() * 0.20f));   // 球面外
+                var pos = center + dir * (radius * (0.97f + (float)rng.NextDouble() * 0.08f));   // 贴球面：缝隙露出同色壳，不透背景
                 // 垂直向上偏置：叶片不下垂到树干以下
                 float minY = canopyBase * 1.02f;
                 if (pos.y < minY) pos.y = minY + (float)rng.NextDouble() * canopyR * 0.25f;
@@ -171,7 +171,7 @@ namespace T3ssDemo
                 // 颜色：越靠外越暗（模拟内部遮挡）
                 // 只有 3 档绿（参考视频的树叶糊成色块，不是彩纸）
                 // 单一绿色：水彩感需要无杂色
-                Color lcol = new Color(0.50f, 0.60f, 0.46f, 1f);   // 压 10%
+                Color lcol = new Color(0.62f, 0.72f, 0.54f, 1f);
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                 AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);
