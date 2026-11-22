@@ -25,7 +25,18 @@ namespace T3ssDemo
             var shapeGo = new GameObject("Shape");
             shapeGo.AddComponent<MeshFilter>().sharedMesh = shape;
             var smr = shapeGo.AddComponent<MeshRenderer>();
-            smr.enabled = false;   // 形状只当发射器，不渲染（避免坏材质）
+            // ★ 形状网格必须渲染：它是"实心底衬"，叶片画在上面
+            // （他们的 树叶Shape.mat shader graph 坏了，改用我们的 ToonFoliage）
+            smr.enabled = true;
+            // 注意：不能用 Custom/ToonFoliage —— 它对顶点做 billboard，会把形状网格压塌
+            // 形状网格要用不做 billboard 的 ToonLit
+            var shapeMat = new Material(Shader.Find("Custom/ToonLit"));
+            shapeMat.SetColor("_BaseColor", new Color(0.14f, 0.20f, 0.11f));
+            shapeMat.SetColor("_Color2", new Color(0.14f, 0.20f, 0.11f));
+            shapeMat.SetColor("_Color3", new Color(0.12f, 0.17f, 0.09f));
+            shapeMat.SetColor("_HighlightColor", new Color(0.22f, 0.30f, 0.17f));
+            shapeMat.SetColor("_ShadowColor", new Color(0.06f, 0.09f, 0.05f));
+            smr.sharedMaterial = shapeMat;
 
             // 2) 叶片网格 + 材质（他们的 Leaf.mesh + 我们的 HLSL shader）
             var leafMesh = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/Imported/Model/Leaf.mesh");
