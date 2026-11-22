@@ -102,6 +102,13 @@ namespace T3ssDemo
                 var texLeaf2 = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Imported/Tex/树叶2.png");
                 Debug.Log("[Imp] 树叶.png=" + (texLeaf != null) + " 树叶2.png=" + (texLeaf2 != null));
                 if (texLeaf != null) newLeafMat.SetTexture("_MainTex", texLeaf);
+                newLeafMat.SetColor("_Color", Color.white);
+                newLeafMat.SetVector("_SunDir", new Vector4(0.35f, 0.85f, 0.40f, 0f));
+                newLeafMat.SetFloat("_LightOffsetScale", 0.396f);
+                newLeafMat.SetColor("_GradDark",  new Color(0.333f, 0.384f, 0.299f));   // → sRGB #64805A（视频暗部）
+                newLeafMat.SetColor("_GradMid1",  new Color(0.429f, 0.494f, 0.374f));
+                newLeafMat.SetColor("_GradMid2",  new Color(0.559f, 0.644f, 0.487f));
+                newLeafMat.SetColor("_GradLight", new Color(0.686f, 0.790f, 0.660f));   // → sRGB #8CA676（视频亮部）
                 // 用他们的 树叶.mat 里能读到的颜色（如果可读）
                 if (leafMat != null && leafMat.HasProperty("_Color")) newLeafMat.SetColor("_ColorA", leafMat.GetColor("_Color"));
                 leafMat = newLeafMat;
