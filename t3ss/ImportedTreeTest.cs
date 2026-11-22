@@ -58,11 +58,11 @@ namespace T3ssDemo
                       " Shape=" + (shapeMat != null) + " 树干=" + (trunkMat != null));
 
             var shapeMatForShape = new Material(Shader.Find("Custom/ToonLit"));
-            shapeMatForShape.SetColor("_BaseColor", new Color(0.270f, 0.352f, 0.218f));   // 线性 → sRGB #6E8A5C
-            shapeMatForShape.SetColor("_Color2", new Color(0.270f, 0.352f, 0.218f));
-            shapeMatForShape.SetColor("_Color3", new Color(0.234f, 0.306f, 0.186f));
-            shapeMatForShape.SetColor("_HighlightColor", new Color(0.432f, 0.535f, 0.342f));
-            shapeMatForShape.SetColor("_ShadowColor", new Color(0.153f, 0.207f, 0.124f));
+            shapeMatForShape.SetColor("_Color", new Color(0.130f, 0.190f, 0.085f));   // 暗绿纯色
+            
+            
+            
+            
 
             // 只保留"树叶"形状网格 + 树干
             foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
@@ -79,7 +79,7 @@ namespace T3ssDemo
                     Debug.Log("[Imp] 树干材质 shader=" + (s != null ? s.name : "null") + " supported=" + (s != null && s.isSupported));
                     if (s == null || !s.isSupported)
                     {
-                        var tm = new Material(Shader.Find("Custom/ToonLit"));
+                        var tm = new Material(Shader.Find("Custom/FlatColor"));
                         tm.SetColor("_BaseColor", new Color(0.28f, 0.14f, 0.22f));
                         tm.SetColor("_Color2", new Color(0.28f, 0.14f, 0.22f));
                         tm.SetColor("_Color3", new Color(0.24f, 0.12f, 0.19f));
@@ -126,8 +126,8 @@ namespace T3ssDemo
                 dl.mats = new System.Collections.Generic.List<Material>();
                 if (leafMat != null) dl.mats.Add(leafMat);
                 if (leafMat2 != null) dl.mats.Add(leafMat2);
-                dl.LeafDenesity = 0.443f;
-                dl.LeafSize = 1.449f;
+                dl.LeafDenesity = 1.0f;   // 100% 顶点都长叶子
+                dl.LeafSize = 0.45f;   // 叶子缩到 1px
                 dl.LeafOffset = 0.356f;
                 dl.LightOffset = 0.396f;
                 Debug.Log("[Imp] DrawLeaf 已挂载，材质数=" + dl.mats.Count);
