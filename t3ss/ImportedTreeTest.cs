@@ -76,20 +76,15 @@ namespace T3ssDemo
                     mr.sharedMaterial = shapeMatForShape;
                 if (mr.name.Contains("树干"))
                 {
-                    // 树干材质也可能坏，检查一下
-                    var s = mr.sharedMaterial != null ? mr.sharedMaterial.shader : null;
-                    Debug.Log("[Imp] 树干材质 shader=" + (s != null ? s.name : "null") + " supported=" + (s != null && s.isSupported));
-                    if (s == null || !s.isSupported)
-                    {
-                        var tm = new Material(Shader.Find("Custom/ToonLit"));
-                        tm.SetColor("_BaseColor", new Color(0.28f, 0.14f, 0.22f));
-                        tm.SetColor("_Color2", new Color(0.28f, 0.14f, 0.22f));
-                        tm.SetColor("_Color3", new Color(0.24f, 0.12f, 0.19f));
-                        tm.SetColor("_HighlightColor", new Color(0.30f, 0.16f, 0.24f));
-                        tm.SetColor("_ShadowColor", new Color(0.10f, 0.05f, 0.09f));
-                        mr.sharedMaterial = tm;
-                        Debug.Log("[Imp] 树干换成 ToonLit");
-                    }
+                    // 树干一律换成 ToonLit 深紫褐（原来的是 URP/Lit 默认灰）
+                    var tm = new Material(Shader.Find("Custom/ToonLit"));
+                    tm.SetColor("_BaseColor",  new Color(0.34f, 0.19f, 0.27f));
+                    tm.SetColor("_Color2",     new Color(0.24f, 0.13f, 0.19f));
+                    tm.SetColor("_Color3",     new Color(0.20f, 0.11f, 0.16f));
+                    tm.SetColor("_HighlightColor", new Color(0.30f, 0.17f, 0.24f));
+                    tm.SetColor("_ShadowColor",    new Color(0.16f, 0.09f, 0.13f));
+                    mr.sharedMaterial = tm;
+                    Debug.Log("[Imp] 树干 → ToonLit 深紫褐");
                 }
             }
 
@@ -123,7 +118,7 @@ namespace T3ssDemo
             if (shapeMesh != null && leafMesh != null && leafMat != null)
             {
                 dl = inst.AddComponent<DrawLeaf>();
-                dl.ShapeMesh = shapeMesh;
+                dl.ShapeMesh = shapeMesh;   // 工程自带的 树叶 网格
                 dl.LeafMesh = leafMesh;
                 dl.mats = new System.Collections.Generic.List<Material>();
                 if (leafMat != null) dl.mats.Add(leafMat);
@@ -155,16 +150,16 @@ namespace T3ssDemo
             // 自动取景到"树叶"的包围盒
             Bounds tb = new Bounds(Vector3.zero, Vector3.one);
             bool hasB = false;
-            foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
+            foreach (var mf2 in inst.GetComponentsInChildren<MeshFilter>())
             {
-                if (!mr.name.Contains("树叶") || mr.GetComponent<MeshFilter>() == null) continue;
-                var m = mr.GetComponent<MeshFilter>().sharedMesh;
-                if (m == null) continue;
-                var wb = mr.transform.TransformPoint(m.bounds.center);
-                tb = new Bounds(wb, m.bounds.size);
-                hasB = true;
-                Debug.Log("[Imp] 树叶包围盒: center=" + wb + " size=" + m.bounds.size);
-                break;
+                if (mf2.name.Contains("树叶") && mf2.sharedMesh != null)
+                {
+                    var b = mf2.sharedMesh.bounds;
+                    tb = new Bounds(mf2.transform.TransformPoint(b.center), b.size);
+                    hasB = true;
+                    Debug.Log("[Imp] 树叶包围盒: center=" + tb.center + " size=" + b.size);
+                    break;
+                }
             }
 
             var camGo = new GameObject("Cam");
