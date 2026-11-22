@@ -59,7 +59,7 @@ namespace T3ssDemo
             Debug.Log("[Imp] 材质: 树叶=" + (leafMat != null) + " 树叶2=" + (leafMat2 != null) +
                       " Shape=" + (shapeMat != null) + " 树干=" + (trunkMat != null));
 
-            var shapeMatForShape = new Material(Shader.Find("Custom/ToonLit"));
+            var shapeMatForShape = new Material(Shader.Find("Custom/ToonLit"));   // 底衬：暗绿，缝隙读作阴影
             shapeMatForShape.SetColor("_BaseColor", new Color(0.270f, 0.352f, 0.218f));   // 线性 → sRGB #6E8A5C
             shapeMatForShape.SetColor("_Color2", new Color(0.270f, 0.352f, 0.218f));
             shapeMatForShape.SetColor("_Color3", new Color(0.234f, 0.306f, 0.186f));
@@ -123,7 +123,7 @@ namespace T3ssDemo
                 dl.mats = new System.Collections.Generic.List<Material>();
                 if (leafMat != null) dl.mats.Add(leafMat);
                 if (leafMat2 != null) dl.mats.Add(leafMat2);
-                dl.LeafDenesity = 0.443f;
+                dl.LeafDenesity = 0.443f;   // 照抄工程
                 dl.LeafSize = 1.449f;
                 dl.LeafOffset = 0.356f;
                 dl.LightOffset = 0.396f;
