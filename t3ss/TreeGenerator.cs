@@ -69,6 +69,7 @@ namespace T3ssDemo
             var verts = new List<Vector3>();
             var normals = new List<Vector3>();
             var uvs = new List<Vector2>();
+            var uv2s = new List<Vector4>();   // xyz = 卡片中心（billboard 用）
             var colors = new List<Color>();
             var tris = new List<int>();
             int triBase = 0;
@@ -80,7 +81,7 @@ namespace T3ssDemo
             float trunkR = Mathf.Max(0.10f, H * (0.060f + (float)rng.NextDouble() * 0.022f));   // 更粗
 
             // ---- 1. 树干（锥形圆柱）
-            AddCylinder(verts, normals, uvs, colors, tris, ref triBase,
+            AddCylinder(verts, normals, uvs, uv2s, colors, tris, ref triBase,
                 Vector3.zero, trunkH, trunkR, trunkR * 0.55f, 8,
                 new Color(0.29f, 0.20f, 0.25f, 1f));
 
@@ -94,7 +95,7 @@ namespace T3ssDemo
                 var start = new Vector3(Mathf.Cos(ang) * trunkR * 0.4f, baseY, Mathf.Sin(ang) * trunkR * 0.4f);
                 var dir = new Vector3(Mathf.Cos(ang) * 0.55f, 2.2f, Mathf.Sin(ang) * 0.55f).normalized;   // 分枝更竖直
                 var end = start + dir * len;
-                AddCylinderBetween(verts, normals, uvs, colors, tris, ref triBase, start, end,
+                AddCylinderBetween(verts, normals, uvs, uv2s, colors, tris, ref triBase, start, end,
                     trunkR * 0.45f, trunkR * 0.28f, 6, new Color(0.29f, 0.20f, 0.25f, 1f));
             }
 
@@ -120,7 +121,7 @@ namespace T3ssDemo
             var shellCol = new Color(0.62f, 0.72f, 0.54f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
             int shIdx = 0;
             foreach (var sc in shellCenters)
-                AddSphere(verts, normals, uvs, colors, tris, ref triBase,
+                AddSphere(verts, normals, uvs, uv2s, colors, tris, ref triBase,
                     new Vector3(sc.x, sc.y, sc.z), sc.w, 14, 10, shellCol, 0.18f, opt.Seed * 31 + shIdx++);
 
             // 整体树冠中心（用于球形法线）
@@ -174,7 +175,7 @@ namespace T3ssDemo
                 Color lcol = new Color(0.62f, 0.72f, 0.54f, 1f);
 
                 float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
-                AddQuad(verts, normals, uvs, colors, tris, ref triBase, pos, rot, s);
+                AddQuad(verts, normals, uvs, uv2s, colors, tris, ref triBase, pos, rot, s);
             }
             leafVerts = verts.Count - shellVerts;
 
@@ -195,6 +196,7 @@ namespace T3ssDemo
             mesh.SetVertices(verts);
             mesh.SetNormals(new List<Vector3>(arrN));
             mesh.SetUVs(0, uvs);
+            mesh.SetUVs(1, uv2s);
             mesh.SetColors(colors);
             mesh.SetTriangles(tris, 0);
             mesh.RecalculateBounds();
@@ -203,7 +205,7 @@ namespace T3ssDemo
 
         // ---------------- 基础几何 ----------------
 
-        static void AddQuad(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Color> c,
+        static void AddQuad(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Vector4> uv2, List<Color> c,
                             List<int> t, ref int b, Vector3 pos, Quaternion rot, float s)
         {
             float h = s * 0.5f;
@@ -220,6 +222,7 @@ namespace T3ssDemo
                 v.Add(pos + rot * corners[i]);
                 n.Add(normal);
                 uv.Add(uvc[i]);
+                uv2.Add(new Vector4(pos.x, pos.y, pos.z, 0));   // 卡片中心
                 c.Add(Color.white);
             }
             t.Add(b + 0); t.Add(b + 2); t.Add(b + 1);
@@ -227,15 +230,15 @@ namespace T3ssDemo
             b += 4;
         }
 
-        static void AddCylinder(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Color> c,
+        static void AddCylinder(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Vector4> uv2, List<Color> c,
                                 List<int> t, ref int b, Vector3 basePos, float height,
                                 float rBottom, float rTop, int sides, Color col)
         {
-            AddCylinderBetween(v, n, uv, c, t, ref b, basePos, basePos + Vector3.up * height,
+            AddCylinderBetween(v, n, uv, uv2, c, t, ref b, basePos, basePos + Vector3.up * height,
                 rBottom, rTop, sides, col);
         }
 
-        static void AddCylinderBetween(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Color> c,
+        static void AddCylinderBetween(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Vector4> uv2, List<Color> c,
                                        List<int> t, ref int b, Vector3 a, Vector3 bb,
                                        float rA, float rB, int sides, Color col)
         {
@@ -250,8 +253,8 @@ namespace T3ssDemo
             {
                 float ang = i / (float)sides * Mathf.PI * 2f;
                 var dir = right * Mathf.Cos(ang) + fwd * Mathf.Sin(ang);
-                v.Add(a + dir * rA); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 0)); c.Add(col);
-                v.Add(bb + dir * rB); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 1)); c.Add(col);
+                v.Add(a + dir * rA); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 0)); uv2.Add(new Vector4((a + dir * rA).x, (a + dir * rA).y, (a + dir * rA).z, 0)); c.Add(col);
+                v.Add(bb + dir * rB); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 1)); uv2.Add(new Vector4((bb + dir * rB).x, (bb + dir * rB).y, (bb + dir * rB).z, 0)); c.Add(col);
             }
             for (int i = 0; i < sides; i++)
             {
@@ -262,7 +265,7 @@ namespace T3ssDemo
             }
             b += sides * 2;        }
 
-        static void AddSphere(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Color> c,
+        static void AddSphere(List<Vector3> v, List<Vector3> n, List<Vector2> uv, List<Vector4> uv2, List<Color> c,
                               List<int> t, ref int b, Vector3 center, float radius,
                               int lon, int lat, Color col, float jag = 0f, int seed = 0)
         {
@@ -292,6 +295,7 @@ namespace T3ssDemo
                     v.Add(center + dir * r);
                     n.Add(dir);
                     uv.Add(new Vector2(uu, vv));
+                    uv2.Add(new Vector4((center + dir * r).x, (center + dir * r).y, (center + dir * r).z, 0));
                     c.Add(col);
                 }
             }

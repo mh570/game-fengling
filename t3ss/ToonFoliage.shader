@@ -49,6 +49,7 @@ Shader "Custom/ToonFoliage"
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
                 float2 uv         : TEXCOORD0;
+                float4 uv2        : TEXCOORD1;   // xyz = 卡片中心（billboard 用）
                 float4 color      : COLOR;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
@@ -67,13 +68,31 @@ Shader "Custom/ToonFoliage"
             {
                 Varyings OUT;
                 UNITY_SETUP_INSTANCE_ID(IN);
-                VertexPositionInputs p = GetVertexPositionInputs(IN.positionOS.xyz);
-                VertexNormalInputs n = GetVertexNormalInputs(IN.normalOS);
-                OUT.positionHCS = p.positionCS;
-                OUT.positionWS = p.positionWS;
-                OUT.normalWS = n.normalWS;
-                OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
-                OUT.color = IN.color;
+
+                // ---- 叶片 billboard：围绕卡片中心重建位置，让每片都正面朝相机
+                // （参考实现 DrawLeaf.cs：Camera → Cross → Matrix Construction）
+                float3 centerOS = IN.uv2.xyz;
+                float3 corner   = IN.positionOS.xyz - centerOS;
+                float3 centerWS = TransformObjectToWorld(centerOS);
+
+                float3 toCam = _WorldSpaceCameraPos - centerWS;
+                toCam.y = 0;                                  // 柱面 billboard：只绕 Y 转
+                float len = length(toCam);
+                toCam = len > 1e-4 ? toCam / len : float3(0, 0, 1);
+
+                float3 rightV = normalize(cross(float3(0, 1, 0), toCam));
+                float3 upV    = float3(0, 1, 0);
+
+                float3 posWS = centerWS
+                             + rightV * corner.x
+                             + upV    * corner.y
+                             + toCam  * corner.z;
+
+                OUT.positionHCS = TransformWorldToHClip(posWS);
+                OUT.positionWS  = posWS;
+                OUT.normalWS    = TransformObjectToWorldNormal(IN.normalOS);
+                OUT.uv          = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.color       = IN.color;
                 return OUT;
             }
 
