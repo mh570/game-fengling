@@ -118,7 +118,7 @@ namespace T3ssDemo
                     rr));
             }
 
-            var shellCol = new Color(0.62f, 0.72f, 0.54f, 1f);   // 壳与叶片同色：缝隙不再露出暗斑
+            var shellCol = Color.white;   // 壳与叶片同色：缝隙不再露出暗斑
             int shIdx = 0;
             foreach (var sc in shellCenters)
                 AddSphere(verts, normals, uvs, uv2s, colors, tris, ref triBase,
@@ -163,7 +163,7 @@ namespace T3ssDemo
                   // 朝向：只绕自身 Z 轴随机（DrawLeaf: Quaternion.Euler(0,0,random)）
                   var rot = Quaternion.Euler(0f, 0f, (float)rng.NextDouble() * 360f);
 
-                  Color lcol = new Color(0.62f, 0.72f, 0.54f, 1f);
+                  Color lcol = Color.white;   // 颜色全交给渐变，顶点色不再压暗
                   float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
                   AddQuad(verts, normals, uvs, uv2s, colors, tris, ref triBase, pos, rot, s);
                   placedLeaves++;
@@ -246,8 +246,8 @@ namespace T3ssDemo
             {
                 float ang = i / (float)sides * Mathf.PI * 2f;
                 var dir = right * Mathf.Cos(ang) + fwd * Mathf.Sin(ang);
-                v.Add(a + dir * rA); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 0)); uv2.Add(new Vector4((a + dir * rA).x, (a + dir * rA).y, (a + dir * rA).z, 0)); c.Add(col);
-                v.Add(bb + dir * rB); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 1)); uv2.Add(new Vector4((bb + dir * rB).x, (bb + dir * rB).y, (bb + dir * rB).z, 0)); c.Add(col);
+                v.Add(a + dir * rA); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 0)); uv2.Add(new Vector4((a + dir * rA).x, (a + dir * rA).y, (a + dir * rA).z, 0)); c.Add(new Color(col.r, col.g, col.b, 0f));
+                v.Add(bb + dir * rB); n.Add(dir); uv.Add(new Vector2(i / (float)sides, 1)); uv2.Add(new Vector4((bb + dir * rB).x, (bb + dir * rB).y, (bb + dir * rB).z, 0)); c.Add(new Color(col.r, col.g, col.b, 0f));
             }
             for (int i = 0; i < sides; i++)
             {
@@ -289,7 +289,7 @@ namespace T3ssDemo
                     n.Add(dir);
                     uv.Add(new Vector2(uu, vv));
                     uv2.Add(new Vector4((center + dir * r).x, (center + dir * r).y, (center + dir * r).z, 0));
-                    c.Add(col);
+                    c.Add(new Color(1f, 1f, 1f, 1f));
                 }
             }
             for (int j = 0; j < lat; j++)

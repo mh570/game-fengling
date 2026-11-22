@@ -124,7 +124,9 @@ Shader "Custom/ToonFoliage"
                 float3 cLow  = _ShadowColor.rgb;
                 float3 cMid  = _MidColor.rgb;
                 float3 cHigh = _HighlightColor.rgb;
-                float3 col = q < 0.5 ? lerp(cLow, cMid, q * 2.0) : lerp(cMid, cHigh, (q - 0.5) * 2.0);
+                float3 grad = q < 0.5 ? lerp(cLow, cMid, q * 2.0) : lerp(cMid, cHigh, (q - 0.5) * 2.0);
+                // 树干（color.a < 0.5）跳过叶片渐变，直接用顶点色
+                float3 col = IN.color.a > 0.5 ? grad : float3(1, 1, 1);
                 col *= _BaseColor.rgb * tex.rgb * IN.color.rgb;   // 顶点色（树干/叶片区分）
 
                 // 环境光（天空光）：否则背光叶片全黑，整体被拉暗

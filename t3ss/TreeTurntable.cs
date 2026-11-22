@@ -47,9 +47,9 @@ namespace T3ssDemo
             mat.SetFloat("_Cuts", 16f);
             mat.SetFloat("_DitherStrength", 0f);
             mat.SetColor("_BaseColor", Color.white);
-            mat.SetColor("_HighlightColor", new Color(0.56f, 0.69f, 0.43f));   // 目标 sRGB #8CA676
-            mat.SetColor("_ShadowColor", new Color(0.17f, 0.27f, 0.16f));   // 目标 sRGB #64805A
-            mat.SetColor("_MidColor", new Color(0.33f, 0.46f, 0.26f));      // 中间调
+            mat.SetColor("_HighlightColor", new Color(0.535f, 0.660f, 0.430f));   // 线性 → sRGB #8CA676
+            mat.SetColor("_ShadowColor", new Color(0.260f, 0.370f, 0.240f));   // 线性 → sRGB #64805A
+            mat.SetColor("_MidColor", new Color(0.385f, 0.500f, 0.330f));    // 线性 → sRGB 中间调
 
             // ---- 生成一棵树
             var opt = new TreeGenerator.Options
