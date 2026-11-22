@@ -26,49 +26,18 @@ namespace T3ssDemo
             foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())
                 Debug.Log("[Imp]   MeshFilter: " + mf.name + " verts=" + (mf.sharedMesh != null ? mf.sharedMesh.vertexCount : 0));
 
-            // 2) ShapeMesh：用我们生成的凹凸球（替换工程自带的蛋形）
+            // 2) 找 ShapeMesh（顶点多的那个）和树干
             Mesh shapeMesh = null;
+            foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())
             {
-                // ★ 只替换形状网格，其余流程完全不变
-                // ★ 工程的做法：5 个独立椭球重叠成树冠（3019 顶点 ÷ 5 ≈ 604 顶点/球）
-                var gen = LobeShapeTest.BuildEllipsoidCluster(
-                    seed: 22,
-                    count: 5,                     // 3~5 个椭球
-                    minR: 1.00f, maxR: 1.00f,   // 推算：所有球半径相同     // 副球半径（主球 = maxR）
-                    spreadXZ: 0.05f, spreadY: 0.25f,   // 推算：垂直堆叠（宽=单球，高=单球+1.5）
-                    flatY: 0.82f,
-                    lon: 28, lat: 20,             // 29×21 = 609 顶点/球 × 5 = 3045 ≈ 工程 3019
-                    centerY: 0.30f);
-                Debug.Log("[Imp] 椭球簇顶点=" + gen.vertexCount + " 包围盒=" + gen.bounds.size);
-                // 缩放到和工程形状网格相同尺寸
-                Mesh orig = null;
-                foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())
-                    if (mf.sharedMesh != null && (mf.name.Contains("树叶") || mf.sharedMesh.name.Contains("树叶")))
-                    { orig = mf.sharedMesh; break; }
-                if (orig != null)
-                {
-                    float os = Mathf.Max(orig.bounds.size.x, orig.bounds.size.y, orig.bounds.size.z);
-                    float gs = Mathf.Max(gen.bounds.size.x, gen.bounds.size.y, gen.bounds.size.z);
-                    float k = os / Mathf.Max(0.0001f, gs);
-                    var vs = gen.vertices;
-                    for (int i = 0; i < vs.Length; i++) vs[i] *= k;
-                    gen.vertices = vs;
-                    gen.RecalculateNormals();
-                    gen.RecalculateBounds();
-                    // 中心对齐到原形状
-                    var shift = orig.bounds.center - gen.bounds.center;
-                    for (int i = 0; i < vs.Length; i++) vs[i] += shift;
-                    gen.vertices = vs;
-                    gen.RecalculateBounds();
-                    Debug.Log("[Imp] 形状替换：原 " + orig.vertexCount + " 顶点 → 生成 " + gen.vertexCount +
-                              " 顶点，缩放 " + k.ToString("F3"));
-                }
-                shapeMesh = gen;
-                // 把生成的形状塞进工程原本的「树叶」MeshFilter（渲染位置/变换都沿用）
-                if (orig != null)
-                    foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())
-                        if (mf.sharedMesh == orig) { mf.sharedMesh = gen; break; }
+                if (mf.sharedMesh == null) continue;
+                if (mf.name.Contains("树叶") || mf.sharedMesh.name.Contains("树叶"))
+                { shapeMesh = mf.sharedMesh; break; }
             }
+            if (shapeMesh == null)
+                foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())
+                    if (mf.sharedMesh != null && shapeMesh == null) shapeMesh = mf.sharedMesh;
+            Debug.Log("[Imp] ShapeMesh 顶点数: " + (shapeMesh != null ? shapeMesh.vertexCount : 0));
 
             // 3) Leaf.mesh
             var leafMesh = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/Imported/Model/Leaf.mesh");
