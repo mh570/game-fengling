@@ -1,22 +1,44 @@
 {
-  "status": "target_locked_render_pending",
-  "decision": "D-010-A: 图2 = 树冠/hero shot 主验收目标 + 3 个回归检查；不是整个游戏最终目标",
+  "status": "targets_locked_render_pending",
+  "decision": "D-010-A + D-011: T1 1:1 近景 + T2 16:9 游戏构图，双目标同权；图2 是树冠/hero shot 主目标，不是整个游戏最终目标",
   "created": "2026-11-22",
   "project": "C:\\Users\\mh570\\Desktop\\demo",
+  "render_project": "C:\\Users\\mh570\\Desktop\\t3ss-demo",
   "unity": "6000.3.28f1",
-  "commit_at_lock": "e73629f",
-  "target": {
-    "source_frame": "Docs/video-analysis/frames/02-trees/f_010.jpg",
-    "crop_px": [1220, 330, 620, 620],
-    "file": "target_620.png",
-    "sha256": "783810E90C415FF3DFFEC4A71B41BE22C4BB28D26DFB848EE155D35F9286EFEA"
+  "commit_at_lock": "c872337",
+  "targets": {
+    "T1_1x1": {
+      "role": "近景叶簇尺度",
+      "source_frame": "Docs/video-analysis/frames/02-trees/f_010.jpg",
+      "crop_px": [1220, 330, 620, 620],
+      "aspect": "1:1",
+      "file": "target_620.png",
+      "sha256": "783810E90C415FF3DFFEC4A71B41BE22C4BB28D26DFB848EE155D35F9286EFEA"
+    },
+    "T2_16x9": {
+      "role": "游戏 16:9 构图（树冠 + 树干 + 码头/水/草）",
+      "source_frame": "Docs/video-analysis/frames/02-trees/f_010.jpg",
+      "crop_px": [1040, 450, 800, 450],
+      "aspect": "16:9",
+      "file": "target_16x9.png",
+      "sha256": "34F0F5516F37F54FB9495F615B7EB32C854CDE2A6B44ED81906C0AA7AD8AADD2",
+      "silhouette_guide": "Docs/images/t3ss/fig1_fig2/t2_silhouette_guide.png",
+      "silhouette_tolerance_px": 15,
+      "silhouette_note": "用户手绘近似轮廓，作为形体参考，不做像素级 IoU；S2/G2 用轮廓带 ±15px + 叶团中心/凹槽检查。"
+    }
   },
   "b0_renders": {
-    "front_1024": null,
-    "side_1024": null,
-    "target_640": null
+    "front_1024": "B0_front_1024.png",
+    "side_1024": "B0_side_1024.png",
+    "target_1x1_620": null,
+    "target_16x9_640": null,
+    "target_16x9_provisional_bad": "B0_target_640_provisional.png"
   },
-  "camera": null,
-  "post": null,
-  "notes": "S0.2 target lock complete. S0.1/S0.3 B0 render + TargetFrameTest pending; G0 not passed."
+  "camera": {
+    "front": "camera_front.txt",
+    "side": "camera_side.txt",
+    "target_provisional_bad": "camera_target_provisional.txt"
+  },
+  "observation": "B0 front/side are valid. The first 640x360 target attempt cropped into a leaf wall; after D-011 dual targets, the 16:9 camera must be re-framed to match target_16x9.png and the hand-drawn silhouette guide.",
+  "notes": "S0.1 front/side done. S0.3 target cameras pending. G0 not passed."
 }

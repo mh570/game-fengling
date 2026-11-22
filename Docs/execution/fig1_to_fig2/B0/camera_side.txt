@@ -1,0 +1,4 @@
+orthographic=true
+size=4.692511
+pos=(21.69, 7.99, 6.05)
+lookAt=(6.67, 6.87, 6.05)

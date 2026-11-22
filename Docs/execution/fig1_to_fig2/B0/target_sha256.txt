@@ -1,6 +1,15 @@
-target_620.png
+T1_1x1  target_620.png
 SHA256 783810E90C415FF3DFFEC4A71B41BE22C4BB28D26DFB848EE155D35F9286EFEA
 source Docs/video-analysis/frames/02-trees/f_010.jpg
 crop 1220,330,620,620
 locked 2026-11-22
 decision D-010-A
+
+T2_16x9  target_16x9.png
+SHA256 34F0F5516F37F54FB9495F615B7EB32C854CDE2A6B44ED81906C0AA7AD8AADD2
+source Docs/video-analysis/frames/02-trees/f_010.jpg
+crop 1040,450,800,450
+silhouette guide Docs/images/t3ss/fig1_fig2/t2_silhouette_guide.png
+tolerance ±15px (hand-drawn, approximate)
+locked 2026-11-22
+decision D-011 (dual target)
