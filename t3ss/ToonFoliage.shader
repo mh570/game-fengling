@@ -9,6 +9,7 @@ Shader "Custom/ToonFoliage"
         _BaseColor ("Base Color", Color) = (0.30, 0.50, 0.22, 1)
         _HighlightColor ("Highlight", Color) = (0.78, 0.92, 0.54, 1)
         _ShadowColor ("Shadow", Color) = (0.24, 0.40, 0.22, 1)
+        _MidColor ("Mid", Color) = (0.40, 0.52, 0.32, 1)
         _Cuts ("Cuts", Range(1,32)) = 16
         _DitherStrength ("Dither", Range(0,1)) = 0.0
     }
@@ -40,6 +41,7 @@ Shader "Custom/ToonFoliage"
                 half4 _BaseColor;
                 half4 _HighlightColor;
                 half4 _ShadowColor;
+                half4 _MidColor;
                 float _Cuts;
                 float _DitherStrength;
             CBUFFER_END
@@ -118,7 +120,11 @@ Shader "Custom/ToonFoliage"
                 // （参考视频的树冠是连续渐变，没有色带）
                 float q = saturate(lit);
 
-                float3 col = lerp(_ShadowColor.rgb, _HighlightColor.rgb, q);
+                // 三段渐变（照 Leaf.shadergraph：Dot(N,L) → Remap → Sample Gradient）
+                float3 cLow  = _ShadowColor.rgb;
+                float3 cMid  = _MidColor.rgb;
+                float3 cHigh = _HighlightColor.rgb;
+                float3 col = q < 0.5 ? lerp(cLow, cMid, q * 2.0) : lerp(cMid, cHigh, (q - 0.5) * 2.0);
                 col *= _BaseColor.rgb * tex.rgb * IN.color.rgb;   // 顶点色（树干/叶片区分）
 
                 // 环境光（天空光）：否则背光叶片全黑，整体被拉暗
@@ -156,6 +162,7 @@ Shader "Custom/ToonFoliage"
                 half4 _BaseColor;
                 half4 _HighlightColor;
                 half4 _ShadowColor;
+                half4 _MidColor;
                 float _Cuts;
                 float _DitherStrength;
             CBUFFER_END

@@ -49,6 +49,7 @@ namespace T3ssDemo
             mat.SetColor("_BaseColor", Color.white);
             mat.SetColor("_HighlightColor", new Color(0.56f, 0.69f, 0.43f));   // 目标 sRGB #8CA676
             mat.SetColor("_ShadowColor", new Color(0.17f, 0.27f, 0.16f));   // 目标 sRGB #64805A
+            mat.SetColor("_MidColor", new Color(0.33f, 0.46f, 0.26f));      // 中间调
 
             // ---- 生成一棵树
             var opt = new TreeGenerator.Options

@@ -78,12 +78,12 @@ namespace T3ssDemo
             // 形状变体：树干比例、树冠比例、粗细都按种子变化
             float trunkRatio = 0.45f + (float)rng.NextDouble() * 0.20f;   // 0.45~0.65
             float trunkH = H * trunkRatio;
-            float trunkR = Mathf.Max(0.10f, H * (0.060f + (float)rng.NextDouble() * 0.022f));   // 更粗
+            float trunkR = Mathf.Max(0.13f, H * (0.080f + (float)rng.NextDouble() * 0.030f));   // 更粗
 
             // ---- 1. 树干（锥形圆柱）
             AddCylinder(verts, normals, uvs, uv2s, colors, tris, ref triBase,
                 Vector3.zero, trunkH, trunkR, trunkR * 0.55f, 8,
-                new Color(0.29f, 0.20f, 0.25f, 1f));
+                new Color(0.067f, 0.036f, 0.050f, 1f));
 
             // ---- 2. 分枝（2~3 根，斜向上）
             int branches = 2 + rng.Next(2);
@@ -96,7 +96,7 @@ namespace T3ssDemo
                 var dir = new Vector3(Mathf.Cos(ang) * 0.55f, 2.2f, Mathf.Sin(ang) * 0.55f).normalized;   // 分枝更竖直
                 var end = start + dir * len;
                 AddCylinderBetween(verts, normals, uvs, uv2s, colors, tris, ref triBase, start, end,
-                    trunkR * 0.45f, trunkR * 0.28f, 6, new Color(0.29f, 0.20f, 0.25f, 1f));
+                    trunkR * 0.45f, trunkR * 0.28f, 6, new Color(0.067f, 0.036f, 0.050f, 1f));
             }
 
             shellVerts = verts.Count;
