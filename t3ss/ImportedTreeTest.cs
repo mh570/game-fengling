@@ -30,13 +30,16 @@ namespace T3ssDemo
             Mesh shapeMesh = null;
             {
                 // ★ 只替换形状网格，其余流程完全不变
-                // ★ 扁椭圆 + 3 个 1/3 半径的突出球
-                var gen = LobeShapeTest.BuildLobedShape(
+                // ★ 工程的做法：5 个独立椭球重叠成树冠（3019 顶点 ÷ 5 ≈ 604 顶点/球）
+                var gen = LobeShapeTest.BuildEllipsoidCluster(
                     seed: 22,
-                    bigLobes: 3, bigH: 0.33f, bigW: 0.45f,   // 突出 1/3，窄一点才鼓
-                    smallLobes: 0, smallH: 0.0f, smallW: 0.30f,
-                    baseR: 1.0f, lon: 48, lat: 28,
-                    ellipsoidScale: new Vector3(1.15f, 0.82f, 1.15f));   // 扁椭圆（宽>高）
+                    count: 5,                     // 3~5 个椭球
+                    minR: 0.42f, maxR: 0.60f,     // 副球半径（主球 = maxR）
+                    spreadXZ: 0.85f, spreadY: 1.15f,
+                    flatY: 0.82f,
+                    lon: 28, lat: 20,             // 29×21 = 609 顶点/球 × 5 = 3045 ≈ 工程 3019
+                    centerY: 0.30f);
+                Debug.Log("[Imp] 椭球簇顶点=" + gen.vertexCount + " 包围盒=" + gen.bounds.size);
                 // 缩放到和工程形状网格相同尺寸
                 Mesh orig = null;
                 foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())

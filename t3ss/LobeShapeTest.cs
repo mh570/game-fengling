@@ -14,6 +14,93 @@ namespace T3ssDemo
     /// </summary>
     public static class LobeShapeTest
     {
+        /// <summary>
+        /// ★ 工程文件的做法：N 个独立椭球（3~5 个）重叠成树冠。
+        /// 每个球是完整闭合椭球面，法线用各自的球心 → 每个球有自己的明暗。
+        /// </summary>
+        public static Mesh BuildEllipsoidCluster(int seed, int count,
+                                                 float minR, float maxR,
+                                                 float spreadXZ, float spreadY,
+                                                 float flatY, int lon, int lat,
+                                                 float centerY)
+        {
+            var rng = new System.Random(seed);
+            var verts = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var uv2 = new List<Vector4>();
+            var colors = new List<Color>();
+            var tris = new List<int>();
+
+            int vbase = 0;
+            for (int b = 0; b < count; b++)
+            {
+                // 球心位置：第一个居中，其余随机散布
+                Vector3 c;
+                float r;
+                if (b == 0)
+                {
+                    c = new Vector3(0f, centerY, 0f);
+                    r = maxR * 1.0f;
+                }
+                else
+                {
+                    float a = (float)rng.NextDouble() * Mathf.PI * 2f;
+                    float d = spreadXZ * (0.35f + (float)rng.NextDouble() * 0.65f);
+                    c = new Vector3(Mathf.Cos(a) * d,
+                                    centerY + ((float)rng.NextDouble() - 0.35f) * spreadY,
+                                    Mathf.Sin(a) * d);
+                    r = Mathf.Lerp(minR, maxR, (float)rng.NextDouble());
+                }
+
+                // 每个球轻微压扁
+                float fy = flatY * (0.9f + (float)rng.NextDouble() * 0.2f);
+
+                for (int j = 0; j <= lat; j++)
+                {
+                    float vv = j / (float)lat;
+                    float phi = vv * Mathf.PI;
+                    for (int i = 0; i <= lon; i++)
+                    {
+                        float uu = i / (float)lon;
+                        float theta = uu * Mathf.PI * 2f;
+                        var dir = new Vector3(
+                            Mathf.Sin(phi) * Mathf.Cos(theta),
+                            Mathf.Cos(phi),
+                            Mathf.Sin(phi) * Mathf.Sin(theta));
+                        var pos = c + new Vector3(dir.x * r, dir.y * r * fy, dir.z * r);
+                        verts.Add(pos);
+                        // ★ 每个球用自己的球心算法线
+                        var nrm = new Vector3(dir.x, dir.y / Mathf.Max(0.01f, fy), dir.z).normalized;
+                        normals.Add(nrm);
+                        uvs.Add(new Vector2(uu, vv));
+                        uv2.Add(new Vector4(pos.x, pos.y, pos.z, 0));
+                        colors.Add(Color.white);
+                    }
+                }
+                for (int j = 0; j < lat; j++)
+                    for (int i = 0; i < lon; i++)
+                    {
+                        int a0 = vbase + j * (lon + 1) + i;
+                        int a1 = a0 + lon + 1;
+                        tris.Add(a0); tris.Add(a1); tris.Add(a0 + 1);
+                        tris.Add(a0 + 1); tris.Add(a1); tris.Add(a1 + 1);
+                    }
+                vbase += (lat + 1) * (lon + 1);
+            }
+
+            var mesh = new Mesh();
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+            mesh.SetVertices(verts);
+            mesh.SetNormals(normals);
+            mesh.SetUVs(0, uvs);
+            mesh.SetUVs(1, uv2);
+            mesh.SetColors(colors);
+            mesh.SetTriangles(tris, 0);
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
         public static Mesh BuildLobedShape(int seed,
                                            int bigLobes, float bigH, float bigW,
                                            int smallLobes, float smallH, float smallW,
@@ -41,6 +128,7 @@ namespace T3ssDemo
             var uv2 = new List<Vector4>();
             var colors = new List<Color>();
             var tris = new List<int>();
+            var lobeCenters = new List<Vector3>();   // 每个凸起的中心（用于逐凸起法线）
 
             var lobes = new List<Vector3>();
             var lobeH = new List<float>();
@@ -63,7 +151,16 @@ namespace T3ssDemo
             AddLobe(bigLobes, bigH, bigW);          // 主团
             AddLobe(smallLobes, smallH, smallW);    // 表面小球
 
+            // 每个凸起的中心（椭球空间内，稍微往里收一点）
+            foreach (var ld in lobes)
+                lobeCenters.Add(new Vector3(ld.x * baseR * ellipsoidScale.x * 0.75f,
+                                            ld.y * baseR * ellipsoidScale.y * 0.75f,
+                                            ld.z * baseR * ellipsoidScale.z * 0.75f));
+            // 最外层兜底（没找到任何凸起时用整体中心）
+            lobeCenters.Add(Vector3.zero);
+
             int start = 0;
+            var normalsPerLobe = new List<Vector3>();
             for (int j = 0; j <= lat; j++)
             {
                 float vv = j / (float)lat;
@@ -90,6 +187,20 @@ namespace T3ssDemo
                                       pos.y * ellipsoidScale.y,
                                       pos.z * ellipsoidScale.z);
                     verts.Add(pos);
+
+                    // ★ 逐凸起法线：找最近的凸起中心，法线从那个中心往外
+                    //   这样每个叶团有自己的明暗 → 有层次
+                    //   （几何是单一连续网格 → 没有接缝）
+                    int nearest = lobeCenters.Count - 1;
+                    float bestD = float.MaxValue;
+                    for (int k = 0; k < lobeCenters.Count; k++)
+                    {
+                        float d = (pos - lobeCenters[k]).sqrMagnitude;
+                        if (d < bestD) { bestD = d; nearest = k; }
+                    }
+                    var nrm = (pos - lobeCenters[nearest]);
+                    normalsPerLobe.Add(nrm.sqrMagnitude > 1e-8f ? nrm.normalized : dir);
+
                     uvs.Add(new Vector2(uu, vv));
                     uv2.Add(new Vector4(pos.x, pos.y, pos.z, 0));
                     colors.Add(Color.white);
@@ -108,11 +219,11 @@ namespace T3ssDemo
             var mesh = new Mesh();
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
             mesh.SetVertices(verts);
+            mesh.SetNormals(normalsPerLobe);   // ★ 逐凸起法线（不是 RecalculateNormals）
             mesh.SetUVs(0, uvs);
             mesh.SetUVs(1, uv2);
             mesh.SetColors(colors);
             mesh.SetTriangles(tris, 0);
-            mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             return mesh;
         }
