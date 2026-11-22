@@ -46,6 +46,20 @@ namespace T3ssDemo
             dl.LeafOffset = 0.15f;
             dl.LightOffset = 0.396f;
 
+            // 3.5) 树干（圆柱）
+            var trunk = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            trunk.name = "Trunk";
+            float th = 3.4f, tr = 0.36f;
+            trunk.transform.localScale = new Vector3(tr * 2f, th * 0.5f, tr * 2f);   // Unity 圆柱高 2
+            trunk.transform.position = new Vector3(0f, th * 0.5f, 0f);
+            var trunkMat = new Material(Shader.Find("Custom/ToonLit"));
+            trunkMat.SetColor("_BaseColor", new Color(0.30f, 0.16f, 0.26f));
+            trunkMat.SetColor("_Color2", new Color(0.30f, 0.16f, 0.26f));
+            trunkMat.SetColor("_Color3", new Color(0.30f, 0.16f, 0.26f));
+            trunkMat.SetColor("_HighlightColor", new Color(0.30f, 0.16f, 0.26f));
+            trunkMat.SetColor("_ShadowColor", new Color(0.14f, 0.08f, 0.12f));
+            trunk.GetComponent<MeshRenderer>().sharedMaterial = trunkMat;
+
             // 4) 地面/光/相机
             var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
             ground.transform.localScale = new Vector3(3, 1, 3);

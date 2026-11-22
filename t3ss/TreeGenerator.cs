@@ -86,8 +86,8 @@ namespace T3ssDemo
             for (int k = 0; k < 2; k++)
             {
                 float a = (float)rng.NextDouble() * Mathf.PI * 2f;
-                float d = canopyR * (0.25f + (float)rng.NextDouble() * 0.30f);
-                float rr = canopyR * (0.58f + (float)rng.NextDouble() * 0.20f);
+                float d = canopyR * (0.50f + (float)rng.NextDouble() * 0.30f);   // 拉远，显出凸起
+                float rr = canopyR * (0.48f + (float)rng.NextDouble() * 0.14f);   // 缩小副球
                 shellCenters.Add(new Vector4(Mathf.Cos(a) * d,
                     canopyBase + canopyR * (0.20f + (float)rng.NextDouble() * 0.45f),
                     Mathf.Sin(a) * d, rr));
