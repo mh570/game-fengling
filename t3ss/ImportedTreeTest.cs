@@ -34,8 +34,8 @@ namespace T3ssDemo
                 var gen = LobeShapeTest.BuildEllipsoidCluster(
                     seed: 22,
                     count: 5,                     // 3~5 个椭球
-                    minR: 0.42f, maxR: 0.60f,     // 副球半径（主球 = maxR）
-                    spreadXZ: 0.85f, spreadY: 1.15f,
+                    minR: 1.00f, maxR: 1.00f,   // 推算：所有球半径相同     // 副球半径（主球 = maxR）
+                    spreadXZ: 0.05f, spreadY: 0.25f,   // 推算：垂直堆叠（宽=单球，高=单球+1.5）
                     flatY: 0.82f,
                     lon: 28, lat: 20,             // 29×21 = 609 顶点/球 × 5 = 3045 ≈ 工程 3019
                     centerY: 0.30f);
