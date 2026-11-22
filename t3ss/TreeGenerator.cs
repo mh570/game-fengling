@@ -127,55 +127,48 @@ namespace T3ssDemo
             // 整体树冠中心（用于球形法线）
             var canopyCenter = new Vector3(0f, canopyBase + canopyR * 0.45f, 0f);
 
-            // ---- 4. 叶片卡片：撒在壳表面
-            var leafCenters = shellCenters;
-            int leafCount = Mathf.Max(50, opt.LeafCount);
+            // ---- 4. 叶片：遍历「形状网格顶点」（照 DrawLeaf.cs 的做法）
+            // DrawLeaf.cs: for (i < ShapeMesh.vertices.Length) if (density >= random) 长一片叶子
+            // 叶片数 = 形状网格顶点数 × 密度，天然均匀、天然贴合形状
             float leafSize = Mathf.Max(0.05f, opt.LeafSize);
+            float density = Mathf.Clamp01(opt.LeafCount / 500f);   // 用 LeafCount 参数当"密度×500"用
+            int lon = 14, lat = 10;                                 // 和 AddSphere 的细分一致
+            int placedLeaves = 0;
 
-            for (int i = 0; i < leafCount; i++)
+            foreach (var sc in shellCenters)
             {
-                // ---- 均匀分布（Fibonacci 球）：t3ssel8r 说纯随机会 "too messy"，
-                //      要用蓝噪声/均匀分布。这里用黄金角螺旋，比随机更均匀。
-                var sc = leafCenters[i % leafCenters.Count];
-                var center = new Vector3(sc.x, sc.y, sc.z);
-                float radius = sc.w;
+              var center = new Vector3(sc.x, sc.y, sc.z);
+              float radius = sc.w;
 
-                int perShell = Mathf.Max(1, leafCount / leafCenters.Count);
-                int k = i / leafCenters.Count;
-                float y = 1f - (k + 0.5f) / perShell * 2f;          // -1 → 1
-                float rr2 = Mathf.Sqrt(Mathf.Max(0f, 1f - y * y));
-                float phi2 = k * 2.39996f;                          // 黄金角
-                var dir = new Vector3(
-                    Mathf.Cos(phi2) * rr2,
-                    y,
-                    Mathf.Sin(phi2) * rr2);
+              for (int j = 0; j <= lat; j++)
+              {
+                float vv2 = j / (float)lat;
+                float phiA = vv2 * Mathf.PI;
+                for (int i2 = 0; i2 <= lon; i2++)
+                {
+                  if ((float)rng.NextDouble() > density) continue;   // 密度过滤
 
-                // 轻微抖动，避免过于规则
-                dir += new Vector3(
-                    (float)(rng.NextDouble() - 0.5) * 0.18f,
-                    (float)(rng.NextDouble() - 0.5) * 0.18f,
-                    (float)(rng.NextDouble() - 0.5) * 0.18f);
-                dir.Normalize();
+                  float uu2 = i2 / (float)lon;
+                  float thetaA = uu2 * Mathf.PI * 2f;
+                  var dir = new Vector3(
+                      Mathf.Sin(phiA) * Mathf.Cos(thetaA),
+                      Mathf.Cos(phiA),
+                      Mathf.Sin(phiA) * Mathf.Sin(thetaA));
 
-                // 位置：球面上 + 随机内外偏移
-                var pos = center + dir * (radius * (0.97f + (float)rng.NextDouble() * 0.08f));   // 贴球面：缝隙露出同色壳，不透背景
-                // 垂直向上偏置：叶片不下垂到树干以下
-                float minY = canopyBase * 1.02f;
-                if (pos.y < minY) pos.y = minY + (float)rng.NextDouble() * canopyR * 0.25f;
+                  // 位置 = 顶点位置 + 沿法线偏移（DrawLeaf: pos + normal * LeafOffset）
+                  var pos = center + dir * (radius * 1.05f);
+                  float minY = canopyBase * 1.02f;
+                  if (pos.y < minY) pos.y = minY + (float)rng.NextDouble() * canopyR * 0.25f;
 
-                // 朝向：完全随机
-                var rot = Quaternion.Euler(
-                    (float)rng.NextDouble() * 360f,
-                    (float)rng.NextDouble() * 360f,
-                    (float)rng.NextDouble() * 360f);
+                  // 朝向：只绕自身 Z 轴随机（DrawLeaf: Quaternion.Euler(0,0,random)）
+                  var rot = Quaternion.Euler(0f, 0f, (float)rng.NextDouble() * 360f);
 
-                // 颜色：越靠外越暗（模拟内部遮挡）
-                // 只有 3 档绿（参考视频的树叶糊成色块，不是彩纸）
-                // 单一绿色：水彩感需要无杂色
-                Color lcol = new Color(0.62f, 0.72f, 0.54f, 1f);
-
-                float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
-                AddQuad(verts, normals, uvs, uv2s, colors, tris, ref triBase, pos, rot, s);
+                  Color lcol = new Color(0.62f, 0.72f, 0.54f, 1f);
+                  float s = leafSize * (0.8f + (float)rng.NextDouble() * 0.5f);
+                  AddQuad(verts, normals, uvs, uv2s, colors, tris, ref triBase, pos, rot, s);
+                  placedLeaves++;
+                }
+              }
             }
             leafVerts = verts.Count - shellVerts;
 
