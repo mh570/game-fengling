@@ -1,0 +1,7 @@
+orthographic=true
+size=3.100093
+pitch=35
+yaw=-20
+pos=(7.92, 21.12, -23.95)
+lookAt=(-0.72, 3.42, -0.19)
+frameWidth=11.02255
