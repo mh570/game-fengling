@@ -30,11 +30,13 @@ namespace T3ssDemo
             Mesh shapeMesh = null;
             {
                 // ★ 只替换形状网格，其余流程完全不变
+                // ★ 扁椭圆 + 3 个 1/3 半径的突出球
                 var gen = LobeShapeTest.BuildLobedShape(
                     seed: 22,
-                    bigLobes: 3, bigH: 0.50f, bigW: 0.65f,
-                    smallLobes: 6, smallH: 0.15f, smallW: 0.28f,
-                    baseR: 1.0f, lon: 44, lat: 26);
+                    bigLobes: 3, bigH: 0.33f, bigW: 0.45f,   // 突出 1/3，窄一点才鼓
+                    smallLobes: 0, smallH: 0.0f, smallW: 0.30f,
+                    baseR: 1.0f, lon: 48, lat: 28,
+                    ellipsoidScale: new Vector3(1.15f, 0.82f, 1.15f));   // 扁椭圆（宽>高）
                 // 缩放到和工程形状网格相同尺寸
                 Mesh orig = null;
                 foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())

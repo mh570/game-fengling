@@ -19,6 +19,22 @@ namespace T3ssDemo
                                            int smallLobes, float smallH, float smallW,
                                            float baseR, int lon, int lat)
         {
+            // 默认扁椭圆（宽 > 高）
+            return BuildLobedShape(seed, bigLobes, bigH, bigW, smallLobes, smallH, smallW,
+                                   baseR, lon, lat, new Vector3(1.15f, 0.85f, 1.15f));
+        }
+
+        /// <summary>
+        /// 扁椭圆 + 若干突出球。
+        /// ellipsoidScale: 基础椭圆的各轴缩放（Y 小于 XZ 就是扁的）
+        /// 突出球用高斯叠加，高度 = baseR * bigH（大约 1/3 半径）
+        /// </summary>
+        public static Mesh BuildLobedShape(int seed,
+                                           int bigLobes, float bigH, float bigW,
+                                           int smallLobes, float smallH, float smallW,
+                                           float baseR, int lon, int lat,
+                                           Vector3 ellipsoidScale)
+        {
             var rng = new System.Random(seed);
             var verts = new List<Vector3>();
             var uvs = new List<Vector2>();
@@ -69,6 +85,10 @@ namespace T3ssDemo
                     }
 
                     var pos = dir * r;
+                    // 扁椭圆：把球压成椭球（Y 轴压扁）
+                    pos = new Vector3(pos.x * ellipsoidScale.x,
+                                      pos.y * ellipsoidScale.y,
+                                      pos.z * ellipsoidScale.z);
                     verts.Add(pos);
                     uvs.Add(new Vector2(uu, vv));
                     uv2.Add(new Vector4(pos.x, pos.y, pos.z, 0));
