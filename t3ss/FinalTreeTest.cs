@@ -181,9 +181,9 @@ namespace T3ssDemo
             lm.SetColor("_GradMid2",  new Color(0.559f, 0.644f, 0.487f));
             lm.SetColor("_GradLight", new Color(0.686f, 0.790f, 0.660f));
             dl.mats = new List<Material> { lm, lm };
-            dl.LeafDenesity = 1.0f;      // ★ 100% 顶点（用户决定：密度提高补偿小叶子）
-            dl.LeafSize = 0.30f;         // ★ 缩小 5 倍（用户决定）
-            dl.LeafOffset = 0.10f;       // 相应缩小
+            dl.LeafDenesity = 0.443f;   // 回退 e2a6e4f
+            dl.LeafSize = 1.449f;      // 回退 e2a6e4f
+            dl.LeafOffset = 0.356f;    // 回退 e2a6e4f
             dl.LightOffset = 0.396f;
 
             var camGo = new GameObject("Cam");
@@ -195,7 +195,7 @@ namespace T3ssDemo
             cam.farClipPlane = 100f;
 
             var tb = shapeMesh.bounds;
-            float frameSize = Mathf.Max(tb.extents.x, tb.extents.y) * 1.25f;
+            float frameSize = Mathf.Max(tb.extents.x, tb.extents.y) * 1.25f * 3.5f;   // ★ 拉远 3.5 倍：树在缓冲区只占 ~100px
             cam.orthographicSize = frameSize;
             Vector3 lookAt = tb.center;
             cam.transform.position = lookAt + new Vector3(0f, tb.extents.y * 0.3f, -frameSize * 3.2f);
