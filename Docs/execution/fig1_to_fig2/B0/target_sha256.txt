@@ -1,0 +1,6 @@
+target_620.png
+SHA256 783810E90C415FF3DFFEC4A71B41BE22C4BB28D26DFB848EE155D35F9286EFEA
+source Docs/video-analysis/frames/02-trees/f_010.jpg
+crop 1220,330,620,620
+locked 2026-11-22
+decision D-010-A

@@ -1,0 +1,22 @@
+{
+  "status": "target_locked_render_pending",
+  "decision": "D-010-A: 图2 = 树冠/hero shot 主验收目标 + 3 个回归检查；不是整个游戏最终目标",
+  "created": "2026-11-22",
+  "project": "C:\\Users\\mh570\\Desktop\\demo",
+  "unity": "6000.3.28f1",
+  "commit_at_lock": "e73629f",
+  "target": {
+    "source_frame": "Docs/video-analysis/frames/02-trees/f_010.jpg",
+    "crop_px": [1220, 330, 620, 620],
+    "file": "target_620.png",
+    "sha256": "783810E90C415FF3DFFEC4A71B41BE22C4BB28D26DFB848EE155D35F9286EFEA"
+  },
+  "b0_renders": {
+    "front_1024": null,
+    "side_1024": null,
+    "target_640": null
+  },
+  "camera": null,
+  "post": null,
+  "notes": "S0.2 target lock complete. S0.1/S0.3 B0 render + TargetFrameTest pending; G0 not passed."
+}
