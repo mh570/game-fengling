@@ -57,20 +57,40 @@ namespace T3ssDemo
             Debug.Log("[Imp] 材质: 树叶=" + (leafMat != null) + " 树叶2=" + (leafMat2 != null) +
                       " Shape=" + (shapeMat != null) + " 树干=" + (trunkMat != null));
 
-            // 只保留"树叶"形状网格可见，隐藏地砖/地面/墙壁/树干/石头
+            var shapeMatForShape = new Material(Shader.Find("Custom/ToonLit"));
+            shapeMatForShape.SetColor("_BaseColor", new Color(0.270f, 0.352f, 0.218f));   // 线性 → sRGB #6E8A5C
+            shapeMatForShape.SetColor("_Color2", new Color(0.270f, 0.352f, 0.218f));
+            shapeMatForShape.SetColor("_Color3", new Color(0.234f, 0.306f, 0.186f));
+            shapeMatForShape.SetColor("_HighlightColor", new Color(0.432f, 0.535f, 0.342f));
+            shapeMatForShape.SetColor("_ShadowColor", new Color(0.153f, 0.207f, 0.124f));
+
+            // 只保留"树叶"形状网格 + 树干
             foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
             {
-                // 只禁用"树叶"形状网格（其材质 shader graph 坏了会品红）
-                // 保留树干、地面、地砖、墙壁、石头
-                bool isLeafShape = mr.name.Contains("树叶");
-                mr.enabled = !isLeafShape;
+                // 只渲染"树叶"形状网格 + "树干"，其余（地砖/地面/墙壁/石头）不显示
+                bool keep = mr.name.Contains("树叶") || mr.name.Contains("树干");
+                mr.enabled = keep;
+                if (mr.name.Contains("树叶") && shapeMatForShape != null)
+                    mr.sharedMaterial = shapeMatForShape;
+                if (mr.name.Contains("树干"))
+                {
+                    // 树干材质也可能坏，检查一下
+                    var s = mr.sharedMaterial != null ? mr.sharedMaterial.shader : null;
+                    Debug.Log("[Imp] 树干材质 shader=" + (s != null ? s.name : "null") + " supported=" + (s != null && s.isSupported));
+                    if (s == null || !s.isSupported)
+                    {
+                        var tm = new Material(Shader.Find("Custom/ToonLit"));
+                        tm.SetColor("_BaseColor", new Color(0.28f, 0.14f, 0.22f));
+                        tm.SetColor("_Color2", new Color(0.28f, 0.14f, 0.22f));
+                        tm.SetColor("_Color3", new Color(0.24f, 0.12f, 0.19f));
+                        tm.SetColor("_HighlightColor", new Color(0.30f, 0.16f, 0.24f));
+                        tm.SetColor("_ShadowColor", new Color(0.10f, 0.05f, 0.09f));
+                        mr.sharedMaterial = tm;
+                        Debug.Log("[Imp] 树干换成 ToonLit");
+                    }
+                }
             }
 
-            // 形状网格分到 树叶Shape.mat
-            foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
-            {
-                if (mr.name.Contains("树叶") && shapeMat != null) mr.sharedMaterial = shapeMat;
-            }
 
             // 他们的 shadergraph 在 Unity6 编译失败 → 用我们的 HLSL 版本，贴图沿用他们的
             var hlslLeaf = Shader.Find("Custom/LeafImported");
