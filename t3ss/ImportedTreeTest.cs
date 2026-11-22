@@ -60,8 +60,10 @@ namespace T3ssDemo
             // 只保留"树叶"形状网格可见，隐藏地砖/地面/墙壁/树干/石头
             foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
             {
+                // 只禁用"树叶"形状网格（其材质 shader graph 坏了会品红）
+                // 保留树干、地面、地砖、墙壁、石头
                 bool isLeafShape = mr.name.Contains("树叶");
-                mr.enabled = false;   // 诊断：连形状网格也禁用，只留 DrawLeaf 的实例
+                mr.enabled = !isLeafShape;
             }
 
             // 形状网格分到 树叶Shape.mat
