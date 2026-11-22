@@ -80,8 +80,13 @@ namespace T3ssDemo
             Debug.Log("[Imp] 材质: 树叶=" + (leafMat != null) + " 树叶2=" + (leafMat2 != null) +
                       " Shape=" + (shapeMat != null) + " 树干=" + (trunkMat != null));
 
-            var shapeMatForShape = new Material(Shader.Find("Custom/ToonLit"));
+            // ★ 底衬必须用纯色 Unlit（对应工程的 Unlit.shadergraph）
+            // 用 ToonLit 会让 3 个球明暗不同 → 交界出现虚线
+            var flatShader = Shader.Find("Custom/FlatColor");
+            if (flatShader == null) Debug.LogError("[Imp] ★ 找不到 Custom/FlatColor！");
+            var shapeMatForShape = new Material(flatShader);
             shapeMatForShape.SetColor("_Color", new Color(0.130f, 0.190f, 0.085f));   // 暗绿纯色
+            Debug.Log("[Imp] 底衬 shader=" + (flatShader != null ? flatShader.name : "null"));
             
             
             
@@ -97,20 +102,12 @@ namespace T3ssDemo
                     mr.sharedMaterial = shapeMatForShape;
                 if (mr.name.Contains("树干"))
                 {
-                    // 树干材质也可能坏，检查一下
-                    var s = mr.sharedMaterial != null ? mr.sharedMaterial.shader : null;
-                    Debug.Log("[Imp] 树干材质 shader=" + (s != null ? s.name : "null") + " supported=" + (s != null && s.isSupported));
-                    if (s == null || !s.isSupported)
-                    {
-                        var tm = new Material(Shader.Find("Custom/FlatColor"));
-                        tm.SetColor("_BaseColor", new Color(0.28f, 0.14f, 0.22f));
-                        tm.SetColor("_Color2", new Color(0.28f, 0.14f, 0.22f));
-                        tm.SetColor("_Color3", new Color(0.24f, 0.12f, 0.19f));
-                        tm.SetColor("_HighlightColor", new Color(0.30f, 0.16f, 0.24f));
-                        tm.SetColor("_ShadowColor", new Color(0.10f, 0.05f, 0.09f));
-                        mr.sharedMaterial = tm;
-                        Debug.Log("[Imp] 树干换成 ToonLit");
-                    }
+                    // ★ 无条件换成纯色（工程的 树干.mat 也是 Unlit.shadergraph）
+                    // 之前写成"仅当 shader 不支持才换"，但 URP/Lit 是支持的 → 树干一直是灰色
+                    var tm = new Material(Shader.Find("Custom/FlatColor"));
+                    tm.SetColor("_Color", new Color(0.29f, 0.21f, 0.25f));   // 线性 → sRGB #4A3540
+                    mr.sharedMaterial = tm;
+                    Debug.Log("[Imp] 树干 → FlatColor 深紫褐");
                 }
             }
 
