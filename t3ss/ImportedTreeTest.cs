@@ -39,6 +39,29 @@ namespace T3ssDemo
                     if (mf.sharedMesh != null && shapeMesh == null) shapeMesh = mf.sharedMesh;
             Debug.Log("[Imp] ShapeMesh 顶点数: " + (shapeMesh != null ? shapeMesh.vertexCount : 0));
 
+            // ★ 修虚线：3 个球交界的法线不连续 → 相邻叶片一亮一暗 → 暗色弧线
+            // 把形状网格的法线统一成「从整体中心往外指」，交界处就连续了
+            if (shapeMesh != null)
+            {
+                var dup = Object.Instantiate(shapeMesh);
+                dup.name = shapeMesh.name + "_SphericalNormals";
+                var bnd = dup.bounds;
+                var c = bnd.center;
+                var vs = dup.vertices;
+                var ns = new Vector3[vs.Length];
+                int fixedN = 0;
+                for (int i = 0; i < vs.Length; i++)
+                {
+                    var d = vs[i] - c;
+                    if (d.sqrMagnitude > 1e-8f) { ns[i] = d.normalized; fixedN++; }
+                    else ns[i] = dup.normals[i];
+                }
+                dup.normals = ns;
+                dup.RecalculateBounds();
+                shapeMesh = dup;
+                Debug.Log("[Imp] 法线球面化: " + fixedN + "/" + vs.Length + " 个顶点");
+            }
+
             // 3) Leaf.mesh
             var leafMesh = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/Imported/Model/Leaf.mesh");
             if (leafMesh == null)
@@ -126,8 +149,8 @@ namespace T3ssDemo
                 dl.mats = new System.Collections.Generic.List<Material>();
                 if (leafMat != null) dl.mats.Add(leafMat);
                 if (leafMat2 != null) dl.mats.Add(leafMat2);
-                dl.LeafDenesity = 1.0f;   // 100% 顶点都长叶子
-                dl.LeafSize = 0.45f;   // 叶子缩到 1px
+                dl.LeafDenesity = 1.0f;   // 加大密度测试
+                dl.LeafSize = 1.449f;   // 工程值
                 dl.LeafOffset = 0.356f;
                 dl.LightOffset = 0.396f;
                 Debug.Log("[Imp] DrawLeaf 已挂载，材质数=" + dl.mats.Count);
