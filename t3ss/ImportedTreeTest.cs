@@ -62,7 +62,7 @@ namespace T3ssDemo
             var flatShader = Shader.Find("Custom/FlatColor");
             if (flatShader == null) Debug.LogError("[Imp] ★ 找不到 Custom/FlatColor");
             var shapeMatForShape = new Material(flatShader);
-            shapeMatForShape.SetColor("_Color", new Color(0.130f, 0.190f, 0.085f));   // 暗绿纯色
+            shapeMatForShape.SetColor("_Color", new Color(0.250f, 0.320f, 0.195f));   // 和叶片中调接近 → 空隙不显黑
 
             // 只保留"树叶"形状网格 + 树干
             foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
@@ -118,7 +118,7 @@ namespace T3ssDemo
                 dl.mats = new System.Collections.Generic.List<Material>();
                 if (leafMat != null) dl.mats.Add(leafMat);
                 if (leafMat2 != null) dl.mats.Add(leafMat2);
-                dl.LeafDenesity = 1.0f;   // 加大密度（去暗洞）
+                dl.LeafDenesity = 0.443f;   // 工程值
                 dl.LeafSize = 1.449f;
                 dl.LeafOffset = 0.356f;
                 dl.LightOffset = 0.396f;
