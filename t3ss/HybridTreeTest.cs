@@ -95,9 +95,10 @@ namespace T3ssDemo
             var rt = new RenderTexture(512, 512, 24, RenderTextureFormat.ARGB32);
             cam.targetTexture = rt;
             var mi = typeof(DrawLeaf).GetMethod("DrawLeafs", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            // 只初始化一次，之后每帧只画（之前重复 InitLeaf 导致批次错位 → 矩形伪影）
+            dl.InitLeaf();
             for (int i = 0; i < 3; i++)
             {
-                dl.InitLeaf();
                 if (mi != null) mi.Invoke(dl, null);
                 cam.Render();
             }

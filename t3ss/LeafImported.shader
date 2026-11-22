@@ -8,9 +8,9 @@ Shader "Custom/LeafImported"
     {
         _MainTex ("Leaf Texture", 2D) = "white" {}
         _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.6
-        _ColorA ("Gradient Dark", Color) = (0.13, 0.22, 0.10, 1)
-        _ColorB ("Gradient Mid",  Color) = (0.38, 0.50, 0.33, 1)
-        _ColorC ("Gradient Light",Color) = (0.54, 0.66, 0.43, 1)
+        _ColorA ("Gradient Dark", Color) = (0.09, 0.15, 0.07, 1)
+        _ColorB ("Gradient Mid",  Color) = (0.26, 0.35, 0.23, 1)
+        _ColorC ("Gradient Light",Color) = (0.38, 0.46, 0.30, 1)
         _LightOffsetScale ("Light Offset Scale", Float) = 0.396
         _WindStrength ("Wind", Float) = 0.08
     }
@@ -124,7 +124,7 @@ Shader "Custom/LeafImported"
                 float3 cA = _ColorA.rgb, cB = _ColorB.rgb, cC = _ColorC.rgb;
                 float3 col = q < 0.5 ? lerp(cA, cB, q * 2.0) : lerp(cB, cC, (q - 0.5) * 2.0);
 
-                float3 ambient = SampleSH(N) * 0.12;
+                float3 ambient = SampleSH(N) * 0.06;
                 col += ambient;
 
                 // 贴图只当形状遮罩用：透明区的 RGB 是品红，不能用
