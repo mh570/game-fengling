@@ -61,7 +61,30 @@ namespace T3ssDemo
             foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
             {
                 bool isLeafShape = mr.name.Contains("树叶");
-                mr.enabled = isLeafShape;
+                mr.enabled = false;   // 诊断：连形状网格也禁用，只留 DrawLeaf 的实例
+            }
+
+            // 形状网格分到 树叶Shape.mat
+            foreach (var mr in inst.GetComponentsInChildren<MeshRenderer>())
+            {
+                if (mr.name.Contains("树叶") && shapeMat != null) mr.sharedMaterial = shapeMat;
+            }
+
+            // 他们的 shadergraph 在 Unity6 编译失败 → 用我们的 HLSL 版本，贴图沿用他们的
+            var hlslLeaf = Shader.Find("Custom/LeafImported");
+            if (hlslLeaf != null)
+            {
+                var newLeafMat = new Material(hlslLeaf) { name = "MAT_LeafHLSL" };
+                newLeafMat.enableInstancing = true;
+                var texLeaf = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Imported/Tex/树叶.png");
+                var texLeaf2 = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Imported/Tex/树叶2.png");
+                Debug.Log("[Imp] 树叶.png=" + (texLeaf != null) + " 树叶2.png=" + (texLeaf2 != null));
+                if (texLeaf != null) newLeafMat.SetTexture("_MainTex", texLeaf);
+                // 用他们的 树叶.mat 里能读到的颜色（如果可读）
+                if (leafMat != null && leafMat.HasProperty("_Color")) newLeafMat.SetColor("_ColorA", leafMat.GetColor("_Color"));
+                leafMat = newLeafMat;
+                leafMat2 = newLeafMat;   // matIndex 随机 0~1，必须两个槽位都有材质
+                Debug.Log("[Imp] 已换成 HLSL 叶片材质");
             }
 
             // 5) 挂 DrawLeaf
