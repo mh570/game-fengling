@@ -88,7 +88,7 @@ namespace T3ssDemo
             lg.useColorTemperature = true;
             lg.colorTemperature = 5000f;     // 工程 5000K
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.55f, 0.62f, 0.55f);
+            RenderSettings.ambientLight = new Color(0.40f, 0.46f, 0.44f);   // e2a6e4f 环境光
 
             // DrawLeaf（照抄 e2a6e4f）
             var dl = inst.AddComponent<DrawLeaf>();
