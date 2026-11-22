@@ -63,6 +63,52 @@ namespace T3ssDemo
             public int Seed;
         }
 
+        /// <summary>只生成形状网格（3 个错位锯齿球），供 DrawLeaf.cs 用。</summary>
+        public static Mesh BuildShapeOnly(Options opt)
+        {
+            var rng = new System.Random(opt.Seed);
+            var verts = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var uv2s = new List<Vector4>();
+            var colors = new List<Color>();
+            var tris = new List<int>();
+            int triBase = 0;
+
+            float H = opt.Height;
+            float trunkRatio = 0.55f;
+            float trunkH = H * trunkRatio;
+            float canopyR = H * 0.42f;
+            float canopyBase = trunkH * 1.15f;
+
+            var shellCenters = new List<Vector4>();
+            shellCenters.Add(new Vector4(0f, canopyBase + canopyR * 0.45f, 0f, canopyR));
+            for (int k = 0; k < 2; k++)
+            {
+                float a = (float)rng.NextDouble() * Mathf.PI * 2f;
+                float d = canopyR * (0.25f + (float)rng.NextDouble() * 0.30f);
+                float rr = canopyR * (0.58f + (float)rng.NextDouble() * 0.20f);
+                shellCenters.Add(new Vector4(Mathf.Cos(a) * d,
+                    canopyBase + canopyR * (0.20f + (float)rng.NextDouble() * 0.45f),
+                    Mathf.Sin(a) * d, rr));
+            }
+
+            int shIdx = 0;
+            foreach (var sc in shellCenters)
+                AddSphere(verts, normals, uvs, uv2s, colors, tris, ref triBase,
+                    new Vector3(sc.x, sc.y, sc.z), sc.w, 28, 20, Color.white, 0.18f, opt.Seed * 31 + shIdx++);
+
+            var mesh = new Mesh();
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+            mesh.SetVertices(verts);
+            mesh.SetNormals(normals);
+            mesh.SetUVs(0, uvs);
+            mesh.SetUVs(1, uv2s);
+            mesh.SetColors(colors);
+            mesh.SetTriangles(tris, 0);
+            mesh.RecalculateBounds();
+            return mesh;
+        }
         public static Mesh Build(Options opt, out int shellVerts, out int leafVerts)
         {
             var rng = new System.Random(opt.Seed);
